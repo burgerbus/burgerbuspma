@@ -259,18 +259,21 @@ class FoodTruckBackendTester:
             response = self.session.get(f"{self.base_url}/api/")
             headers = response.headers
             
-            cors_headers = [
-                'access-control-allow-origin',
-                'access-control-allow-methods',
-                'access-control-allow-headers',
-                'access-control-allow-credentials'
-            ]
+            # Check for specific CORS headers
+            cors_origin = headers.get('access-control-allow-origin')
+            cors_credentials = headers.get('access-control-allow-credentials')
             
-            cors_present = any(header.lower() in [h.lower() for h in headers.keys()] for header in cors_headers)
-            if cors_present:
-                self.log_test("CORS Headers", True, "CORS headers present in response")
+            if cors_origin or cors_credentials:
+                cors_info = []
+                if cors_origin:
+                    cors_info.append(f"Origin: {cors_origin}")
+                if cors_credentials:
+                    cors_info.append(f"Credentials: {cors_credentials}")
+                self.log_test("CORS Headers", True, f"CORS headers present - {', '.join(cors_info)}")
             else:
-                self.log_test("CORS Headers", False, "No CORS headers found")
+                # Debug: print all headers
+                header_list = [f"{k}: {v}" for k, v in headers.items()]
+                self.log_test("CORS Headers", False, f"No CORS headers found. Headers: {header_list[:5]}")
         except Exception as e:
             self.log_test("CORS Headers", False, f"Error checking CORS: {str(e)}")
         
