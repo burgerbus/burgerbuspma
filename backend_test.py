@@ -294,7 +294,7 @@ class FoodTruckBackendTester:
         
         # Test invalid JSON payload
         try:
-            response = self.session.post(f"{self.base_url}/auth/authentication/challenge", 
+            response = self.session.post(f"{self.base_url}/api/auth/authorization/challenge", 
                                        data="invalid json", 
                                        headers={'Content-Type': 'application/json'})
             if response.status_code in [400, 422]:
