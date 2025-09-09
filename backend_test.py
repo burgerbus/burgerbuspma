@@ -158,7 +158,7 @@ class FoodTruckBackendTester:
         # Test invalid wallet address
         try:
             invalid_payload = {"address": "invalid_address"}
-            response = self.session.post(f"{self.base_url}/auth/authentication/challenge", json=invalid_payload)
+            response = self.session.post(f"{self.base_url}/api/auth/authorization/challenge", json=invalid_payload)
             
             if response.status_code in [400, 422]:  # Expected error for invalid address
                 self.log_test("Invalid Wallet Address Handling", True, f"Properly rejected invalid address: {response.status_code}")
