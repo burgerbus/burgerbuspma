@@ -1,5 +1,6 @@
 // Load configuration from environment or config file
 const path = require('path');
+const webpack = require('webpack');
 
 // Environment variable overrides
 const config = {
@@ -12,6 +13,30 @@ module.exports = {
       '@': path.resolve(__dirname, 'src'),
     },
     configure: (webpackConfig) => {
+      
+      // Add polyfills for Node.js modules (needed for Solana wallet adapters)
+      webpackConfig.resolve.fallback = {
+        ...webpackConfig.resolve.fallback,
+        crypto: require.resolve('crypto-browserify'),
+        stream: require.resolve('stream-browserify'),
+        buffer: require.resolve('buffer'),
+        process: require.resolve('process/browser'),
+        util: require.resolve('util'),
+        assert: require.resolve('assert'),
+        http: require.resolve('stream-http'),
+        https: require.resolve('https-browserify'),
+        os: require.resolve('os-browserify/browser'),
+        url: require.resolve('url'),
+      };
+
+      // Add plugins for polyfills
+      webpackConfig.plugins = [
+        ...webpackConfig.plugins,
+        new webpack.ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+          process: 'process/browser',
+        }),
+      ];
       
       // Disable hot reload completely if environment variable is set
       if (config.disableHotReload) {
