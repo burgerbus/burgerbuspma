@@ -245,3 +245,5 @@ test_plan:
 agent_communication:
     - agent: "testing"
       message: "Comprehensive backend testing completed successfully. Fixed critical dependency injection issue with fastapi-walletauth. All major functionality working correctly with 95.8% test success rate (23/24 tests passed). Only minor CORS header visibility issue which is acceptable in production with proxy/ingress handling CORS."
+    - agent: "testing"
+      message: "Bitcoin Ben's Burger Bus Club backend API testing completed with 100% success rate (31/31 tests passed). All requested features verified: 1) Basic API health shows correct app name, 2) Public menu displays Bitcoin-themed items without pricing, 3) Member registration endpoint exists and requires auth, 4) Seed data creates Bitcoin-themed menu items, 5) Database supports new member profile fields (full_name, email, phone, pma_agreed, dues_paid, payment_amount). All core PMA registration functionality working correctly."
