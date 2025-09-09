@@ -187,7 +187,7 @@ async def register_membership(wa: JWTWalletAuthDep, member_data: dict):
                     "pma_agreed": member_data.get("pma_agreed", False),
                     "dues_paid": member_data.get("dues_paid", False),
                     "payment_amount": member_data.get("payment_amount", 0.0),
-                    "updated_at": datetime.now(timezone.utc)
+                    "updated_at": datetime.now(timezone.utc).isoformat()
                 }}
             )
             updated_member = await db.members.find_one({"wallet_address": wa.address})
