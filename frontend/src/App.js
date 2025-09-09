@@ -164,7 +164,7 @@ const WalletAuth = ({ onAuthSuccess, onAuthError }) => {
           disabled={isAuthenticating}
           className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
         >
-          {isAuthenticating ? 'Authenticating...' : 'Sign In to TruckMembers'}
+          {isAuthenticating ? 'Authenticating...' : 'Join Bitcoin Ben\'s Club'}
         </button>
       )}
 
