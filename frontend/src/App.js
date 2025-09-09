@@ -277,8 +277,8 @@ const LandingPage = ({ onGetStarted }) => {
                 className="w-full h-48 object-cover"
               />
               <div className="p-6">
-                <h3 className="text-xl font-bold text-white mb-2">Artisanal Fruit Bowl</h3>
-                <p className="text-gray-400 mb-4">Seasonal fruits with edible flowers</p>
+                <h3 className="text-xl font-bold text-white mb-2">The Satoshi Stacker</h3>
+                <p className="text-gray-400 mb-4">Triple-stacked wagyu beef with crypto-gold sauce</p>
                 <div className="text-center">
                   <div className="text-orange-500 font-bold text-lg">Members Only Pricing</div>
                   <div className="text-gray-400 text-sm">Connect wallet to view prices</div>
