@@ -306,7 +306,7 @@ class FoodTruckBackendTester:
         
         # Test missing required parameters
         try:
-            response = self.session.post(f"{self.base_url}/auth/authentication/challenge", json={})
+            response = self.session.post(f"{self.base_url}/api/auth/authorization/challenge", json={})
             if response.status_code in [400, 422]:
                 self.log_test("Missing Parameters Handling", True, f"Properly handled missing params: {response.status_code}")
             else:
