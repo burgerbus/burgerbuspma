@@ -209,7 +209,9 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
       onComplete();
     } catch (error) {
       console.error('Registration failed:', error);
-      alert('Registration failed. Please try again.');
+      console.error('Error details:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      alert(`Registration failed: ${error.response?.data?.detail || error.message}. Please try again.`);
     } finally {
       setProcessing(false);
     }
