@@ -267,7 +267,7 @@ const LandingPage = ({ onGetStarted }) => {
       {/* Sample Menu Preview */}
       <div className="bg-gray-800/50 py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-4xl font-bold text-white text-center mb-12">Premium Menu Preview</h2>
+          <h2 className="text-4xl font-bold text-white text-center mb-12">Bitcoin Ben's Exclusive Menu</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-gray-800 rounded-lg overflow-hidden">
