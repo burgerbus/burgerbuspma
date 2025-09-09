@@ -463,7 +463,7 @@ class FoodTruckBackendTester:
     
     def run_all_tests(self):
         """Run all backend tests"""
-        print(f"🚀 Starting comprehensive backend testing for Food Truck Membership Site")
+        print(f"🚀 Starting comprehensive backend testing for Bitcoin Ben's Burger Bus Club")
         print(f"🔗 Backend URL: {self.base_url}")
         print("=" * 80)
         
@@ -471,8 +471,10 @@ class FoodTruckBackendTester:
         self.test_basic_health_check()
         self.test_public_endpoints()
         self.test_wallet_authentication_flow()
+        self.test_member_registration_endpoint()
         self.test_admin_data_seeding()
         self.test_database_integration()
+        self.test_member_profile_fields()
         self.test_cors_and_security()
         self.test_error_handling()
         
