@@ -96,7 +96,7 @@ async def check_tier_access(required_tier: str, user_tier: str) -> bool:
 app.include_router(jwt_authorization_router, prefix="/auth")
 
 # Authentication dependency
-async def get_authenticated_member(wa: JWTWalletAuthDep = Depends()) -> MemberProfile:
+async def get_authenticated_member(wa: JWTWalletAuthDep) -> MemberProfile:
     member = await get_or_create_member(wa.address)
     return member
 
