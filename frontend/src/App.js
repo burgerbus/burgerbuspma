@@ -34,7 +34,7 @@ class AuthService {
   }
 
   async requestChallenge(address, chain = 'SOL') {
-    const response = await this.apiClient.post('/api/auth/authentication/challenge', {
+    const response = await this.apiClient.post('/api/auth/authorization/challenge', {
       address,
       chain
     });
