@@ -42,7 +42,7 @@ class AuthService {
   }
 
   async solveChallenge(address, signature, message) {
-    const response = await this.apiClient.post('/auth/authentication/solve', {
+    const response = await this.apiClient.post('/api/auth/authentication/solve', {
       address,
       signature,
       message
