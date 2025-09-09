@@ -15,7 +15,7 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # Set application name for wallet auth
-os.environ["FASTAPI_WALLETAUTH_APP"] = "TruckMembers"
+os.environ["FASTAPI_WALLETAUTH_APP"] = "Bitcoin Ben's Burger Bus Club"
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
