@@ -135,7 +135,7 @@ class FoodTruckBackendTester:
         try:
             # Test challenge generation
             challenge_payload = {"address": test_wallet_address}
-            response = self.session.post(f"{self.base_url}/auth/authentication/challenge", json=challenge_payload)
+            response = self.session.post(f"{self.base_url}/api/auth/authorization/challenge", json=challenge_payload)
             
             if response.status_code == 200:
                 data = response.json()
