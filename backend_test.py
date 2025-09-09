@@ -258,10 +258,11 @@ class FoodTruckBackendTester:
             cors_headers = [
                 'access-control-allow-origin',
                 'access-control-allow-methods',
-                'access-control-allow-headers'
+                'access-control-allow-headers',
+                'access-control-allow-credentials'
             ]
             
-            cors_present = any(header in headers for header in cors_headers)
+            cors_present = any(header.lower() in [h.lower() for h in headers.keys()] for header in cors_headers)
             if cors_present:
                 self.log_test("CORS Headers", True, "CORS headers present in response")
             else:
