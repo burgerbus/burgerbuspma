@@ -568,6 +568,7 @@ const WalletProviders = ({ children }) => {
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter({ network }),
+      new BraveWalletAdapter(),
     ],
     [network]
   );
