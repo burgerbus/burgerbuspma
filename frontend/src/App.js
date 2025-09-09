@@ -8,6 +8,7 @@ import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { WalletModalProvider, WalletMultiButton, WalletDisconnectButton } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { BraveWalletAdapter } from '@solana/wallet-adapter-brave';
 
 // Import wallet adapter CSS
 import '@solana/wallet-adapter-react-ui/styles.css';
