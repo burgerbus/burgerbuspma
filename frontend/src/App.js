@@ -125,6 +125,8 @@ const WalletAuth = ({ onAuthSuccess, onAuthError }) => {
 
     } catch (error) {
       console.error('Authentication failed:', error);
+      console.error('Auth error response:', error.response?.data);
+      console.error('Auth solve response data:', error.response);
       setError(error.message || 'Authentication failed');
       onAuthError && onAuthError(error);
     } finally {
