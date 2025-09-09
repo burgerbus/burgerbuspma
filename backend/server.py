@@ -105,11 +105,24 @@ async def get_authenticated_member(wa: JWTWalletAuthDep) -> MemberProfile:
 async def root():
     return {"message": "Welcome to TruckMembers - Private Food Truck Community"}
 
-@api_router.get("/menu/public", response_model=List[MenuItem])
+@api_router.get("/menu/public", response_model=List[dict])
 async def get_public_menu():
-    """Get basic menu items visible to non-members."""
+    """Get basic menu items visible to non-members (no pricing shown)."""
     menu_items = await db.menu_items.find({"tier_required": "basic"}).to_list(50)
-    return [MenuItem(**item) for item in menu_items]
+    # Remove pricing information for public view
+    public_items = []
+    for item in menu_items:
+        public_item = {
+            "id": item["id"],
+            "name": item["name"],
+            "description": item["description"],
+            "category": item["category"],
+            "image_url": item["image_url"],
+            "is_available": item["is_available"],
+            "members_only_pricing": True
+        }
+        public_items.append(public_item)
+    return public_items
 
 @api_router.get("/locations/public", response_model=List[TruckLocation])
 async def get_public_locations():
