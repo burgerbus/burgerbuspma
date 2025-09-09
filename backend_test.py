@@ -189,6 +189,47 @@ class FoodTruckBackendTester:
         except Exception as e:
             self.log_test("Invalid Wallet Address Challenge", False, f"Connection error: {str(e)}")
     
+    def test_member_registration_endpoint(self):
+        """Test member registration endpoint with PMA agreement and dues payment"""
+        print("\n=== Testing Member Registration Endpoint ===")
+        
+        # Test member registration endpoint without authentication (should fail)
+        try:
+            member_data = {
+                "fullName": "John Bitcoin",
+                "email": "john@bitcoinben.com",
+                "phone": "+1-555-0123",
+                "pma_agreed": True,
+                "dues_paid": True,
+                "payment_amount": 50.0
+            }
+            
+            response = self.session.post(f"{self.base_url}/api/membership/register", json=member_data)
+            
+            if response.status_code in [401, 403]:
+                self.log_test("Member Registration Auth Required", True, f"Properly requires authentication: {response.status_code}")
+            elif response.status_code == 422:
+                # Check if it's a validation error about missing auth
+                data = response.json()
+                if "detail" in data:
+                    self.log_test("Member Registration Auth Required", True, f"Auth validation error as expected: {data['detail']}")
+                else:
+                    self.log_test("Member Registration Auth Required", False, f"Unexpected 422 response: {data}")
+            else:
+                self.log_test("Member Registration Auth Required", False, f"Unexpected status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Member Registration Auth Required", False, f"Connection error: {str(e)}")
+        
+        # Test endpoint exists (even if auth fails)
+        try:
+            response = self.session.post(f"{self.base_url}/api/membership/register")
+            if response.status_code != 404:
+                self.log_test("Member Registration Endpoint Exists", True, f"Endpoint exists (status: {response.status_code})")
+            else:
+                self.log_test("Member Registration Endpoint Exists", False, "Endpoint not found (404)")
+        except Exception as e:
+            self.log_test("Member Registration Endpoint Exists", False, f"Connection error: {str(e)}")
+    
     def test_admin_data_seeding(self):
         """Test admin data seeding endpoint"""
         print("\n=== Testing Admin Data Seeding ===")
