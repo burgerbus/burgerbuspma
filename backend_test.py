@@ -87,18 +87,18 @@ class FoodTruckBackendTester:
                 if isinstance(data, list):
                     self.log_test("Public Menu Endpoint", True, f"Status: {response.status_code}, Items: {len(data)}")
                     
-                    # Check for Bitcoin Ben's themed items
-                    bitcoin_themed_items = ["The Satoshi Stacker", "The Hodl Burger", "The Bitcoin Mining Rig", "Lightning Network Loaded Fries"]
+                    # Check for Bitcoin Ben's themed items (only basic tier items show in public menu)
+                    bitcoin_themed_items = ["The Satoshi Stacker", "The Hodl Burger", "Lightning Network Loaded Fries"]
                     found_items = []
                     
                     for item in data:
                         if item.get("name") in bitcoin_themed_items:
                             found_items.append(item["name"])
                     
-                    if found_items:
+                    if len(found_items) >= 2:  # Should have at least 2 basic tier Bitcoin Ben's items
                         self.log_test("Bitcoin Ben's Themed Items", True, f"Found themed items: {', '.join(found_items)}")
                     else:
-                        self.log_test("Bitcoin Ben's Themed Items", False, f"No Bitcoin Ben's themed items found in menu")
+                        self.log_test("Bitcoin Ben's Themed Items", False, f"Expected Bitcoin Ben's themed items, found: {found_items}")
                     
                     # Verify pricing is hidden (should not have price/member_price fields)
                     if len(data) > 0:
