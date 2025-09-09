@@ -92,8 +92,8 @@ async def check_tier_access(required_tier: str, user_tier: str) -> bool:
     tier_hierarchy = {"basic": 1, "premium": 2, "vip": 3}
     return tier_hierarchy.get(user_tier, 0) >= tier_hierarchy.get(required_tier, 0)
 
-# Include wallet authentication routes
-app.include_router(jwt_authorization_router, prefix="/auth")
+# Include wallet authentication routes in API router
+api_router.include_router(jwt_authorization_router, prefix="/auth")
 
 # Authentication dependency
 async def get_authenticated_member(wa: JWTWalletAuthDep) -> MemberProfile:
