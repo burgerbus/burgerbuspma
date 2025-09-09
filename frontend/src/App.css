@@ -1,34 +1,129 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Wallet Adapter UI Overrides */
+.wallet-adapter-button {
+  @apply bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-lg transition-colors;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.wallet-adapter-button-trigger {
+  @apply bg-orange-600 hover:bg-orange-700;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.wallet-adapter-modal-overlay {
+  @apply bg-black bg-opacity-75;
 }
 
-.App-link {
-    color: #61dafb;
+.wallet-adapter-modal {
+  @apply bg-gray-800 border border-gray-700;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.wallet-adapter-modal-title {
+  @apply text-white;
+}
+
+.wallet-adapter-modal-list {
+  @apply bg-gray-800;
+}
+
+.wallet-adapter-modal-list-more {
+  @apply bg-gray-700 text-white;
+}
+
+.wallet-adapter-modal-wrapper {
+  @apply text-white;
+}
+
+/* Custom styles */
+.app-container {
+  @apply min-h-screen bg-gray-900 text-white;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #ea580c 100%);
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:scale-105 hover:shadow-xl;
+}
+
+.btn-primary {
+  @apply bg-orange-600 hover:bg-orange-700 text-white font-medium px-6 py-3 rounded-lg transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-3 rounded-lg transition-colors;
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.8s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Food truck themed styling */
+.food-truck-accent {
+  @apply text-orange-500;
+}
+
+.member-badge {
+  @apply bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold;
+}
+
+.premium-glow {
+  box-shadow: 0 0 20px rgba(234, 88, 12, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-title {
+    @apply text-4xl;
+  }
+  
+  .grid-responsive {
+    @apply grid-cols-1;
+  }
+}
+
+/* Dark theme scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-orange-600 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-orange-700;
 }
