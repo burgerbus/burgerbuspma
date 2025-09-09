@@ -173,6 +173,7 @@ async def update_member_profile(
 @api_router.post("/membership/register")
 async def register_membership(member_data: dict, member: MemberProfile = Depends(get_authenticated_member)):
     """Register new membership with PMA agreement and dues payment"""
+    """Register new membership with PMA agreement and dues payment"""
     try:
         # Update existing member with PMA info
         await db.members.update_one(
