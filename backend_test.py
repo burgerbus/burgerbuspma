@@ -49,15 +49,15 @@ class FoodTruckBackendTester:
         """Test basic API health endpoints"""
         print("\n=== Testing Basic API Health Check ===")
         
-        # Test root endpoint
+        # Test root endpoint - should show Bitcoin Ben's Burger Bus Club
         try:
             response = self.session.get(f"{self.base_url}/api/")
             if response.status_code == 200:
                 data = response.json()
-                if "message" in data and "TruckMembers" in data["message"]:
+                if "message" in data and "Bitcoin Ben's Burger Bus Club" in data["message"]:
                     self.log_test("Root API Endpoint", True, f"Status: {response.status_code}, Message: {data['message']}")
                 else:
-                    self.log_test("Root API Endpoint", False, f"Unexpected response format", data)
+                    self.log_test("Root API Endpoint", False, f"Expected Bitcoin Ben's Burger Bus Club in message, got: {data}")
             else:
                 self.log_test("Root API Endpoint", False, f"Status: {response.status_code}", response.text)
         except Exception as e:
