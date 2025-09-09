@@ -418,6 +418,34 @@ const MemberDashboard = ({ memberAddress }) => {
     );
   }
 
+  // Show PMA agreement page if needed
+  if (showPMAPage) {
+    return <PMAgreementPage memberAddress={memberAddress} onComplete={() => {
+      setShowPMAPage(false);
+      // Reload member data after PMA completion
+      const loadMemberData = async () => {
+        try {
+          const [profile, menuData, locationsData, eventsData, ordersData] = await Promise.all([
+            authService.get('/api/profile'),
+            authService.get('/api/menu/member'),
+            authService.get('/api/locations/member'),
+            authService.get('/api/events'),
+            authService.get('/api/orders')
+          ]);
+
+          setMemberData(profile);
+          setMenu(menuData);
+          setLocations(locationsData);
+          setEvents(eventsData);
+          setOrders(ordersData);
+        } catch (error) {
+          console.error('Error reloading member data:', error);
+        }
+      };
+      loadMemberData();
+    }} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Header */}
