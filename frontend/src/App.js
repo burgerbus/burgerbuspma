@@ -208,8 +208,8 @@ const LandingPage = ({ onGetStarted }) => {
             </h1>
           </div>
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Join our exclusive food truck community. Get access to premium gourmet meals, 
-            member-only locations, tax-free pricing, and special events.
+            Join Bitcoin Ben's exclusive burger club. Get access to premium gourmet burgers, 
+            crypto-friendly dining, member-only locations, and special Bitcoin events.
           </p>
           
           <div className="flex flex-col items-center gap-6">
