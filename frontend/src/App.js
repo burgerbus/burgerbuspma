@@ -38,11 +38,12 @@ class AuthService {
     return response.data;
   }
 
-  async solveChallenge(address, signature, message) {
+  async solveChallenge(address, signature, message, chain = 'SOL') {
     const params = new URLSearchParams({
       address,
       signature,
-      message
+      message,
+      chain
     });
     
     const response = await this.apiClient.post(`/api/auth/authorization/solve?${params.toString()}`);
