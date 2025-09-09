@@ -103,7 +103,7 @@ async def get_authenticated_member(wa: JWTWalletAuthDep) -> MemberProfile:
 # Public routes (no auth required)
 @api_router.get("/")
 async def root():
-    return {"message": "Welcome to TruckMembers - Private Food Truck Community"}
+    return {"message": "Welcome to Bitcoin Ben's Burger Bus Club - Exclusive Gourmet Experience"}
 
 @api_router.get("/menu/public", response_model=List[dict])
 async def get_public_menu():
