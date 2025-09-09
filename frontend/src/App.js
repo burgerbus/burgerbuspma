@@ -54,7 +54,7 @@ class AuthService {
 
   async logout() {
     try {
-      await this.apiClient.post('/api/auth/authentication/logout');
+      await this.apiClient.post('/api/auth/authorization/logout');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
