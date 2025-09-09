@@ -333,6 +333,7 @@ const MemberDashboard = ({ memberAddress }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('menu');
+  const [showPMAPage, setShowPMAPage] = useState(false);
 
   useEffect(() => {
     const loadMemberData = async () => {
