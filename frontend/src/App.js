@@ -268,9 +268,9 @@ const LandingPage = ({ onGetStarted }) => {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-white mb-2">Artisanal Fruit Bowl</h3>
                 <p className="text-gray-400 mb-4">Seasonal fruits with edible flowers</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-500 font-bold">$9 (Members)</span>
-                  <span className="text-gray-400 line-through">$12 (Public)</span>
+                <div className="text-center">
+                  <div className="text-orange-500 font-bold text-lg">Members Only Pricing</div>
+                  <div className="text-gray-400 text-sm">Connect wallet to view prices</div>
                 </div>
               </div>
             </div>
@@ -284,9 +284,9 @@ const LandingPage = ({ onGetStarted }) => {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-white mb-2">Truffle Mac & Cheese</h3>
                 <p className="text-gray-400 mb-4">Artisanal with truffle oil & parmesan</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-500 font-bold">$14 (Members)</span>
-                  <span className="text-gray-400 line-through">$18 (Public)</span>
+                <div className="text-center">
+                  <div className="text-orange-500 font-bold text-lg">Members Only Pricing</div>
+                  <div className="text-gray-400 text-sm">Connect wallet to view prices</div>
                 </div>
               </div>
             </div>
@@ -301,9 +301,9 @@ const LandingPage = ({ onGetStarted }) => {
                 <h3 className="text-xl font-bold text-white mb-2">Wagyu Beef Slider Trio</h3>
                 <p className="text-gray-400 mb-2">Premium wagyu with gourmet toppings</p>
                 <div className="text-orange-400 text-sm mb-4">🥇 Premium Members Only</div>
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-500 font-bold">$22 (Members)</span>
-                  <span className="text-gray-400 line-through">$28 (Public)</span>
+                <div className="text-center">
+                  <div className="text-orange-500 font-bold text-lg">Members Only Pricing</div>
+                  <div className="text-gray-400 text-sm">Connect wallet to view prices</div>
                 </div>
               </div>
             </div>
