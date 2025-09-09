@@ -79,22 +79,40 @@ class FoodTruckBackendTester:
         """Test public endpoints that don't require authentication"""
         print("\n=== Testing Public Endpoints ===")
         
-        # Test public menu endpoint
+        # Test public menu endpoint - should show Bitcoin Ben's themed items without pricing
         try:
             response = self.session.get(f"{self.base_url}/api/menu/public")
             if response.status_code == 200:
                 data = response.json()
                 if isinstance(data, list):
                     self.log_test("Public Menu Endpoint", True, f"Status: {response.status_code}, Items: {len(data)}")
+                    
+                    # Check for Bitcoin Ben's themed items
+                    bitcoin_themed_items = ["The Satoshi Stacker", "The Hodl Burger", "The Bitcoin Mining Rig", "Lightning Network Loaded Fries"]
+                    found_items = []
+                    
+                    for item in data:
+                        if item.get("name") in bitcoin_themed_items:
+                            found_items.append(item["name"])
+                    
+                    if found_items:
+                        self.log_test("Bitcoin Ben's Themed Items", True, f"Found themed items: {', '.join(found_items)}")
+                    else:
+                        self.log_test("Bitcoin Ben's Themed Items", False, f"No Bitcoin Ben's themed items found in menu")
+                    
+                    # Verify pricing is hidden (should not have price/member_price fields)
                     if len(data) > 0:
-                        # Validate menu item structure
                         item = data[0]
-                        required_fields = ['id', 'name', 'description', 'price', 'member_price', 'category']
-                        if all(field in item for field in required_fields):
-                            self.log_test("Menu Item Structure", True, "All required fields present")
+                        if "price" not in item and "member_price" not in item:
+                            self.log_test("Public Menu Pricing Hidden", True, "Pricing correctly hidden from public view")
                         else:
-                            missing = [f for f in required_fields if f not in item]
-                            self.log_test("Menu Item Structure", False, f"Missing fields: {missing}")
+                            self.log_test("Public Menu Pricing Hidden", False, "Pricing visible in public menu")
+                        
+                        # Check for members_only_pricing flag
+                        if item.get("members_only_pricing") == True:
+                            self.log_test("Members Only Pricing Flag", True, "Correct members_only_pricing flag present")
+                        else:
+                            self.log_test("Members Only Pricing Flag", False, "Missing or incorrect members_only_pricing flag")
                 else:
                     self.log_test("Public Menu Endpoint", False, "Response is not a list", data)
             else:
