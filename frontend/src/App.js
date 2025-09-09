@@ -653,7 +653,7 @@ function App() {
               Connect Your Solana Wallet
             </h2>
             <p className="text-gray-400 text-center mb-8">
-              Sign a message with your wallet to prove ownership and join TruckMembers
+              Sign a message with your wallet to join Bitcoin Ben's Burger Bus Club
             </p>
             
             <WalletAuth 
