@@ -187,6 +187,33 @@ async def register_membership(member_data: dict, member: MemberProfile = Depends
                 "payment_amount": member_data.get("payment_amount", 0.0),
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }}
+@api_router.post("/test/register-no-auth")
+async def test_registration_no_auth(member_data: dict):
+    """TEMPORARY: Test registration without authentication for debugging"""
+    try:
+        # Get or create a member for testing
+        test_wallet = member_data.get("wallet_address", "test_wallet_address")
+        member = await get_or_create_member(test_wallet)
+        
+        # Update member with PMA info (same logic as real registration)
+        await db.members.update_one(
+            {"wallet_address": member.wallet_address},
+            {"$set": {
+                "full_name": member_data.get("fullName", ""),
+                "email": member_data.get("email", ""),
+                "phone": member_data.get("phone", ""),
+                "pma_agreed": member_data.get("pma_agreed", False),
+                "dues_paid": member_data.get("dues_paid", False),
+                "payment_amount": member_data.get("payment_amount", 0.0),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        updated_member = await db.members.find_one({"wallet_address": member.wallet_address})
+        return {"message": "Test registration successful", "member": MemberProfile(**updated_member)}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Test registration failed: {str(e)}")
         )
         updated_member = await db.members.find_one({"wallet_address": member.wallet_address})
         return {"message": "Membership updated successfully", "member": MemberProfile(**updated_member)}
