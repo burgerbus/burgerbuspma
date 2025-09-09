@@ -171,7 +171,7 @@ async def update_member_profile(
     )
     return {"message": "Profile updated successfully"}
 @api_router.post("/membership/register")
-async def register_membership(wa: JWTWalletAuthDep, member_data: dict):
+async def register_membership(member_data: dict, member: MemberProfile = Depends(get_authenticated_member)):
     """Register new membership with PMA agreement and dues payment"""
     try:
         # Check if member already exists
