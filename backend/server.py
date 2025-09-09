@@ -124,22 +124,8 @@ api_router.include_router(jwt_authorization_router, prefix="/auth")
 
 # Authentication dependency
 async def get_authenticated_member(wa: JWTWalletAuthDep) -> MemberProfile:
-    try:
-        member = await get_or_create_member(wa.address)
-        return member
-    except Exception as e:
-        print(f"Error in get_authenticated_member: {e}")
-        # Create a temporary member for debugging
-        temp_member = MemberProfile(
-            wallet_address=wa.address,
-            full_name="",
-            email="", 
-            phone="",
-            pma_agreed=False,
-            dues_paid=False,
-            payment_amount=0.0
-        )
-        return temp_member
+    member = await get_or_create_member(wa.address)
+    return member
 
 # Public routes (no auth required)
 @api_router.get("/")
