@@ -153,6 +153,43 @@ async def update_member_profile(
         {"$set": {"favorite_items": favorite_items}}
     )
     return {"message": "Profile updated successfully"}
+@api_router.post("/membership/register")
+async def register_membership(wa: JWTWalletAuthDep, member_data: dict):
+    """Register new membership with PMA agreement and dues payment"""
+    try:
+        # Check if member already exists
+        existing_member = await db.members.find_one({"wallet_address": wa.address})
+        if existing_member:
+            # Update existing member with PMA info
+            await db.members.update_one(
+                {"wallet_address": wa.address},
+                {"$set": {
+                    "full_name": member_data.get("fullName", ""),
+                    "email": member_data.get("email", ""),
+                    "phone": member_data.get("phone", ""),
+                    "pma_agreed": member_data.get("pma_agreed", False),
+                    "dues_paid": member_data.get("dues_paid", False),
+                    "payment_amount": member_data.get("payment_amount", 0.0),
+                    "updated_at": datetime.now(timezone.utc)
+                }}
+            )
+            updated_member = await db.members.find_one({"wallet_address": wa.address})
+            return {"message": "Membership updated successfully", "member": MemberProfile(**updated_member)}
+        else:
+            # Create new member
+            new_member = MemberProfile(
+                wallet_address=wa.address,
+                full_name=member_data.get("fullName", ""),
+                email=member_data.get("email", ""),
+                phone=member_data.get("phone", ""),
+                pma_agreed=member_data.get("pma_agreed", False),
+                dues_paid=member_data.get("dues_paid", False),
+                payment_amount=member_data.get("payment_amount", 0.0)
+            )
+            await db.members.insert_one(new_member.dict())
+            return {"message": "Membership created successfully", "member": new_member}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 @api_router.get("/menu/member", response_model=List[MenuItem])
 async def get_member_menu(member: MemberProfile = Depends(get_authenticated_member)):
