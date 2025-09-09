@@ -17,6 +17,10 @@ load_dotenv(ROOT_DIR / '.env')
 # Set application name for wallet auth
 os.environ["FASTAPI_WALLETAUTH_APP"] = "Bitcoin Ben's Burger Bus Club"
 
+# Ensure JWT secret is available
+if not os.environ.get("FASTAPI_WALLETAUTH_SECRET"):
+    os.environ["FASTAPI_WALLETAUTH_SECRET"] = "bitcoin-bens-burger-bus-secret-key-2025-solana-members-only"
+
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
