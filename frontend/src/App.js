@@ -250,8 +250,8 @@ const LandingPage = ({ onGetStarted }) => {
             <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
               💰
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Tax-Free Pricing</h3>
-            <p className="text-gray-400">Special member pricing on all premium items</p>
+            <h3 className="text-xl font-bold text-white mb-2">Crypto Pricing</h3>
+            <p className="text-gray-400">Pay with crypto and get exclusive member discounts</p>
           </div>
           
           <div className="text-center">
