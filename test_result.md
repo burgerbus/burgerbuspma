@@ -201,6 +201,30 @@ backend:
           agent: "testing"
           comment: "Error handling working correctly. Invalid JSON returns 422, missing parameters return 422, non-existent endpoints return 404 as expected."
 
+  - task: "Member Registration with PMA"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Member registration endpoint POST /api/membership/register properly implemented. Requires authentication (returns 403 for unauthenticated requests). Accepts new member profile fields: full_name, email, phone, pma_agreed, dues_paid, payment_amount."
+
+  - task: "Database Member Profile Fields"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "New member profile fields verified in database structure. MemberProfile model supports full_name, email, phone, pma_agreed, dues_paid, payment_amount fields. Registration endpoint properly handles complete and incomplete member data."
+
 frontend:
   # No frontend testing performed as per instructions
 
