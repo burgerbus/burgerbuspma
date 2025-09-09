@@ -89,7 +89,15 @@ class MemberEvent(BaseModel):
 async def get_or_create_member(wallet_address: str) -> MemberProfile:
     member = await db.members.find_one({"wallet_address": wallet_address})
     if not member:
-        new_member = MemberProfile(wallet_address=wallet_address)
+        new_member = MemberProfile(
+            wallet_address=wallet_address,
+            full_name="",
+            email="",
+            phone="",
+            pma_agreed=False,
+            dues_paid=False,
+            payment_amount=0.0
+        )
         await db.members.insert_one(new_member.dict())
         return new_member
     return MemberProfile(**member)
