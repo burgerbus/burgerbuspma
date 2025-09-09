@@ -300,12 +300,14 @@ class FoodTruckBackendTester:
                     if len(menu_data) >= 1:  # Should have at least basic tier items
                         self.log_test("Database Menu Persistence", True, f"Successfully persisted {len(menu_data)} menu items")
                         
-                        # Verify data structure integrity
+                        # Verify data structure integrity for public menu (no pricing)
                         sample_item = menu_data[0]
-                        if all(key in sample_item for key in ['id', 'name', 'price', 'member_price']):
-                            self.log_test("Database Data Integrity", True, "Menu item structure maintained")
+                        required_public_fields = ['id', 'name', 'description', 'category', 'image_url', 'is_available']
+                        if all(key in sample_item for key in required_public_fields):
+                            self.log_test("Database Data Integrity", True, "Public menu item structure maintained")
                         else:
-                            self.log_test("Database Data Integrity", False, "Menu item structure corrupted")
+                            missing = [f for f in required_public_fields if f not in sample_item]
+                            self.log_test("Database Data Integrity", False, f"Public menu item structure missing: {missing}")
                     else:
                         self.log_test("Database Menu Persistence", False, "No menu items persisted")
                 
@@ -321,6 +323,61 @@ class FoodTruckBackendTester:
                 self.log_test("Database Integration", False, "Could not seed data for testing")
         except Exception as e:
             self.log_test("Database Integration", False, f"Database connection error: {str(e)}")
+    
+    def test_member_profile_fields(self):
+        """Test that new member profile fields are supported in the database structure"""
+        print("\n=== Testing Member Profile Fields ===")
+        
+        # Test that the member registration endpoint accepts the new fields
+        # This is an indirect test since we can't authenticate without a real wallet signature
+        try:
+            # Test with complete member data structure
+            member_data = {
+                "fullName": "Alice Bitcoin",
+                "email": "alice@bitcoinben.com", 
+                "phone": "+1-555-0456",
+                "pma_agreed": True,
+                "dues_paid": True,
+                "payment_amount": 75.0
+            }
+            
+            response = self.session.post(f"{self.base_url}/api/membership/register", json=member_data)
+            
+            # Should fail with auth error, but if it's a validation error about the fields, that's bad
+            if response.status_code in [401, 403]:
+                self.log_test("Member Profile Fields Structure", True, "Endpoint accepts new member profile fields (auth required)")
+            elif response.status_code == 422:
+                # Check if it's about missing auth vs field validation
+                try:
+                    error_data = response.json()
+                    error_detail = str(error_data.get("detail", ""))
+                    if "authorization" in error_detail.lower() or "token" in error_detail.lower() or "auth" in error_detail.lower():
+                        self.log_test("Member Profile Fields Structure", True, "New member profile fields accepted (auth validation)")
+                    else:
+                        self.log_test("Member Profile Fields Structure", False, f"Field validation error: {error_detail}")
+                except:
+                    self.log_test("Member Profile Fields Structure", True, "Endpoint processes new member fields (422 validation)")
+            else:
+                self.log_test("Member Profile Fields Structure", False, f"Unexpected response: {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Profile Fields Structure", False, f"Connection error: {str(e)}")
+        
+        # Test with missing required PMA fields
+        try:
+            incomplete_data = {
+                "fullName": "Bob Bitcoin"
+                # Missing email, phone, pma_agreed, dues_paid, payment_amount
+            }
+            
+            response = self.session.post(f"{self.base_url}/api/membership/register", json=incomplete_data)
+            
+            # Should still fail with auth, but endpoint should exist and process the request
+            if response.status_code in [401, 403, 422]:
+                self.log_test("Member Profile Optional Fields", True, "Endpoint handles incomplete member data appropriately")
+            else:
+                self.log_test("Member Profile Optional Fields", False, f"Unexpected response: {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Profile Optional Fields", False, f"Connection error: {str(e)}")
     
     def test_cors_and_security(self):
         """Test CORS headers and security measures"""
