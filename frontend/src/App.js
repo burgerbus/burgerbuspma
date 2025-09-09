@@ -406,8 +406,8 @@ const MemberDashboard = ({ memberAddress }) => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-white">Member Dashboard</h1>
-              <p className="text-gray-400">Welcome back, {memberAddress?.slice(0, 8)}...</p>
+              <h1 className="text-3xl font-bold text-white">Club Dashboard</h1>
+              <p className="text-gray-400">Welcome to Bitcoin Ben's, {memberAddress?.slice(0, 8)}...</p>
             </div>
             <WalletAuth />
           </div>
