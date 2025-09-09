@@ -234,8 +234,8 @@ const LandingPage = ({ onGetStarted }) => {
             <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
               🍕
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Exclusive Menus</h3>
-            <p className="text-gray-400">Access premium gourmet items not available to the public</p>
+            <h3 className="text-xl font-bold text-white mb-2">Bitcoin Burgers</h3>
+            <p className="text-gray-400">Exclusive gourmet burgers crafted for crypto enthusiasts</p>
           </div>
           
           <div className="text-center">
