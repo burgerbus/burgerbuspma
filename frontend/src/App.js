@@ -309,8 +309,8 @@ const LandingPage = ({ onGetStarted }) => {
                 className="w-full h-48 object-cover"
               />
               <div className="p-6">
-                <h3 className="text-xl font-bold text-white mb-2">Wagyu Beef Slider Trio</h3>
-                <p className="text-gray-400 mb-2">Premium wagyu with gourmet toppings</p>
+                <h3 className="text-xl font-bold text-white mb-2">The Bitcoin Mining Rig</h3>
+                <p className="text-gray-400 mb-2">Ultimate burger stack for serious crypto miners</p>
                 <div className="text-orange-400 text-sm mb-4">🥇 Premium Members Only</div>
                 <div className="text-center">
                   <div className="text-orange-500 font-bold text-lg">Members Only Pricing</div>
