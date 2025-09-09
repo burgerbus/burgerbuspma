@@ -221,7 +221,7 @@ const LandingPage = ({ onGetStarted }) => {
             </button>
             
             <div className="text-gray-400 text-sm">
-              🔐 Secure blockchain authentication with Solana wallets
+              🔐 Secure blockchain authentication with Solana wallets | 🍔 Premium Bitcoin Burgers
             </div>
           </div>
         </div>
