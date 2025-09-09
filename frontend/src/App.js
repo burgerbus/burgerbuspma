@@ -115,7 +115,8 @@ const WalletAuth = ({ onAuthSuccess, onAuthError }) => {
       const authResponse = await authService.solveChallenge(
         address,
         signatureString,
-        challenge.message
+        challenge.message,
+        'SOL'
       );
 
       onAuthSuccess && onAuthSuccess(address);
