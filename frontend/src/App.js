@@ -107,7 +107,7 @@ const WalletAuth = ({ onAuthSuccess, onAuthError }) => {
       const address = publicKey.toBase58();
       const challenge = await authService.requestChallenge(address, 'SOL');
       
-      const encodedMessage = new TextEncoder().encode(challenge.message);
+      const encodedMessage = new TextEncoder().encode(challenge.challenge);
       const signature = await signMessage(encodedMessage);
       
       const signatureString = Array.from(signature).join(',');
@@ -115,7 +115,7 @@ const WalletAuth = ({ onAuthSuccess, onAuthError }) => {
       const authResponse = await authService.solveChallenge(
         address,
         signatureString,
-        challenge.message,
+        challenge.challenge,
         'SOL'
       );
 
