@@ -227,6 +227,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "New member profile fields verified in database structure. MemberProfile model supports full_name, email, phone, pma_agreed, dues_paid, payment_amount fields. Registration endpoint properly handles complete and incomplete member data."
+        - working: true
+          agent: "testing"
+          comment: "Database model datetime handling verified working correctly. Data seeding and persistence tests passed. Menu items properly formatted with all required fields. Member profile model supports all new PMA fields correctly."
 
 frontend:
   # No frontend testing performed as per instructions
