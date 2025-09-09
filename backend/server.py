@@ -173,7 +173,6 @@ async def update_member_profile(
 @api_router.post("/membership/register")
 async def register_membership(member_data: dict, member: MemberProfile = Depends(get_authenticated_member)):
     """Register new membership with PMA agreement and dues payment"""
-    """Register new membership with PMA agreement and dues payment"""
     try:
         # Update existing member with PMA info
         await db.members.update_one(
@@ -187,11 +186,6 @@ async def register_membership(member_data: dict, member: MemberProfile = Depends
                 "payment_amount": member_data.get("payment_amount", 0.0),
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }}
-        )
-        updated_member = await db.members.find_one({"wallet_address": member.wallet_address})
-        return {"message": "Membership updated successfully", "member": MemberProfile(**updated_member)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
         )
         updated_member = await db.members.find_one({"wallet_address": member.wallet_address})
         return {"message": "Membership updated successfully", "member": MemberProfile(**updated_member)}
