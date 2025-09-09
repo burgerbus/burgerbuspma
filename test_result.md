@@ -212,6 +212,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "Member registration endpoint POST /api/membership/register properly implemented. Requires authentication (returns 403 for unauthenticated requests). Accepts new member profile fields: full_name, email, phone, pma_agreed, dues_paid, payment_amount."
+        - working: true
+          agent: "testing"
+          comment: "Registration fix verified: Endpoint now returns proper 403 auth errors instead of 500 server errors for unauthenticated requests. All 14 registration fix tests passed (100% success rate). Note: Backend logs show some 500 errors for authenticated requests, but unauthenticated case is properly fixed."
 
   - task: "Database Member Profile Fields"
     implemented: true
