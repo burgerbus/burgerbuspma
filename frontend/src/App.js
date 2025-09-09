@@ -34,10 +34,7 @@ class AuthService {
   }
 
   async requestChallenge(address, chain = 'SOL') {
-    const response = await this.apiClient.post('/api/auth/authorization/challenge', {
-      address,
-      chain
-    });
+    const response = await this.apiClient.post(`/api/auth/authorization/challenge?address=${address}&chain=${chain}`);
     return response.data;
   }
 
