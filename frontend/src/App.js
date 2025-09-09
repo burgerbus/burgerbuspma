@@ -177,6 +177,183 @@ const WalletAuth = ({ onAuthSuccess, onAuthError }) => {
   );
 };
 
+// PMA Agreement Page Component
+const PMAgreementPage = ({ memberAddress, onComplete }) => {
+  const [agreed, setAgreed] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [memberInfo, setMemberInfo] = useState({
+    fullName: '',
+    email: '',
+    phone: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!agreed) {
+      alert('Please read and accept the PMA agreement to continue.');
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      // Create member profile with PMA agreement
+      await authService.post('/api/membership/register', {
+        ...memberInfo,
+        pma_agreed: true,
+        dues_paid: true,
+        payment_amount: 21,
+        wallet_address: memberAddress
+      });
+
+      alert('Welcome to Bitcoin Ben\'s Burger Bus Club! Your membership is now active.');
+      onComplete();
+    } catch (error) {
+      console.error('Registration failed:', error);
+      alert('Registration failed. Please try again.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gray-800 rounded-lg p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">
+              Welcome to <span className="text-orange-500">Bitcoin Ben's</span><br />
+              Burger Bus Club
+            </h1>
+            <p className="text-gray-400">
+              Complete your membership by signing our Private Membership Agreement
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Member Information */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-white font-medium mb-2">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={memberInfo.fullName}
+                  onChange={(e) => setMemberInfo({...memberInfo, fullName: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none"
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div>
+                <label className="block text-white font-medium mb-2">Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  value={memberInfo.email}
+                  onChange={(e) => setMemberInfo({...memberInfo, email: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none"
+                  placeholder="Enter your email"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-white font-medium mb-2">Phone Number (Optional)</label>
+              <input
+                type="tel"
+                value={memberInfo.phone}
+                onChange={(e) => setMemberInfo({...memberInfo, phone: e.target.value})}
+                className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none"
+                placeholder="Enter your phone number"
+              />
+            </div>
+
+            {/* PMA Agreement */}
+            <div className="bg-gray-700 p-6 rounded-lg max-h-96 overflow-y-auto">
+              <h2 className="text-xl font-bold text-white mb-4">Private Membership Agreement</h2>
+              <div className="text-gray-300 space-y-4 text-sm leading-relaxed">
+                <p>
+                  <strong>Bitcoin Ben's Burger Bus Club - Private Membership Agreement</strong>
+                </p>
+                <p>
+                  This Private Membership Agreement ("Agreement") is entered into between Bitcoin Ben's Burger Bus Club, 
+                  a private membership association ("Club"), and the undersigned ("Member").
+                </p>
+                <p>
+                  <strong>1. PRIVATE MEMBERSHIP ASSOCIATION</strong><br />
+                  The Club is a private membership association operating under the right of private contract and association. 
+                  Membership is by invitation only and subject to acceptance of this Agreement.
+                </p>
+                <p>
+                  <strong>2. MEMBERSHIP BENEFITS</strong><br />
+                  Members enjoy exclusive access to premium gourmet burgers, crypto-friendly dining experiences, 
+                  member-only locations, special Bitcoin events, and discounted pricing on all menu items.
+                </p>
+                <p>
+                  <strong>3. MEMBERSHIP DUES</strong><br />
+                  Annual membership dues are $21.00, payable upon joining and annually thereafter. 
+                  Dues are non-refundable and provide access to all club benefits for one year.
+                </p>
+                <p>
+                  <strong>4. PRIVACY & CONDUCT</strong><br />
+                  Members agree to maintain the privacy of club operations and respect fellow members. 
+                  The Club reserves the right to terminate membership for violations of club policies.
+                </p>
+                <p>
+                  <strong>5. BLOCKCHAIN AUTHENTICATION</strong><br />
+                  Membership is tied to your Solana wallet address: <code className="bg-gray-600 px-2 py-1 rounded text-orange-400">{memberAddress}</code>
+                </p>
+                <p>
+                  <strong>6. LIMITATION OF LIABILITY</strong><br />
+                  Members participate at their own risk. The Club limits liability to the maximum extent permitted by law.
+                </p>
+                <p className="text-orange-400 font-medium">
+                  By checking the box below, you acknowledge that you have read, understood, and agree to be bound by this Agreement.
+                </p>
+              </div>
+            </div>
+
+            {/* Agreement Checkbox */}
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="pma-agreement"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 w-4 h-4 text-orange-600 bg-gray-700 border-gray-600 rounded focus:ring-orange-500"
+              />
+              <label htmlFor="pma-agreement" className="text-white">
+                I have read and agree to the Private Membership Agreement and understand that by joining, 
+                I am entering into a private contract with Bitcoin Ben's Burger Bus Club.
+              </label>
+            </div>
+
+            {/* Payment Information */}
+            <div className="bg-orange-900/20 border border-orange-600 rounded-lg p-6">
+              <h3 className="text-xl font-bold text-orange-400 mb-2">Membership Investment</h3>
+              <div className="flex justify-between items-center text-white">
+                <span>Annual Membership Dues:</span>
+                <span className="text-2xl font-bold text-orange-400">$21.00</span>
+              </div>
+              <p className="text-gray-400 text-sm mt-2">
+                Payment processing via crypto-friendly methods. Your membership activates immediately upon agreement.
+              </p>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={!agreed || processing}
+              className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-4 rounded-lg font-bold text-lg transition-colors"
+            >
+              {processing ? 'Processing Membership...' : 'Join Club & Pay $21 Dues'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Main App Components
 const LandingPage = ({ onGetStarted }) => {
   return (
