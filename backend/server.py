@@ -23,7 +23,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app
-app = FastAPI(title="Food Truck Membership API")
+app = FastAPI(title="Bitcoin Ben's Burger Bus Club API")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
