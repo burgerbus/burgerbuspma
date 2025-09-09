@@ -131,6 +131,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "Public menu and locations endpoints working correctly. Menu returns 2 items after seeding, locations returns 1 location. Data structure validation passed."
+        - working: true
+          agent: "testing"
+          comment: "Bitcoin Ben's themed public menu verified. GET /api/menu/public returns 3 Bitcoin-themed items: 'The Satoshi Stacker', 'The Hodl Burger', 'Lightning Network Loaded Fries'. Pricing correctly hidden with members_only_pricing flag. Public locations endpoint working correctly."
 
   - task: "Wallet Authentication Flow"
     implemented: true
