@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './App.css';
 import axios from 'axios';
+import bs58 from 'bs58';
 
 // Solana wallet imports
 import { ConnectionProvider, WalletProvider, useWallet } from '@solana/wallet-adapter-react';
