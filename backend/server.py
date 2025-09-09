@@ -98,8 +98,17 @@ async def get_or_create_member(wallet_address: str) -> MemberProfile:
             dues_paid=False,
             payment_amount=0.0
         )
-        await db.members.insert_one(new_member.dict())
+        member_dict = new_member.dict()
+        # Convert datetime to string for MongoDB storage
+        if 'joined_at' in member_dict and isinstance(member_dict['joined_at'], datetime):
+            member_dict['joined_at'] = member_dict['joined_at'].isoformat()
+        await db.members.insert_one(member_dict)
         return new_member
+    
+    # Handle datetime conversion when retrieving from MongoDB
+    if 'joined_at' in member and isinstance(member['joined_at'], str):
+        member['joined_at'] = datetime.fromisoformat(member['joined_at'].replace('Z', '+00:00'))
+    
     return MemberProfile(**member)
 
 async def check_tier_access(required_tier: str, user_tier: str) -> bool:
