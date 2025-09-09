@@ -111,8 +111,8 @@ const WalletAuth = ({ onAuthSuccess, onAuthError }) => {
       const encodedMessage = new TextEncoder().encode(challenge.challenge);
       const signature = await signMessage(encodedMessage);
       
-      // Convert signature to hex format
-      const signatureString = Array.from(signature, byte => byte.toString(16).padStart(2, '0')).join('');
+      // Convert signature to base58 format (Solana standard)
+      const signatureString = bs58.encode(signature);
       
       const authResponse = await authService.solveChallenge(
         address,
