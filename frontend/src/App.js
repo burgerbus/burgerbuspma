@@ -193,9 +193,20 @@ const LandingPage = ({ onGetStarted }) => {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-6xl font-bold text-white mb-6">
-            Welcome to <span className="text-orange-500">TruckMembers</span>
-          </h1>
+          <div className="flex flex-col items-center mb-6">
+            <img 
+              src="/bitcoin-bens-logo.png" 
+              alt="Bitcoin Ben's Burger Bus"
+              className="w-32 h-32 mb-4"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+            <h1 className="text-6xl font-bold text-white text-center">
+              <span className="text-orange-500">Bitcoin Ben's</span><br />
+              <span className="text-white">Burger Bus Club</span>
+            </h1>
+          </div>
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
             Join our exclusive food truck community. Get access to premium gourmet meals, 
             member-only locations, tax-free pricing, and special events.
