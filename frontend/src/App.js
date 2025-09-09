@@ -343,9 +343,20 @@ const MemberDashboard = ({ memberAddress }) => {
         // Seed sample data first
         await authService.post('/api/admin/seed-data');
         
+        // Try to load member profile first
+        let profile;
+        try {
+          profile = await authService.get('/api/profile');
+        } catch (profileError) {
+          // If profile doesn't exist, show PMA page
+          console.log('No profile found, showing PMA page');
+          setShowPMAPage(true);
+          setLoading(false);
+          return;
+        }
+
         // Load member data
-        const [profile, menuData, locationsData, eventsData, ordersData] = await Promise.all([
-          authService.get('/api/profile'),
+        const [menuData, locationsData, eventsData, ordersData] = await Promise.all([
           authService.get('/api/menu/member'),
           authService.get('/api/locations/member'),
           authService.get('/api/events'),
@@ -357,8 +368,15 @@ const MemberDashboard = ({ memberAddress }) => {
         setLocations(locationsData);
         setEvents(eventsData);
         setOrders(ordersData);
+        
+        // Check if member has paid dues
+        if (!profile.dues_paid) {
+          setShowPMAPage(true);
+        }
       } catch (error) {
         console.error('Error loading member data:', error);
+        // Show PMA page on error
+        setShowPMAPage(true);
       } finally {
         setLoading(false);
       }
