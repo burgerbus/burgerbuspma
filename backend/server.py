@@ -203,7 +203,11 @@ async def register_membership(wa: JWTWalletAuthDep, member_data: dict):
                 dues_paid=member_data.get("dues_paid", False),
                 payment_amount=member_data.get("payment_amount", 0.0)
             )
-            await db.members.insert_one(new_member.dict())
+            member_dict = new_member.dict()
+            # Convert datetime to string for MongoDB storage
+            if 'joined_at' in member_dict and isinstance(member_dict['joined_at'], datetime):
+                member_dict['joined_at'] = member_dict['joined_at'].isoformat()
+            await db.members.insert_one(member_dict)
             return {"message": "Membership created successfully", "member": new_member}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
