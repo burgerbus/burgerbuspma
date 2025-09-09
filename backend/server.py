@@ -32,10 +32,16 @@ api_router = APIRouter(prefix="/api")
 class MemberProfile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     wallet_address: str
+    full_name: str = ""
+    email: str = ""
+    phone: str = ""
     membership_tier: str = "basic"  # basic, premium, vip
     joined_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     favorite_items: List[str] = []
     total_orders: int = 0
+    pma_agreed: bool = False
+    dues_paid: bool = False
+    payment_amount: float = 0.0
 
 class MenuItem(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
