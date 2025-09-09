@@ -231,7 +231,7 @@ class FoodTruckBackendTester:
             self.log_test("Member Registration Endpoint Exists", False, f"Connection error: {str(e)}")
     
     def test_admin_data_seeding(self):
-        """Test admin data seeding endpoint"""
+        """Test admin data seeding endpoint - should create Bitcoin Ben's themed items"""
         print("\n=== Testing Admin Data Seeding ===")
         
         try:
@@ -243,14 +243,27 @@ class FoodTruckBackendTester:
                     self.log_test("Admin Data Seeding", True, f"Status: {response.status_code}, Message: {data['message']}")
                     
                     # Verify data was actually seeded by checking public endpoints
-                    time.sleep(1)  # Give database time to update
+                    time.sleep(2)  # Give database time to update
                     
-                    # Check if menu items were seeded
+                    # Check if Bitcoin Ben's themed menu items were seeded
                     menu_response = self.session.get(f"{self.base_url}/api/menu/public")
                     if menu_response.status_code == 200:
                         menu_data = menu_response.json()
                         if len(menu_data) > 0:
                             self.log_test("Menu Data Persistence", True, f"Found {len(menu_data)} menu items after seeding")
+                            
+                            # Check for specific Bitcoin Ben's themed items
+                            bitcoin_themed_items = ["The Satoshi Stacker", "The Hodl Burger", "The Bitcoin Mining Rig", "Lightning Network Loaded Fries"]
+                            found_items = []
+                            
+                            for item in menu_data:
+                                if item.get("name") in bitcoin_themed_items:
+                                    found_items.append(item["name"])
+                            
+                            if len(found_items) >= 2:  # Should have at least basic tier items
+                                self.log_test("Bitcoin Ben's Themed Menu Items", True, f"Found themed items: {', '.join(found_items)}")
+                            else:
+                                self.log_test("Bitcoin Ben's Themed Menu Items", False, f"Expected Bitcoin Ben's themed items, found: {found_items}")
                         else:
                             self.log_test("Menu Data Persistence", False, "No menu items found after seeding")
                     
