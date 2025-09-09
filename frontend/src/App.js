@@ -110,8 +110,8 @@ const WalletAuth = ({ onAuthSuccess, onAuthError }) => {
       const encodedMessage = new TextEncoder().encode(challenge.challenge);
       const signature = await signMessage(encodedMessage);
       
-      // Convert signature to base64 format (64 bytes)
-      const signatureString = btoa(String.fromCharCode(...signature));
+      // Convert signature to hex format
+      const signatureString = Array.from(signature, byte => byte.toString(16).padStart(2, '0')).join('');
       
       const authResponse = await authService.solveChallenge(
         address,
