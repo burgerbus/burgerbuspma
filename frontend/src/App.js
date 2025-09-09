@@ -242,8 +242,8 @@ const LandingPage = ({ onGetStarted }) => {
             <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
               📍
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">VIP Locations</h3>
-            <p className="text-gray-400">Member-only food truck stops and private events</p>
+            <h3 className="text-xl font-bold text-white mb-2">Crypto Meetups</h3>
+            <p className="text-gray-400">Exclusive stops at Bitcoin conferences and crypto events</p>
           </div>
           
           <div className="text-center">
