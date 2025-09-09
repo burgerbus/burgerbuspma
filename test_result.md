@@ -161,6 +161,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "Admin seed-data endpoint working correctly. Successfully seeds sample menu items, locations, and events. Data persistence verified."
+        - working: true
+          agent: "testing"
+          comment: "Bitcoin Ben's themed data seeding verified. POST /api/admin/seed-data successfully creates Bitcoin-themed menu items including 'The Satoshi Stacker', 'The Hodl Burger', 'The Bitcoin Mining Rig' (premium tier), and 'Lightning Network Loaded Fries'. Data persistence confirmed."
 
   - task: "Database Integration"
     implemented: true
