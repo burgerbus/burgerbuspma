@@ -372,15 +372,16 @@ class PMAValidationTester:
                     item_id = menu_items[0]["id"]
                     
                     # Try to create order with complete PMA status
-                    order_data = {
-                        "items": [
-                            {"item_id": item_id, "quantity": 1, "special_instructions": "Extra delicious"}
-                        ],
+                    items_data = [
+                        {"item_id": item_id, "quantity": 1, "special_instructions": "Extra delicious"}
+                    ]
+                    
+                    params = {
                         "pickup_location": "Downtown Business District",
                         "pickup_time": "15:00"
                     }
                     
-                    response = self.session.post(f"{self.base_url}/api/orders", json=order_data, headers=auth_headers)
+                    response = self.session.post(f"{self.base_url}/api/orders", json=items_data, params=params, headers=auth_headers)
                     
                     if response.status_code in [200, 201]:
                         data = response.json()
