@@ -577,9 +577,17 @@ const MemberDashboard = ({ memberAddress }) => {
                   </div>
                   <button
                     onClick={() => handlePreOrder(item)}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg font-medium transition-colors"
+                    disabled={!memberData?.pma_agreed || !memberData?.dues_paid}
+                    className={`w-full py-2 rounded-lg font-medium transition-colors ${
+                      memberData?.pma_agreed && memberData?.dues_paid
+                        ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    }`}
                   >
-                    Pre-Order Now
+                    {memberData?.pma_agreed && memberData?.dues_paid 
+                      ? 'Pre-Order Now' 
+                      : 'Complete Membership to Order'
+                    }
                   </button>
                 </div>
               </div>
