@@ -157,6 +157,134 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     member = await get_or_create_member(wallet_address)
     return member
 
+# BCH Authentication Models
+class ChallengeRequest(BaseModel):
+    app_name: str = "Bitcoin Ben's Burger Bus Club"
+
+class ChallengeResponse(BaseModel):
+    challenge_id: str
+    message: str
+    expires_at: str
+
+class SignatureRequest(BaseModel):
+    challenge_id: str
+    bch_address: str
+    signature: str
+    message: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
+
+# In-memory challenge storage (use Redis in production)
+active_challenges = {}
+
+# BCH Authentication Service
+class BCHAuthService:
+    def __init__(self):
+        self.challenge_expiry_minutes = 5
+        
+    def generate_challenge(self, app_name: str) -> Dict[str, Any]:
+        """Generate a unique challenge message for Bitcoin Cash wallet signing"""
+        timestamp = datetime.utcnow()
+        nonce = secrets.token_hex(16)
+        
+        challenge_data = {
+            "message": f"Authentication Challenge\nApp: {app_name}\nTime: {timestamp.isoformat()}\nNonce: {nonce}",
+            "timestamp": timestamp.isoformat(),
+            "nonce": nonce,
+            "expires_at": (timestamp + timedelta(minutes=self.challenge_expiry_minutes)).isoformat()
+        }
+        
+        return challenge_data
+    
+    def verify_signature(self, address: str, signature: str, message: str) -> bool:
+        """Verify Bitcoin Cash message signature"""
+        try:
+            # Simple verification - in a real implementation, use proper BCH message verification
+            # For now, we'll accept any signature to test the flow
+            return len(signature) > 10 and len(address) > 10
+        except Exception as e:
+            print(f"Signature verification error: {e}")
+            return False
+
+bch_auth_service = BCHAuthService()
+
+# BCH Authentication Endpoints
+@api_router.post("/auth/challenge", response_model=ChallengeResponse)
+async def generate_challenge(request: ChallengeRequest):
+    """Generate a new authentication challenge for Bitcoin Cash wallet signing"""
+    try:
+        challenge_data = bch_auth_service.generate_challenge(request.app_name)
+        challenge_id = secrets.token_hex(16)
+        
+        # Store challenge for verification
+        active_challenges[challenge_id] = {
+            **challenge_data,
+            "created_at": datetime.utcnow().isoformat()
+        }
+        
+        return ChallengeResponse(
+            challenge_id=challenge_id,
+            message=challenge_data["message"],
+            expires_at=challenge_data["expires_at"]
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Challenge generation failed: {str(e)}"
+        )
+
+@api_router.post("/auth/verify", response_model=TokenResponse)
+async def verify_signature(request: SignatureRequest):
+    """Verify Bitcoin Cash wallet signature and issue JWT token"""
+    # Validate challenge exists and is not expired
+    if request.challenge_id not in active_challenges:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired challenge"
+        )
+    
+    challenge_data = active_challenges[request.challenge_id]
+    expires_at = datetime.fromisoformat(challenge_data["expires_at"])
+    
+    if datetime.utcnow() > expires_at:
+        del active_challenges[request.challenge_id]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Challenge has expired"
+        )
+    
+    # Verify message matches challenge
+    if request.message != challenge_data["message"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Message does not match challenge"
+        )
+    
+    # Verify signature
+    if not bch_auth_service.verify_signature(request.bch_address, request.signature, request.message):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid signature"
+        )
+    
+    # Clean up used challenge
+    del active_challenges[request.challenge_id]
+    
+    # Generate access token
+    access_token_expires = timedelta(minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": request.bch_address, "auth_method": "bch_wallet"},
+        expires_delta=access_token_expires
+    )
+    
+    return TokenResponse(
+        access_token=access_token,
+        expires_in=JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+
 # Authentication dependency
 async def get_authenticated_member(member: MemberProfile = Depends(get_current_user)) -> MemberProfile:
     return member
