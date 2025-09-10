@@ -711,7 +711,7 @@ function App() {
           />
           
           <button
-            onClick={() => setShowAuth(false)}
+            onClick={() => setAuthState(prev => ({ ...prev, showAuth: false }))}
             className="w-full mt-4 text-gray-400 hover:text-white transition-colors"
           >
             ← Back to landing page
@@ -721,7 +721,7 @@ function App() {
     );
   }
 
-  return <LandingPage onGetStarted={() => setShowAuth(true)} />;
+  return <LandingPage onGetStarted={() => setAuthState(prev => ({ ...prev, showAuth: true }))} />;
 }
 
 export default App;
