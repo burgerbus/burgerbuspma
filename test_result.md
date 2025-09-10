@@ -307,7 +307,107 @@ backend:
           comment: "JWT Authentication Fix testing completed with 83.3% success rate (10/12 tests passed). FASTAPI_WALLETAUTH_SECRET environment variable properly loaded and working. Authentication challenge/solve endpoints functioning correctly. Protected endpoints now return proper 403 errors instead of 500 errors for unauthenticated requests. Registration flow working as expected. Minor issues: Challenge message uses default format instead of app name, Invalid JWT tokens cause 500 errors (library-level issue). Main authentication fix objective achieved successfully."
 
 frontend:
-  # No frontend testing performed as per instructions
+  - task: "BCH Authentication Landing Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Landing page loads correctly with 'Bitcoin Ben's Burger Bus Club' heading and 'Connect Wallet & Join' button. All visual elements and branding properly displayed."
+
+  - task: "BCH Authentication Flow"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/BCHAuth.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "Initial authentication failed with 'Wallet Demo BCH Wallet not available' error. Issue was in BCHWalletManager where availableWallets array was empty when connectWallet was called."
+        - working: true
+          agent: "testing"
+          comment: "FIXED: Added detectWallets() call before connectWallet() in handleWalletSelected function. Authentication now works end-to-end: Connect Wallet & Join → BCH auth page → Demo BCH Wallet → successful authentication with JWT token storage."
+
+  - task: "BCH Wallet Manager Integration"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/BCHWalletManager.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "Demo wallet connection failed due to timing issue - different BCHWalletManager instances used in selector vs authentication components."
+        - working: true
+          agent: "testing"
+          comment: "FIXED: Ensured detectWallets() is called before connectWallet(). Demo wallet now properly connects and generates demo signature for authentication."
+
+  - task: "Member Dashboard Access"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Dashboard loads successfully after authentication with 'Club Dashboard' heading, member address display, and all required stats (Membership Tier: BASIC, Total Orders: 0, Available Locations: 2, Exclusive Events: 1)."
+
+  - task: "Dashboard Content and Navigation"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "All dashboard tabs working perfectly: Menu (4 Bitcoin-themed items with member pricing), Locations (2 locations with member-only badges), Events (1 event with join functionality), Orders (shows 'No orders yet' message). Tab navigation smooth and responsive."
+
+  - task: "Menu Items Display"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Menu displays all Bitcoin-themed items correctly: 'The Satoshi Stacker' ($21), 'The Hodl Burger' ($18), 'The Bitcoin Mining Rig' ($28, Premium), 'Lightning Network Loaded Fries'. Member pricing and Pre-Order buttons functional."
+
+  - task: "JWT Token Persistence"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/BCHAuth.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "JWT token properly stored in localStorage with key 'bch_auth_token'. Authentication state maintained after page refresh - dashboard remains accessible without re-authentication."
+
+  - task: "API Integration"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/BCHAuth.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "All API endpoints working correctly: POST /api/auth/challenge (200), POST /api/auth/verify (200), GET /api/debug/profile (200), GET /api/debug/menu (200), GET /api/debug/locations (200), GET /api/debug/events (200), GET /api/debug/orders (200). Backend integration fully functional."
 
 metadata:
   created_by: "testing_agent"
