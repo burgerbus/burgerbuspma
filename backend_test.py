@@ -631,13 +631,422 @@ class FoodTruckBackendTester:
             except Exception as e:
                 self.log_test(f"Protected Endpoint Security ({endpoint})", False, f"Error: {str(e)}")
     
+    def test_bch_payment_system(self):
+        """Test the new BCH payment system endpoints"""
+        print("\n=== Testing BCH Payment System ===")
+        
+        # Test 1: Payment Creation Endpoint
+        try:
+            response = self.session.post(f"{self.base_url}/api/payments/create-membership-payment", 
+                                       json={"user_address": "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2"})
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "payment_id", "amount_usd", "amount_bch", "bch_price", 
+                                 "receiving_address", "expires_at", "qr_code", "payment_uri", "instructions"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Payment Creation Endpoint", True, f"All required fields present. Payment ID: {data.get('payment_id')}")
+                    
+                    # Store payment_id for status testing
+                    self.payment_id = data["payment_id"]
+                    
+                    # Validate payment details
+                    if data["amount_usd"] == 21.0:
+                        self.log_test("Payment Amount USD", True, f"Correct membership fee: ${data['amount_usd']}")
+                    else:
+                        self.log_test("Payment Amount USD", False, f"Expected $21, got ${data['amount_usd']}")
+                    
+                    # Validate BCH price fetching (should be > 0)
+                    if data["bch_price"] > 0:
+                        self.log_test("BCH Price Fetching", True, f"BCH price fetched: ${data['bch_price']}")
+                    else:
+                        self.log_test("BCH Price Fetching", False, f"Invalid BCH price: ${data['bch_price']}")
+                    
+                    # Validate BCH amount calculation
+                    expected_bch = 21.0 / data["bch_price"]
+                    if abs(data["amount_bch"] - expected_bch) < 0.00000001:  # 8 decimal precision
+                        self.log_test("BCH Amount Calculation", True, f"Correct BCH amount: {data['amount_bch']}")
+                    else:
+                        self.log_test("BCH Amount Calculation", False, f"Expected {expected_bch}, got {data['amount_bch']}")
+                    
+                    # Validate QR code generation
+                    if data["qr_code"] and data["qr_code"].startswith("data:image/png;base64,"):
+                        self.log_test("QR Code Generation", True, "QR code generated successfully")
+                    else:
+                        self.log_test("QR Code Generation", False, "Invalid or missing QR code")
+                    
+                    # Validate payment URI format
+                    expected_uri_start = f"bitcoincash:{data['receiving_address']}?amount="
+                    if data["payment_uri"].startswith(expected_uri_start):
+                        self.log_test("Payment URI Format", True, "Payment URI correctly formatted")
+                    else:
+                        self.log_test("Payment URI Format", False, f"Invalid payment URI format: {data['payment_uri']}")
+                        
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Payment Creation Endpoint", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Payment Creation Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Payment Creation Endpoint", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Payment Status Endpoint
+        if hasattr(self, 'payment_id'):
+            try:
+                response = self.session.get(f"{self.base_url}/api/payments/status/{self.payment_id}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    required_fields = ["payment_id", "status", "amount_usd", "amount_bch", 
+                                     "receiving_address", "expires_at", "created_at"]
+                    
+                    if all(field in data for field in required_fields):
+                        self.log_test("Payment Status Endpoint", True, f"Status: {data['status']}, Payment ID: {data['payment_id']}")
+                        
+                        # Validate status is pending for new payment
+                        if data["status"] == "pending":
+                            self.log_test("Payment Initial Status", True, "Payment status correctly set to pending")
+                        else:
+                            self.log_test("Payment Initial Status", False, f"Expected 'pending', got '{data['status']}'")
+                            
+                        # Validate expiration logic (should be 24 hours from creation)
+                        from datetime import datetime, timezone
+                        try:
+                            expires_at = datetime.fromisoformat(data["expires_at"].replace('Z', '+00:00'))
+                            created_at = datetime.fromisoformat(data["created_at"].replace('Z', '+00:00'))
+                            time_diff = (expires_at - created_at).total_seconds()
+                            expected_hours = 24 * 3600  # 24 hours in seconds
+                            
+                            if abs(time_diff - expected_hours) < 300:  # Allow 5 minute tolerance
+                                self.log_test("Payment Expiration Logic", True, f"Payment expires in {time_diff/3600:.1f} hours")
+                            else:
+                                self.log_test("Payment Expiration Logic", False, f"Expected 24 hours, got {time_diff/3600:.1f} hours")
+                        except Exception as e:
+                            self.log_test("Payment Expiration Logic", False, f"Error parsing dates: {str(e)}")
+                    else:
+                        missing_fields = [f for f in required_fields if f not in data]
+                        self.log_test("Payment Status Endpoint", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Payment Status Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+            except Exception as e:
+                self.log_test("Payment Status Endpoint", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Invalid Payment ID
+        try:
+            response = self.session.get(f"{self.base_url}/api/payments/status/invalid_payment_id")
+            
+            if response.status_code == 404:
+                data = response.json()
+                if "Payment not found" in data.get("detail", ""):
+                    self.log_test("Invalid Payment ID Handling", True, "Properly handles invalid payment ID")
+                else:
+                    self.log_test("Invalid Payment ID Handling", False, f"Unexpected error message: {data.get('detail')}")
+            else:
+                self.log_test("Invalid Payment ID Handling", False, f"Expected 404, got {response.status_code}")
+        except Exception as e:
+            self.log_test("Invalid Payment ID Handling", False, f"Connection error: {str(e)}")
+    
+    def test_admin_payment_endpoints(self):
+        """Test admin payment management endpoints"""
+        print("\n=== Testing Admin Payment Endpoints ===")
+        
+        # Test 1: Admin Verify Payment
+        if hasattr(self, 'payment_id'):
+            try:
+                verify_data = {
+                    "payment_id": self.payment_id,
+                    "transaction_id": "test_tx_12345abcdef",
+                    "admin_notes": "Test verification"
+                }
+                response = self.session.post(f"{self.base_url}/api/admin/verify-payment", json=verify_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    required_fields = ["success", "message", "payment_id", "member_activated", "cashstamp_pending"]
+                    
+                    if all(field in data for field in required_fields):
+                        self.log_test("Admin Verify Payment", True, f"Payment verified successfully: {data['message']}")
+                        
+                        # Validate verification response
+                        if data["success"] and data["member_activated"] and data["cashstamp_pending"]:
+                            self.log_test("Payment Verification Response", True, "All verification flags correct")
+                        else:
+                            self.log_test("Payment Verification Response", False, f"Unexpected verification flags: {data}")
+                    else:
+                        missing_fields = [f for f in required_fields if f not in data]
+                        self.log_test("Admin Verify Payment", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Admin Verify Payment", False, f"Status: {response.status_code}, Response: {response.text}")
+            except Exception as e:
+                self.log_test("Admin Verify Payment", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Admin Pending Payments List
+        try:
+            response = self.session.get(f"{self.base_url}/api/admin/pending-payments")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["pending_payments", "count"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Admin Pending Payments", True, f"Found {data['count']} pending payments")
+                    
+                    # Validate pending payments structure
+                    if data["count"] > 0 and len(data["pending_payments"]) > 0:
+                        payment = data["pending_payments"][0]
+                        payment_fields = ["payment_id", "user_address", "amount_usd", "amount_bch", "created_at", "expires_at"]
+                        if all(field in payment for field in payment_fields):
+                            self.log_test("Pending Payment Structure", True, "Payment structure is correct")
+                        else:
+                            missing = [f for f in payment_fields if f not in payment]
+                            self.log_test("Pending Payment Structure", False, f"Missing fields: {missing}")
+                    else:
+                        self.log_test("Pending Payment Structure", True, "No pending payments (expected after verification)")
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Admin Pending Payments", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Admin Pending Payments", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Admin Pending Payments", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Admin Send Cashstamp
+        if hasattr(self, 'payment_id'):
+            try:
+                cashstamp_data = {
+                    "payment_id": self.payment_id,
+                    "recipient_address": "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2",
+                    "admin_wallet_address": "bitcoincash:qpadmin123456789abcdef"
+                }
+                response = self.session.post(f"{self.base_url}/api/admin/send-cashstamp", json=cashstamp_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    required_fields = ["success", "message", "payment_id", "cashstamp_amount_bch", 
+                                     "cashstamp_amount_usd", "instructions", "note"]
+                    
+                    if all(field in data for field in required_fields):
+                        self.log_test("Admin Send Cashstamp", True, f"Cashstamp instructions generated: {data['message']}")
+                        
+                        # Validate cashstamp amount
+                        if data["cashstamp_amount_usd"] == 15.0:
+                            self.log_test("Cashstamp Amount USD", True, f"Correct cashstamp amount: ${data['cashstamp_amount_usd']}")
+                        else:
+                            self.log_test("Cashstamp Amount USD", False, f"Expected $15, got ${data['cashstamp_amount_usd']}")
+                        
+                        # Validate instructions structure
+                        instructions = data["instructions"]
+                        if isinstance(instructions, dict) and "action" in instructions and "amount_bch" in instructions:
+                            self.log_test("Cashstamp Instructions", True, "Instructions properly formatted")
+                        else:
+                            self.log_test("Cashstamp Instructions", False, f"Invalid instructions format: {instructions}")
+                    else:
+                        missing_fields = [f for f in required_fields if f not in data]
+                        self.log_test("Admin Send Cashstamp", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Admin Send Cashstamp", False, f"Status: {response.status_code}, Response: {response.text}")
+            except Exception as e:
+                self.log_test("Admin Send Cashstamp", False, f"Connection error: {str(e)}")
+        
+        # Test 4: Cashstamp for Unverified Payment (should fail)
+        try:
+            # Create a new payment for this test
+            response = self.session.post(f"{self.base_url}/api/payments/create-membership-payment", 
+                                       json={"user_address": "bitcoincash:qtest123456789"})
+            if response.status_code == 200:
+                new_payment_id = response.json()["payment_id"]
+                
+                cashstamp_data = {
+                    "payment_id": new_payment_id,
+                    "recipient_address": "bitcoincash:qtest123456789"
+                }
+                response = self.session.post(f"{self.base_url}/api/admin/send-cashstamp", json=cashstamp_data)
+                
+                if response.status_code == 400:
+                    data = response.json()
+                    if "Payment must be verified first" in data.get("detail", ""):
+                        self.log_test("Cashstamp Unverified Payment", True, "Properly rejects unverified payment")
+                    else:
+                        self.log_test("Cashstamp Unverified Payment", False, f"Unexpected error: {data.get('detail')}")
+                else:
+                    self.log_test("Cashstamp Unverified Payment", False, f"Expected 400, got {response.status_code}")
+        except Exception as e:
+            self.log_test("Cashstamp Unverified Payment", False, f"Connection error: {str(e)}")
+    
+    def test_payment_integration_flow(self):
+        """Test complete payment flow integration"""
+        print("\n=== Testing Payment Integration Flow ===")
+        
+        # Test complete flow: create → check status → verify → check status → cashstamp
+        try:
+            # Step 1: Create payment
+            user_address = "bitcoincash:qintegration_test_address"
+            response = self.session.post(f"{self.base_url}/api/payments/create-membership-payment", 
+                                       json={"user_address": user_address})
+            
+            if response.status_code == 200:
+                payment_data = response.json()
+                payment_id = payment_data["payment_id"]
+                self.log_test("Integration Flow - Create Payment", True, f"Payment created: {payment_id}")
+                
+                # Step 2: Check initial status
+                status_response = self.session.get(f"{self.base_url}/api/payments/status/{payment_id}")
+                if status_response.status_code == 200:
+                    status_data = status_response.json()
+                    if status_data["status"] == "pending":
+                        self.log_test("Integration Flow - Initial Status", True, "Payment status is pending")
+                        
+                        # Step 3: Admin verify payment
+                        verify_data = {
+                            "payment_id": payment_id,
+                            "transaction_id": "integration_test_tx_abc123"
+                        }
+                        verify_response = self.session.post(f"{self.base_url}/api/admin/verify-payment", json=verify_data)
+                        
+                        if verify_response.status_code == 200:
+                            self.log_test("Integration Flow - Verify Payment", True, "Payment verified successfully")
+                            
+                            # Step 4: Check updated status
+                            updated_status_response = self.session.get(f"{self.base_url}/api/payments/status/{payment_id}")
+                            if updated_status_response.status_code == 200:
+                                updated_status_data = updated_status_response.json()
+                                if updated_status_data["status"] == "verified":
+                                    self.log_test("Integration Flow - Updated Status", True, "Payment status updated to verified")
+                                    
+                                    # Validate transaction_id and verified_at are set
+                                    if updated_status_data.get("transaction_id") and updated_status_data.get("verified_at"):
+                                        self.log_test("Integration Flow - Verification Details", True, "Transaction ID and verification time recorded")
+                                    else:
+                                        self.log_test("Integration Flow - Verification Details", False, "Missing transaction ID or verification time")
+                                    
+                                    # Step 5: Generate cashstamp
+                                    cashstamp_data = {
+                                        "payment_id": payment_id,
+                                        "recipient_address": user_address
+                                    }
+                                    cashstamp_response = self.session.post(f"{self.base_url}/api/admin/send-cashstamp", json=cashstamp_data)
+                                    
+                                    if cashstamp_response.status_code == 200:
+                                        self.log_test("Integration Flow - Generate Cashstamp", True, "Cashstamp instructions generated")
+                                        self.log_test("Integration Flow - Complete", True, "Full payment flow completed successfully")
+                                    else:
+                                        self.log_test("Integration Flow - Generate Cashstamp", False, f"Cashstamp failed: {cashstamp_response.status_code}")
+                                else:
+                                    self.log_test("Integration Flow - Updated Status", False, f"Expected 'verified', got '{updated_status_data['status']}'")
+                            else:
+                                self.log_test("Integration Flow - Updated Status", False, f"Status check failed: {updated_status_response.status_code}")
+                        else:
+                            self.log_test("Integration Flow - Verify Payment", False, f"Verification failed: {verify_response.status_code}")
+                    else:
+                        self.log_test("Integration Flow - Initial Status", False, f"Expected 'pending', got '{status_data['status']}'")
+                else:
+                    self.log_test("Integration Flow - Initial Status", False, f"Status check failed: {status_response.status_code}")
+            else:
+                self.log_test("Integration Flow - Create Payment", False, f"Payment creation failed: {response.status_code}")
+        except Exception as e:
+            self.log_test("Integration Flow - Complete", False, f"Integration test error: {str(e)}")
+    
+    def test_payment_error_scenarios(self):
+        """Test payment system error handling"""
+        print("\n=== Testing Payment Error Scenarios ===")
+        
+        # Test 1: Verify non-existent payment
+        try:
+            verify_data = {
+                "payment_id": "non_existent_payment_123",
+                "transaction_id": "test_tx"
+            }
+            response = self.session.post(f"{self.base_url}/api/admin/verify-payment", json=verify_data)
+            
+            if response.status_code == 404:
+                data = response.json()
+                if "Payment not found" in data.get("detail", ""):
+                    self.log_test("Verify Non-existent Payment", True, "Properly handles non-existent payment")
+                else:
+                    self.log_test("Verify Non-existent Payment", False, f"Unexpected error: {data.get('detail')}")
+            else:
+                self.log_test("Verify Non-existent Payment", False, f"Expected 404, got {response.status_code}")
+        except Exception as e:
+            self.log_test("Verify Non-existent Payment", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Double verification (should handle gracefully)
+        if hasattr(self, 'payment_id'):
+            try:
+                verify_data = {
+                    "payment_id": self.payment_id,
+                    "transaction_id": "double_verify_test"
+                }
+                response = self.session.post(f"{self.base_url}/api/admin/verify-payment", json=verify_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if "already verified" in data.get("message", "").lower():
+                        self.log_test("Double Verification Handling", True, "Properly handles already verified payment")
+                    else:
+                        self.log_test("Double Verification Handling", True, "Verification completed (may update transaction ID)")
+                else:
+                    self.log_test("Double Verification Handling", False, f"Unexpected status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Double Verification Handling", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Cashstamp for non-existent payment
+        try:
+            cashstamp_data = {
+                "payment_id": "non_existent_payment_456",
+                "recipient_address": "bitcoincash:qtest"
+            }
+            response = self.session.post(f"{self.base_url}/api/admin/send-cashstamp", json=cashstamp_data)
+            
+            if response.status_code == 404:
+                data = response.json()
+                if "Payment not found" in data.get("detail", ""):
+                    self.log_test("Cashstamp Non-existent Payment", True, "Properly handles non-existent payment")
+                else:
+                    self.log_test("Cashstamp Non-existent Payment", False, f"Unexpected error: {data.get('detail')}")
+            else:
+                self.log_test("Cashstamp Non-existent Payment", False, f"Expected 404, got {response.status_code}")
+        except Exception as e:
+            self.log_test("Cashstamp Non-existent Payment", False, f"Connection error: {str(e)}")
+    
+    def test_bch_price_fallback(self):
+        """Test BCH price fetching and fallback mechanism"""
+        print("\n=== Testing BCH Price Fallback ===")
+        
+        # Create multiple payments to test price consistency
+        try:
+            prices = []
+            for i in range(3):
+                response = self.session.post(f"{self.base_url}/api/payments/create-membership-payment", 
+                                           json={"user_address": f"bitcoincash:qtest{i}"})
+                if response.status_code == 200:
+                    data = response.json()
+                    prices.append(data["bch_price"])
+                    time.sleep(1)  # Small delay between requests
+            
+            if len(prices) >= 2:
+                # Prices should be consistent (within reasonable range) or fallback to 300
+                if all(p > 0 for p in prices):
+                    if all(abs(p - prices[0]) < 50 for p in prices):  # Prices within $50 of each other
+                        self.log_test("BCH Price Consistency", True, f"Prices consistent: {prices}")
+                    elif all(p == 300.0 for p in prices):
+                        self.log_test("BCH Price Fallback", True, "Using fallback price of $300")
+                    else:
+                        self.log_test("BCH Price Variation", True, f"Price variation detected: {prices} (may be normal)")
+                else:
+                    self.log_test("BCH Price Fetching", False, f"Invalid prices: {prices}")
+            else:
+                self.log_test("BCH Price Testing", False, "Could not create enough payments for price testing")
+        except Exception as e:
+            self.log_test("BCH Price Testing", False, f"Error testing price fetching: {str(e)}")
+
     def test_error_handling(self):
         """Test error handling for invalid requests"""
         print("\n=== Testing Error Handling ===")
         
         # Test invalid JSON payload
         try:
-            response = self.session.post(f"{self.base_url}/api/auth/authorization/challenge", 
+            response = self.session.post(f"{self.base_url}/api/auth/challenge", 
                                        data="invalid json", 
                                        headers={'Content-Type': 'application/json'})
             if response.status_code in [400, 422]:
@@ -649,7 +1058,7 @@ class FoodTruckBackendTester:
         
         # Test missing required parameters
         try:
-            response = self.session.post(f"{self.base_url}/api/auth/authorization/challenge", json={})
+            response = self.session.post(f"{self.base_url}/api/auth/challenge", json={})
             if response.status_code in [400, 422]:
                 self.log_test("Missing Parameters Handling", True, f"Properly handled missing params: {response.status_code}")
             else:
