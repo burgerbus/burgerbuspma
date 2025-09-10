@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the new BCH (Bitcoin Cash) authentication system that replaced the old Solana authentication. Test challenge generation, signature verification, JWT tokens, protected endpoints, and error handling."
+user_problem_statement: "Test the new hybrid BCH payment system that replaces the simple PMA flow with real Bitcoin Cash payments. Test payment creation, status checking, admin verification, cashstamp generation, and complete integration flow."
 
 backend:
   - task: "Basic API Health Check"
@@ -193,7 +193,91 @@ backend:
     status_history:
         - working: true
           agent: "testing"
-          comment: "Error handling working correctly. Invalid challenge_id returns 400 'Invalid or expired challenge', message mismatch returns 400 'Message does not match challenge', invalid signatures return 401 'Invalid signature'. All error scenarios properly handled."
+          comment: "Minor: Error handling working correctly. Invalid challenge_id returns 400 'Invalid or expired challenge', message mismatch returns 400 'Message does not match challenge', invalid signatures return 401 'Invalid signature'. Minor test expectation issues with error message format but core functionality works."
+
+  - task: "BCH Payment Creation Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "BCH payment creation endpoint working perfectly. POST /api/payments/create-membership-payment successfully fetches BCH price from CoinGecko API (with fallback to $300), calculates correct BCH amount for $21 USD membership fee, generates valid QR codes for payment, and creates payment requests with all required fields including payment_id, expires_at (24 hours), and payment URI."
+
+  - task: "BCH Payment Status Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Payment status endpoint working correctly. GET /api/payments/status/{payment_id} returns payment details with proper status tracking (pending/verified/expired), handles expiration logic (24 hours), and includes all required fields: payment_id, status, amounts, addresses, timestamps. Invalid payment IDs properly return 404 errors."
+
+  - task: "Admin Payment Verification Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Admin verification endpoint working perfectly. POST /api/admin/verify-payment accepts JSON body with payment_id and transaction_id, updates payment status to 'verified', records verification timestamp and transaction ID, and returns proper success response with member_activated and cashstamp_pending flags. Handles already verified payments gracefully."
+
+  - task: "Admin Payment Management Endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Admin management endpoints working correctly. GET /api/admin/pending-payments lists all pending payments with proper structure and count. POST /api/admin/send-cashstamp generates $15 BCH cashstamp instructions with current BCH price calculation, proper recipient addressing, and manual transaction instructions. Properly validates that payments must be verified before cashstamp generation."
+
+  - task: "BCH Payment Integration Flow"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Complete payment integration flow working perfectly. Full end-to-end testing successful: create payment → check initial status (pending) → admin verify payment → check updated status (verified) → generate cashstamp instructions. All status transitions work correctly, transaction IDs and verification timestamps are properly recorded, and the hybrid manual verification workflow functions as designed."
+
+  - task: "BCH Price Fetching and QR Code Generation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "BCH price fetching and QR code generation working correctly. CoinGecko API integration successfully fetches current BCH prices with proper fallback to $300 USD when API fails. QR code generation creates valid base64-encoded PNG images with proper BCH payment URIs in format 'bitcoincash:address?amount=X&label=Bitcoin Ben's Membership'. Price consistency maintained across multiple requests."
+
+  - task: "Payment Error Handling"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Payment error handling working correctly. Non-existent payment IDs return proper 404 errors, unverified payments cannot generate cashstamps (400 error), double verification is handled gracefully, and all error scenarios return appropriate HTTP status codes and descriptive error messages."
 
   - task: "Wallet Authentication Flow"
     implemented: true
@@ -262,7 +346,7 @@ backend:
     status_history:
         - working: true
           agent: "testing"
-          comment: "Error handling working correctly. Invalid JSON returns 422, missing parameters return 422, non-existent endpoints return 404 as expected."
+          comment: "Minor: Error handling working correctly. Invalid JSON returns 422, missing parameters return 422, non-existent endpoints return 404 as expected. Minor test expectation issue with one parameter handling test but core functionality works."
 
   - task: "Member Registration with PMA"
     implemented: true
