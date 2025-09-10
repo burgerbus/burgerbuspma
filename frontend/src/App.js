@@ -399,7 +399,7 @@ const MemberDashboard = ({ memberAddress }) => {
         special_instructions: ""
       }];
 
-      await authService.post('/api/orders', {
+      await bchAuthService.post('/api/orders', {
         items: orderItems,
         pickup_location: "Downtown Business District",
         pickup_time: "12:00"
@@ -408,7 +408,7 @@ const MemberDashboard = ({ memberAddress }) => {
       alert('Order placed successfully!');
       
       // Refresh orders
-      const ordersData = await authService.get('/api/orders');
+      const ordersData = await bchAuthService.get('/api/orders');
       setOrders(ordersData);
     } catch (error) {
       console.error('Order failed:', error);
