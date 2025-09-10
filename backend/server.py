@@ -390,12 +390,12 @@ async def debug_get_profile():
         "id": "debug-profile-123",
         "wallet_address": "debug_wallet_address",
         "membership_tier": "basic",
-        "full_name": "Debug User",
-        "email": "debug@bitcoinben.com",
-        "phone": "+1-555-0123",
-        "pma_agreed": True,
-        "dues_paid": True,
-        "payment_amount": 21.0,
+        "full_name": "",
+        "email": "",
+        "phone": "",
+        "pma_agreed": False,
+        "dues_paid": False,
+        "payment_amount": 0.0,
         "total_orders": 0,
         "favorite_items": []
     }
