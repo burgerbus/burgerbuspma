@@ -392,6 +392,13 @@ const MemberDashboard = ({ memberAddress }) => {
   }, []);
 
   const handlePreOrder = async (item, quantity = 1) => {
+    // Check if member has completed PMA requirements
+    if (!memberData || !memberData.pma_agreed || !memberData.dues_paid) {
+      alert('You must complete your PMA membership agreement and pay annual dues ($21) before placing orders. Please complete your registration first.');
+      setShowPMAPage(true);
+      return;
+    }
+
     try {
       const orderItems = [{
         item_id: item.id,
@@ -412,7 +419,14 @@ const MemberDashboard = ({ memberAddress }) => {
       setOrders(ordersData);
     } catch (error) {
       console.error('Order failed:', error);
-      alert('Order failed. Please try again.');
+      
+      if (error.response?.status === 403) {
+        // Backend validation failed - show PMA page
+        alert(error.response.data.detail || 'Please complete your membership requirements before ordering.');
+        setShowPMAPage(true);
+      } else {
+        alert('Order failed. Please try again.');
+      }
     }
   };
 
