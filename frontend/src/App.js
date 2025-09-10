@@ -1,21 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import axios from 'axios';
-import bs58 from 'bs58';
-
-// Solana wallet imports
-import { ConnectionProvider, WalletProvider, useWallet } from '@solana/wallet-adapter-react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { WalletModalProvider, WalletMultiButton, WalletDisconnectButton } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
-import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
-import { BraveWalletAdapter } from '@solana/wallet-adapter-brave';
-
-// Import wallet adapter CSS
-import '@solana/wallet-adapter-react-ui/styles.css';
+import { BCHAuthentication, bchAuthService } from './BCHAuth';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 // Auth Service
 class AuthService {
