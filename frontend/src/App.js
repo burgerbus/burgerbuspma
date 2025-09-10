@@ -347,12 +347,12 @@ const MemberDashboard = ({ memberAddress }) => {
         setLoading(true);
         
         // Seed sample data first
-        await authService.post('/api/admin/seed-data');
+        await bchAuthService.post('/api/admin/seed-data');
         
         // Try to load member profile first (using debug endpoint temporarily)
         let profile;
         try {
-          profile = await authService.get('/api/debug/profile');
+          profile = await bchAuthService.get('/api/debug/profile');
         } catch (profileError) {
           // If profile doesn't exist, show PMA page
           console.log('No profile found, showing PMA page');
@@ -363,10 +363,10 @@ const MemberDashboard = ({ memberAddress }) => {
 
         // Load member data (using debug endpoints temporarily)
         const [menuData, locationsData, eventsData, ordersData] = await Promise.all([
-          authService.get('/api/debug/menu'),
-          authService.get('/api/debug/locations'),
-          authService.get('/api/debug/events'),
-          authService.get('/api/debug/orders')
+          bchAuthService.get('/api/debug/menu'),
+          bchAuthService.get('/api/debug/locations'),
+          bchAuthService.get('/api/debug/events'),
+          bchAuthService.get('/api/debug/orders')
         ]);
 
         setMemberData(profile);
