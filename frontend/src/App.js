@@ -909,7 +909,19 @@ function App() {
     console.error('Auth error:', error);
   };
 
+  // Check for admin access via URL parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('admin') === 'true') {
+      setAuthState(prev => ({ ...prev, showAdmin: true }));
+    }
+  }, []);
+
   // Use the combined state for render condition
+  if (authState.showAdmin) {
+    return <AdminPanel />;
+  }
+
   if (authState.isAuthenticated && authState.memberAddress) {
     return <MemberDashboard memberAddress={authState.memberAddress} />;
   }
