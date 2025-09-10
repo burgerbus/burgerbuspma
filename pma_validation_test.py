@@ -176,15 +176,16 @@ class PMAValidationTester:
         
         try:
             # Test order creation with incomplete membership
-            order_data = {
-                "items": [
-                    {"item_id": "test_item_123", "quantity": 1, "special_instructions": "Extra crispy"}
-                ],
+            items_data = [
+                {"item_id": "test_item_123", "quantity": 1, "special_instructions": "Extra crispy"}
+            ]
+            
+            params = {
                 "pickup_location": "Downtown Business District",
                 "pickup_time": "12:00"
             }
             
-            response = self.session.post(f"{self.base_url}/api/orders", json=order_data, headers=auth_headers)
+            response = self.session.post(f"{self.base_url}/api/orders", json=items_data, params=params, headers=auth_headers)
             
             if response.status_code == 403:
                 data = response.json()
