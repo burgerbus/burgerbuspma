@@ -173,51 +173,7 @@ async def update_member_profile(
         {"wallet_address": member.wallet_address},
         {"$set": {"favorite_items": favorite_items}}
     )
-# TEMPORARY: Registration without auth for debugging
-@api_router.post("/debug/register")
-async def debug_registration(member_data: dict):
-    """TEMPORARY: Debug registration without authentication"""
-    try:
-        wallet_address = member_data.get("wallet_address", "debug_wallet_123")
-        
-        # Create or get member
-        existing_member = await db.members.find_one({"wallet_address": wallet_address})
-        if not existing_member:
-            new_member = MemberProfile(
-                wallet_address=wallet_address,
-                full_name="",
-                email="",
-                phone="",
-                pma_agreed=False,
-                dues_paid=False,
-                payment_amount=0.0
-            )
-            member_dict = new_member.dict()
-            if 'joined_at' in member_dict and isinstance(member_dict['joined_at'], datetime):
-                member_dict['joined_at'] = member_dict['joined_at'].isoformat()
-            await db.members.insert_one(member_dict)
-            existing_member = member_dict
-        
-        # Update with PMA info
-        await db.members.update_one(
-            {"wallet_address": wallet_address},
-            {"$set": {
-                "full_name": member_data.get("fullName", ""),
-                "email": member_data.get("email", ""),
-                "phone": member_data.get("phone", ""),
-                "pma_agreed": member_data.get("pma_agreed", False),
-                "dues_paid": member_data.get("dues_paid", False),
-                "payment_amount": member_data.get("payment_amount", 0.0),
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }}
-        )
-        
-        updated_member = await db.members.find_one({"wallet_address": wallet_address})
-        return {"message": "Debug registration successful", "member": MemberProfile(**updated_member)}
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Debug registration failed: {str(e)}")
+
     return {"message": "Profile updated successfully"}
 @api_router.post("/membership/register")
 async def register_membership(member_data: dict, member: MemberProfile = Depends(get_authenticated_member)):
