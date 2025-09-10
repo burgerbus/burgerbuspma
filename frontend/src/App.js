@@ -690,47 +690,37 @@ function App() {
   };
 
   if (isAuthenticated && memberAddress) {
-    return (
-      <WalletProviders>
-        <MemberDashboard memberAddress={memberAddress} />
-      </WalletProviders>
-    );
+    return <MemberDashboard memberAddress={memberAddress} />;
   }
 
   if (showAuth) {
     return (
-      <WalletProviders>
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-          <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold text-white text-center mb-6">
-              Connect Your Solana Wallet
-            </h2>
-            <p className="text-gray-400 text-center mb-8">
-              Sign a message with your wallet to join Bitcoin Ben's Burger Bus Club
-            </p>
-            
-            <WalletAuth 
-              onAuthSuccess={handleAuthSuccess}
-              onAuthError={handleAuthError}
-            />
-            
-            <button
-              onClick={() => setShowAuth(false)}
-              className="w-full mt-4 text-gray-400 hover:text-white transition-colors"
-            >
-              ← Back to landing page
-            </button>
-          </div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
+          <h2 className="text-2xl font-bold text-white text-center mb-6">
+            Connect Your Bitcoin Cash Wallet
+          </h2>
+          <p className="text-gray-400 text-center mb-8">
+            Sign a message with your wallet to join Bitcoin Ben's Burger Bus Club
+          </p>
+          
+          <BCHAuthentication 
+            onAuthSuccess={handleAuthSuccess}
+            onAuthError={handleAuthError}
+          />
+          
+          <button
+            onClick={() => setShowAuth(false)}
+            className="w-full mt-4 text-gray-400 hover:text-white transition-colors"
+          >
+            ← Back to landing page
+          </button>
         </div>
-      </WalletProviders>
+      </div>
     );
   }
 
-  return (
-    <WalletProviders>
-      <LandingPage onGetStarted={() => setShowAuth(true)} />
-    </WalletProviders>
-  );
+  return <LandingPage onGetStarted={() => setShowAuth(true)} />;
 }
 
 export default App;
