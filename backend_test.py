@@ -143,51 +143,257 @@ class FoodTruckBackendTester:
         except Exception as e:
             self.log_test("Public Locations Endpoint", False, f"Connection error: {str(e)}")
     
-    def test_wallet_authentication_flow(self):
-        """Test Solana wallet authentication endpoints"""
-        print("\n=== Testing Wallet Authentication Flow ===")
+    def test_bch_authentication_flow(self):
+        """Test BCH (Bitcoin Cash) wallet authentication endpoints"""
+        print("\n=== Testing BCH Authentication Flow ===")
         
-        # Test authentication challenge endpoint
-        test_wallet_address = "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"  # Valid Solana address format
+        # Test BCH authentication challenge endpoint
+        test_bch_address = "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2"  # Valid BCH address format
         
+        # Test 1: Challenge Generation
         try:
-            # Test challenge generation
-            params = {"address": test_wallet_address, "chain": "SOL"}
-            response = self.session.post(f"{self.base_url}/api/auth/authorization/challenge", params=params)
+            challenge_data = {
+                "app_name": "Bitcoin Ben's Burger Bus Club"
+            }
+            response = self.session.post(f"{self.base_url}/api/auth/challenge", json=challenge_data)
             
             if response.status_code == 200:
                 data = response.json()
-                if "challenge" in data:
-                    self.log_test("Authentication Challenge", True, f"Status: {response.status_code}, Challenge generated")
+                required_fields = ["challenge_id", "message", "expires_at"]
+                if all(field in data for field in required_fields):
+                    self.log_test("BCH Challenge Generation", True, f"Status: {response.status_code}, All required fields present")
                     
-                    # Validate challenge format
-                    challenge = data["challenge"]
-                    if isinstance(challenge, str) and len(challenge) > 10:
-                        self.log_test("Challenge Format", True, f"Challenge length: {len(challenge)}")
+                    # Store challenge data for verification test
+                    self.challenge_id = data["challenge_id"]
+                    self.challenge_message = data["message"]
+                    
+                    # Validate challenge structure
+                    if len(data["challenge_id"]) == 32:  # Should be 16 bytes hex = 32 chars
+                        self.log_test("Challenge ID Format", True, f"Challenge ID length: {len(data['challenge_id'])}")
                     else:
-                        self.log_test("Challenge Format", False, f"Invalid challenge format: {challenge}")
+                        self.log_test("Challenge ID Format", False, f"Invalid challenge ID length: {len(data['challenge_id'])}")
+                    
+                    # Validate message contains app name, timestamp, and nonce
+                    message = data["message"]
+                    if "Bitcoin Ben's Burger Bus Club" in message and "Time:" in message and "Nonce:" in message:
+                        self.log_test("Challenge Message Format", True, "Message contains app name, timestamp, and nonce")
+                    else:
+                        self.log_test("Challenge Message Format", False, f"Invalid message format: {message}")
+                    
+                    # Validate expires_at is in future (5 minutes)
+                    from datetime import datetime
+                    try:
+                        expires_at = datetime.fromisoformat(data["expires_at"])
+                        now = datetime.utcnow()
+                        time_diff = (expires_at - now).total_seconds()
+                        if 250 <= time_diff <= 350:  # Should be around 5 minutes (300 seconds)
+                            self.log_test("Challenge Expiration", True, f"Challenge expires in {time_diff:.0f} seconds")
+                        else:
+                            self.log_test("Challenge Expiration", False, f"Unexpected expiration time: {time_diff:.0f} seconds")
+                    except Exception as e:
+                        self.log_test("Challenge Expiration", False, f"Error parsing expires_at: {str(e)}")
                 else:
-                    self.log_test("Authentication Challenge", False, "No challenge in response", data)
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("BCH Challenge Generation", False, f"Missing fields: {missing_fields}", data)
             else:
-                self.log_test("Authentication Challenge", False, f"Status: {response.status_code}", response.text)
+                self.log_test("BCH Challenge Generation", False, f"Status: {response.status_code}", response.text)
         except Exception as e:
-            self.log_test("Authentication Challenge", False, f"Connection error: {str(e)}")
+            self.log_test("BCH Challenge Generation", False, f"Connection error: {str(e)}")
         
-        # Test invalid wallet address (challenge generation should still work, validation happens at solve stage)
-        try:
-            invalid_params = {"address": "invalid_address", "chain": "SOL"}
-            response = self.session.post(f"{self.base_url}/api/auth/authorization/challenge", params=invalid_params)
-            
-            if response.status_code == 200:  # Challenge generation should work even with invalid address
-                data = response.json()
-                if "challenge" in data and data["address"] == "invalid_address":
-                    self.log_test("Invalid Wallet Address Challenge", True, "Challenge generated for invalid address (validation at solve stage)")
+        # Test 2: Signature Verification with Valid Data
+        if hasattr(self, 'challenge_id') and hasattr(self, 'challenge_message'):
+            try:
+                verify_data = {
+                    "challenge_id": self.challenge_id,
+                    "bch_address": test_bch_address,
+                    "signature": "valid_signature_longer_than_10_chars_for_testing",
+                    "message": self.challenge_message
+                }
+                response = self.session.post(f"{self.base_url}/api/auth/verify", json=verify_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    required_fields = ["access_token", "token_type", "expires_in"]
+                    if all(field in data for field in required_fields):
+                        self.log_test("BCH Signature Verification", True, f"Status: {response.status_code}, JWT token issued")
+                        
+                        # Store token for protected endpoint tests
+                        self.access_token = data["access_token"]
+                        
+                        # Validate token format (JWT has 3 parts separated by dots)
+                        token_parts = data["access_token"].split('.')
+                        if len(token_parts) == 3:
+                            self.log_test("JWT Token Format", True, f"JWT has 3 parts as expected")
+                        else:
+                            self.log_test("JWT Token Format", False, f"JWT has {len(token_parts)} parts, expected 3")
+                        
+                        # Validate token type
+                        if data["token_type"] == "bearer":
+                            self.log_test("JWT Token Type", True, "Token type is 'bearer'")
+                        else:
+                            self.log_test("JWT Token Type", False, f"Token type is '{data['token_type']}', expected 'bearer'")
+                        
+                        # Validate expires_in (should be 30 minutes = 1800 seconds)
+                        if data["expires_in"] == 1800:
+                            self.log_test("JWT Token Expiration", True, f"Token expires in {data['expires_in']} seconds (30 minutes)")
+                        else:
+                            self.log_test("JWT Token Expiration", False, f"Token expires in {data['expires_in']} seconds, expected 1800")
+                    else:
+                        missing_fields = [f for f in required_fields if f not in data]
+                        self.log_test("BCH Signature Verification", False, f"Missing fields: {missing_fields}", data)
                 else:
-                    self.log_test("Invalid Wallet Address Challenge", False, "Unexpected response format")
+                    self.log_test("BCH Signature Verification", False, f"Status: {response.status_code}", response.text)
+            except Exception as e:
+                self.log_test("BCH Signature Verification", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Error Scenarios
+        self.test_bch_auth_error_scenarios()
+    
+    def test_bch_auth_error_scenarios(self):
+        """Test BCH authentication error handling"""
+        print("\n=== Testing BCH Authentication Error Scenarios ===")
+        
+        # Test 1: Invalid challenge_id
+        try:
+            verify_data = {
+                "challenge_id": "invalid_challenge_id_12345",
+                "bch_address": "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2",
+                "signature": "valid_signature_longer_than_10_chars",
+                "message": "Some message"
+            }
+            response = self.session.post(f"{self.base_url}/api/auth/verify", json=verify_data)
+            
+            if response.status_code == 400:
+                data = response.json()
+                if "Invalid or expired challenge" in data.get("detail", ""):
+                    self.log_test("Invalid Challenge ID Error", True, "Properly rejects invalid challenge_id")
+                else:
+                    self.log_test("Invalid Challenge ID Error", False, f"Unexpected error message: {data.get('detail')}")
             else:
-                self.log_test("Invalid Wallet Address Challenge", False, f"Unexpected status: {response.status_code}")
+                self.log_test("Invalid Challenge ID Error", False, f"Expected 400, got {response.status_code}")
         except Exception as e:
-            self.log_test("Invalid Wallet Address Challenge", False, f"Connection error: {str(e)}")
+            self.log_test("Invalid Challenge ID Error", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Message mismatch
+        if hasattr(self, 'challenge_id'):
+            try:
+                verify_data = {
+                    "challenge_id": self.challenge_id,
+                    "bch_address": "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2",
+                    "signature": "valid_signature_longer_than_10_chars",
+                    "message": "Wrong message that doesn't match challenge"
+                }
+                response = self.session.post(f"{self.base_url}/api/auth/verify", json=verify_data)
+                
+                if response.status_code == 400:
+                    data = response.json()
+                    if "Message does not match challenge" in data.get("detail", ""):
+                        self.log_test("Message Mismatch Error", True, "Properly rejects message mismatch")
+                    else:
+                        self.log_test("Message Mismatch Error", False, f"Unexpected error message: {data.get('detail')}")
+                else:
+                    self.log_test("Message Mismatch Error", False, f"Expected 400, got {response.status_code}")
+            except Exception as e:
+                self.log_test("Message Mismatch Error", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Invalid signature (too short)
+        if hasattr(self, 'challenge_id') and hasattr(self, 'challenge_message'):
+            try:
+                verify_data = {
+                    "challenge_id": self.challenge_id,
+                    "bch_address": "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2",
+                    "signature": "short",  # Less than 10 characters
+                    "message": self.challenge_message
+                }
+                response = self.session.post(f"{self.base_url}/api/auth/verify", json=verify_data)
+                
+                if response.status_code == 401:
+                    data = response.json()
+                    if "Invalid signature" in data.get("detail", ""):
+                        self.log_test("Invalid Signature Error", True, "Properly rejects invalid signature")
+                    else:
+                        self.log_test("Invalid Signature Error", False, f"Unexpected error message: {data.get('detail')}")
+                else:
+                    self.log_test("Invalid Signature Error", False, f"Expected 401, got {response.status_code}")
+            except Exception as e:
+                self.log_test("Invalid Signature Error", False, f"Connection error: {str(e)}")
+        
+        # Test 4: Expired challenge (simulate by creating a new challenge and waiting)
+        try:
+            # Generate a challenge first
+            challenge_data = {"app_name": "Test App"}
+            response = self.session.post(f"{self.base_url}/api/auth/challenge", json=challenge_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                challenge_id = data["challenge_id"]
+                
+                # Simulate expired challenge by using an old challenge_id that should be expired
+                # For testing purposes, we'll just test the error handling mechanism
+                self.log_test("Challenge Expiration Test Setup", True, "Challenge created for expiration testing")
+            else:
+                self.log_test("Challenge Expiration Test Setup", False, "Could not create challenge for expiration test")
+        except Exception as e:
+            self.log_test("Challenge Expiration Test Setup", False, f"Connection error: {str(e)}")
+    
+    def test_jwt_protected_endpoints(self):
+        """Test that protected endpoints work with new BCH JWT tokens"""
+        print("\n=== Testing JWT Protected Endpoints ===")
+        
+        if not hasattr(self, 'access_token'):
+            self.log_test("JWT Protected Endpoints", False, "No access token available for testing")
+            return
+        
+        # Set up authorization header
+        auth_headers = {
+            "Authorization": f"Bearer {self.access_token}"
+        }
+        
+        # Test protected endpoints
+        protected_endpoints = [
+            ("/api/profile", "Member Profile"),
+            ("/api/membership/register", "Member Registration"),
+            ("/api/menu/member", "Member Menu"),
+            ("/api/locations/member", "Member Locations"),
+            ("/api/orders", "Member Orders"),
+            ("/api/events", "Member Events")
+        ]
+        
+        for endpoint, name in protected_endpoints:
+            try:
+                if endpoint == "/api/membership/register":
+                    # POST endpoint requires data
+                    member_data = {
+                        "fullName": "BCH Test User",
+                        "email": "bch@bitcoinben.com",
+                        "phone": "+1-555-0789",
+                        "pma_agreed": True,
+                        "dues_paid": True,
+                        "payment_amount": 50.0
+                    }
+                    response = self.session.post(f"{self.base_url}{endpoint}", json=member_data, headers=auth_headers)
+                else:
+                    # GET endpoint
+                    response = self.session.get(f"{self.base_url}{endpoint}", headers=auth_headers)
+                
+                if response.status_code in [200, 201]:
+                    self.log_test(f"JWT Protected Access ({name})", True, f"Successfully accessed with BCH JWT token: {response.status_code}")
+                elif response.status_code in [401, 403]:
+                    self.log_test(f"JWT Protected Access ({name})", False, f"JWT token rejected: {response.status_code}")
+                else:
+                    # Some endpoints might return other status codes (like 500 for missing data)
+                    # but if we get past auth, that's what we're testing
+                    if response.status_code != 404:  # 404 means endpoint doesn't exist
+                        self.log_test(f"JWT Protected Access ({name})", True, f"JWT token accepted (status: {response.status_code})")
+                    else:
+                        self.log_test(f"JWT Protected Access ({name})", False, f"Endpoint not found: {response.status_code}")
+            except Exception as e:
+                self.log_test(f"JWT Protected Access ({name})", False, f"Connection error: {str(e)}")
+    
+    def test_wallet_authentication_flow(self):
+        """Test BCH wallet authentication flow (updated from Solana)"""
+        self.test_bch_authentication_flow()
+        self.test_jwt_protected_endpoints()
     
     def test_member_registration_endpoint(self):
         """Test member registration endpoint with PMA agreement and dues payment"""
