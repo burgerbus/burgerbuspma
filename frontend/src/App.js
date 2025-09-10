@@ -626,31 +626,6 @@ const MemberDashboard = ({ memberAddress }) => {
   );
 };
 
-// Wallet Provider Setup
-const WalletProviders = ({ children }) => {
-  const network = WalletAdapterNetwork.Devnet;
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-  
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter({ network }),
-      new BraveWalletAdapter(),
-    ],
-    [network]
-  );
-
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          {children}
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
-  );
-};
-
 // Main App
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
