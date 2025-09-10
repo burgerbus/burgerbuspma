@@ -174,7 +174,10 @@ export const BCHAuthentication = ({ onAuthSuccess, onAuthError }) => {
     setAuthState('connecting');
 
     try {
-      // Step 1: Connect to wallet
+      // Step 1: Detect wallets first to populate availableWallets array
+      await walletManager.detectWallets();
+      
+      // Step 2: Connect to wallet
       setAuthState('connecting');
       const wallet = await walletManager.connectWallet(walletName);
       console.log('Wallet connected:', wallet);
