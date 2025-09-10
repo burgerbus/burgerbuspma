@@ -214,6 +214,50 @@ async def debug_registration(member_data: dict):
         
         updated_member = await db.members.find_one({"wallet_address": wallet_address})
         return {"message": "Debug registration successful", "member": MemberProfile(**updated_member)}
+# TEMPORARY: Debug endpoints without auth
+@api_router.get("/debug/profile")
+async def debug_get_profile():
+    """TEMPORARY: Get debug profile without authentication"""
+    return {
+        "id": "debug-profile-123",
+        "wallet_address": "debug_wallet_address",
+        "membership_tier": "basic",
+        "full_name": "Debug User",
+        "email": "debug@bitcoinben.com",
+        "phone": "+1-555-0123",
+        "pma_agreed": True,
+        "dues_paid": True,
+        "payment_amount": 21.0,
+        "total_orders": 0,
+        "favorite_items": []
+    }
+
+@api_router.get("/debug/menu")
+async def debug_get_menu():
+    """TEMPORARY: Get debug menu without authentication"""
+    # Seed menu items first
+    await seed_sample_data()
+    
+    # Return menu items
+    menu_items = await db.menu_items.find().to_list(100)
+    return [MenuItem(**item) for item in menu_items]
+
+@api_router.get("/debug/locations")
+async def debug_get_locations():
+    """TEMPORARY: Get debug locations without authentication"""
+    locations = await db.locations.find().to_list(50)
+    return [TruckLocation(**location) for location in locations]
+
+@api_router.get("/debug/events")
+async def debug_get_events():
+    """TEMPORARY: Get debug events without authentication"""
+    events = await db.events.find().to_list(20)
+    return [MemberEvent(**event) for event in events]
+
+@api_router.get("/debug/orders")
+async def debug_get_orders():
+    """TEMPORARY: Get debug orders without authentication"""
+    return []  # Empty orders list
     except Exception as e:
         import traceback
         traceback.print_exc()
