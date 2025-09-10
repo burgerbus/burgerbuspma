@@ -483,6 +483,31 @@ const MemberDashboard = ({ memberAddress }) => {
 
       {/* Member Stats */}
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* PMA Status Warning */}
+        {memberData && (!memberData.pma_agreed || !memberData.dues_paid) && (
+          <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-red-400 font-bold text-lg">⚠️ Membership Incomplete</h3>
+                <p className="text-red-300">
+                  {!memberData.pma_agreed && !memberData.dues_paid 
+                    ? "Please complete your PMA agreement and pay annual dues ($21) to start ordering."
+                    : !memberData.pma_agreed 
+                    ? "Please sign the PMA agreement to complete your membership."
+                    : "Please pay your annual dues ($21) to start ordering."
+                  }
+                </p>
+              </div>
+              <button
+                onClick={() => setShowPMAPage(true)}
+                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Complete Membership
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-800 rounded-lg p-6">
             <div className="text-orange-500 text-2xl font-bold">{memberData?.membership_tier?.toUpperCase()}</div>
@@ -497,8 +522,10 @@ const MemberDashboard = ({ memberAddress }) => {
             <div className="text-gray-400">Available Locations</div>
           </div>
           <div className="bg-gray-800 rounded-lg p-6">
-            <div className="text-orange-500 text-2xl font-bold">{events.length}</div>
-            <div className="text-gray-400">Exclusive Events</div>
+            <div className={`text-2xl font-bold ${memberData?.pma_agreed && memberData?.dues_paid ? 'text-green-500' : 'text-red-500'}`}>
+              {memberData?.pma_agreed && memberData?.dues_paid ? '✅' : '❌'}
+            </div>
+            <div className="text-gray-400">PMA Status</div>
           </div>
         </div>
 
