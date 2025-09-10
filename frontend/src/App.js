@@ -659,12 +659,12 @@ function App() {
 
   useEffect(() => {
     const checkAuth = () => {
-      const authenticated = authService.isAuthenticated();
+      const authenticated = bchAuthService.isAuthenticated();
       setIsAuthenticated(authenticated);
       
       if (authenticated) {
-        // In a real app, decode JWT to get address
-        const token = authService.getStoredToken();
+        // Decode JWT to get address
+        const token = bchAuthService.getStoredToken();
         if (token) {
           try {
             const payload = JSON.parse(atob(token.split('.')[1]));
