@@ -24,12 +24,10 @@ from bitcoin.core import Hash160
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# Set wallet auth environment variables BEFORE importing the library
-os.environ["FASTAPI_WALLETAUTH_APP"] = "Bitcoin Ben's Burger Bus Club" 
-os.environ["FASTAPI_WALLETAUTH_SECRET"] = "bitcoin-bens-burger-bus-secret-key-2025-solana-members-only"
-
-# Import wallet auth AFTER setting environment variables
-from fastapi_walletauth import jwt_authorization_router, JWTWalletAuthDep
+# BCH Authentication Configuration
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "bch-bitcoin-bens-burger-bus-secret-key-2025")
+JWT_ALGORITHM = "HS256"
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -129,12 +127,38 @@ async def check_tier_access(required_tier: str, user_tier: str) -> bool:
     tier_hierarchy = {"basic": 1, "premium": 2, "vip": 3}
     return tier_hierarchy.get(user_tier, 0) >= tier_hierarchy.get(required_tier, 0)
 
-# Include wallet authentication routes in API router
-api_router.include_router(jwt_authorization_router, prefix="/auth")
+# BCH Authentication Helper Functions
+security = HTTPBearer()
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        wallet_address: str = payload.get("sub")
+        if wallet_address is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    
+    member = await get_or_create_member(wallet_address)
+    return member
 
 # Authentication dependency
-async def get_authenticated_member(wa: JWTWalletAuthDep) -> MemberProfile:
-    member = await get_or_create_member(wa.address)
+async def get_authenticated_member(member: MemberProfile = Depends(get_current_user)) -> MemberProfile:
     return member
 
 # Public routes (no auth required)
