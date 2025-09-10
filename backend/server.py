@@ -17,9 +17,11 @@ import json
 from collections import defaultdict
 from jose import JWTError, jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import bitcoin
-from bitcoin.wallet import CBitcoinSecret, CBitcoinAddress
-from bitcoin.core import Hash160
+import requests
+from decimal import Decimal
+import qrcode
+from io import BytesIO
+import base64 as b64
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
