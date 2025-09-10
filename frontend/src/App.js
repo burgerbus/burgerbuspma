@@ -129,7 +129,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
                 </p>
                 <p>
                   <strong>5. BLOCKCHAIN AUTHENTICATION</strong><br />
-                  Membership is tied to your Solana wallet address: <code className="bg-gray-600 px-2 py-1 rounded text-orange-400">{memberAddress}</code>
+                  Membership is tied to your Bitcoin Cash wallet address: <code className="bg-gray-600 px-2 py-1 rounded text-orange-400">{memberAddress}</code>
                 </p>
                 <p>
                   <strong>6. LIMITATION OF LIABILITY</strong><br />
