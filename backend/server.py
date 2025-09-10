@@ -481,7 +481,21 @@ async def create_pre_order(
     pickup_time: str,
     member: MemberProfile = Depends(get_authenticated_member)
 ):
-    """Create a pre-order for pickup."""
+    """Create a pre-order for pickup. Requires completed PMA agreement and dues payment."""
+    
+    # Validate that member has completed PMA requirements
+    if not member.pma_agreed:
+        raise HTTPException(
+            status_code=403, 
+            detail="PMA agreement must be signed before placing orders. Please complete your membership registration."
+        )
+    
+    if not member.dues_paid:
+        raise HTTPException(
+            status_code=403, 
+            detail="Annual dues ($21) must be paid before placing orders. Please complete your membership payment."
+        )
+    
     # Calculate total with member pricing
     total = 0.0
     for item in items:
