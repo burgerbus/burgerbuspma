@@ -27,9 +27,9 @@ class FoodTruckBackendTester:
                         return line.split('=', 1)[1].strip()
         except Exception as e:
             print(f"Error reading frontend .env: {e}")
-            return "https://members-food.preview.emergentagent.com"
+            return "https://blockchain-eats.preview.emergentagent.com"
         
-        return "https://members-food.preview.emergentagent.com"
+        return "https://blockchain-eats.preview.emergentagent.com"
     
     def log_test(self, test_name: str, success: bool, details: str = "", response_data: Any = None):
         """Log test results"""
