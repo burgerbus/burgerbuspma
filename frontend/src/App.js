@@ -607,11 +607,11 @@ const MemberDashboard = ({ memberAddress }) => {
       const loadMemberData = async () => {
         try {
           const [profile, menuData, locationsData, eventsData, ordersData] = await Promise.all([
-            authService.get('/api/profile'),
-            authService.get('/api/menu/member'),
-            authService.get('/api/locations/member'),
-            authService.get('/api/events'),
-            authService.get('/api/orders')
+            authService.get('/api/debug/profile'),
+            authService.get('/api/debug/menu'),
+            authService.get('/api/debug/locations'),
+            authService.get('/api/debug/events'),
+            authService.get('/api/debug/orders')
           ]);
 
           setMemberData(profile);
