@@ -225,6 +225,11 @@ async def debug_registration(member_data: dict):
         
         updated_member = await db.members.find_one({"wallet_address": wallet_address})
         return {"message": "Debug registration successful", "member": MemberProfile(**updated_member)}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Debug registration failed: {str(e)}")
+
 # TEMPORARY: Debug endpoints without auth
 @api_router.get("/debug/profile")
 async def debug_get_profile():
