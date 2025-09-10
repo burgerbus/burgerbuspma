@@ -269,11 +269,6 @@ async def debug_get_events():
 async def debug_get_orders():
     """TEMPORARY: Get debug orders without authentication"""
     return []  # Empty orders list
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Debug registration failed: {str(e)}")
-    return {"message": "Profile updated successfully"}
 @api_router.post("/membership/register")
 async def register_membership(member_data: dict, member: MemberProfile = Depends(get_authenticated_member)):
     """Register new membership with PMA agreement and dues payment"""
