@@ -659,9 +659,29 @@ function App() {
   }, []);
 
   const handleAuthSuccess = (address) => {
+    console.log('Authentication successful for address:', address);
     setIsAuthenticated(true);
     setMemberAddress(address);
     setShowAuth(false);
+    
+    // Force a re-check of authentication state after a brief delay
+    setTimeout(() => {
+      const authenticated = bchAuthService.isAuthenticated();
+      console.log('Re-checking auth state:', authenticated);
+      if (authenticated) {
+        const token = bchAuthService.getStoredToken();
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            setMemberAddress(payload.sub);
+            setIsAuthenticated(true);
+            console.log('Auth state updated successfully');
+          } catch (e) {
+            console.error('Token decode error:', e);
+          }
+        }
+      }
+    }, 500);
   };
 
   const handleAuthError = (error) => {
