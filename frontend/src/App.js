@@ -8,6 +8,8 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const PMAgreementPage = ({ memberAddress, onComplete }) => {
   const [agreed, setAgreed] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [step, setStep] = useState('agreement'); // agreement, payment, waiting
+  const [paymentData, setPaymentData] = useState(null);
   const [memberInfo, setMemberInfo] = useState({
     fullName: '',
     email: '',
@@ -23,26 +25,193 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
 
     setProcessing(true);
     try {
-      // Create member profile with PMA agreement (using debug endpoint temporarily)
-      await bchAuthService.post('/api/debug/register', {
-        ...memberInfo,
-        pma_agreed: true,
-        dues_paid: true,
-        payment_amount: 21,
-        wallet_address: memberAddress
+      // Create real BCH payment request
+      const response = await bchAuthService.post('/api/payments/create-membership-payment', null, {
+        params: { user_address: memberAddress }
       });
 
-      alert('Welcome to Bitcoin Ben\'s Burger Bus Club! Your membership is now active.');
-      onComplete();
+      if (response.success) {
+        setPaymentData(response);
+        setStep('payment');
+      } else {
+        throw new Error('Failed to create payment request');
+      }
     } catch (error) {
-      console.error('Registration failed:', error);
-      console.error('Error details:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      alert(`Registration failed: ${error.response?.data?.detail || error.message}. Please try again.`);
+      console.error('Payment creation failed:', error);
+      alert(`Payment creation failed: ${error.response?.data?.detail || error.message}. Please try again.`);
     } finally {
       setProcessing(false);
     }
   };
+
+  const handlePaymentComplete = () => {
+    setStep('waiting');
+    // Poll for payment status every 30 seconds
+    const pollInterval = setInterval(async () => {
+      try {
+        const status = await bchAuthService.get(`/api/payments/status/${paymentData.payment_id}`);
+        if (status.status === 'verified') {
+          clearInterval(pollInterval);
+          alert('Payment verified! Welcome to Bitcoin Ben\'s Burger Bus Club!');
+          onComplete();
+        }
+      } catch (error) {
+        console.error('Status check failed:', error);
+      }
+    }, 30000);
+
+    // Clean up interval after 1 hour
+    setTimeout(() => clearInterval(pollInterval), 3600000);
+  };
+
+  if (step === 'payment' && paymentData) {
+    return (
+      <div className="min-h-screen bg-gray-900 py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gray-800 rounded-lg p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-white mb-4">
+                Complete Your <span className="text-orange-500">$21 Membership</span> Payment
+              </h1>
+              <p className="text-gray-400">
+                Send Bitcoin Cash to activate your membership and receive your $15 cashstamp bonus!
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Payment Instructions */}
+              <div className="space-y-6">
+                <div className="bg-gray-700 rounded-lg p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">💰 Payment Details</h3>
+                  <div className="space-y-3 text-gray-300">
+                    <div className="flex justify-between">
+                      <span>Amount (USD):</span>
+                      <span className="text-orange-400 font-bold">${paymentData.amount_usd}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Amount (BCH):</span>
+                      <span className="text-orange-400 font-bold">{paymentData.amount_bch} BCH</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>BCH Price:</span>
+                      <span>${paymentData.bch_price.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Cashstamp Bonus:</span>
+                      <span className="text-green-400 font-bold">$15 BCH</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-700 rounded-lg p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">📱 Send Payment</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        BCH Address:
+                      </label>
+                      <div className="bg-gray-600 rounded p-3 break-all text-sm font-mono text-orange-400">
+                        {paymentData.receiving_address}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        onClick={() => navigator.clipboard.writeText(paymentData.receiving_address)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                      >
+                        Copy Address
+                      </button>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(paymentData.amount_bch.toString())}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                      >
+                        Copy Amount
+                      </button>
+                    </div>
+
+                    <div className="text-center">
+                      <a
+                        href={paymentData.payment_uri}
+                        className="inline-block px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
+                      >
+                        📱 Open in BCH Wallet
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <button
+                    onClick={handlePaymentComplete}
+                    className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
+                  >
+                    ✅ I've Sent the Payment
+                  </button>
+                </div>
+              </div>
+
+              {/* QR Code */}
+              <div className="text-center">
+                <h3 className="text-xl font-bold text-white mb-4">📷 QR Code Payment</h3>
+                {paymentData.qr_code && (
+                  <div className="bg-white rounded-lg p-4 inline-block">
+                    <img
+                      src={paymentData.qr_code}
+                      alt="BCH Payment QR Code"
+                      className="w-64 h-64"
+                    />
+                  </div>
+                )}
+                <p className="text-gray-400 mt-4 text-sm">
+                  Scan with your BCH wallet to pay instantly
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4">
+                <p className="text-yellow-400 font-medium">
+                  ⏰ Payment expires in 24 hours
+                </p>
+                <p className="text-gray-300 text-sm mt-2">
+                  After payment, admin will verify and activate your membership within 24 hours.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 'waiting') {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4 text-center">
+          <div className="text-6xl mb-4">⏳</div>
+          <h2 className="text-2xl font-bold text-white mb-4">Payment Submitted!</h2>
+          <p className="text-gray-400 mb-6">
+            We've received your payment notification. Our admin will verify your BCH payment and activate your membership within 24 hours.
+          </p>
+          <div className="bg-blue-900/20 border border-blue-600 rounded-lg p-4">
+            <p className="text-blue-400 font-medium">📧 You'll receive:</p>
+            <ul className="text-gray-300 text-sm mt-2 space-y-1">
+              <li>• Membership activation confirmation</li>
+              <li>• $15 BCH cashstamp bonus</li>
+              <li>• Access to exclusive menu and locations</li>
+            </ul>
+          </div>
+          <button
+            onClick={() => setStep('agreement')}
+            className="mt-6 text-orange-400 hover:text-orange-300 transition-colors"
+          >
+            ← Back to agreement
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 py-12 px-4">
@@ -58,7 +227,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">{/* Rest of the original PMA form stays the same */}
             {/* Member Information */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
