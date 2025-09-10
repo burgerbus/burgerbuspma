@@ -1086,6 +1086,15 @@ class FoodTruckBackendTester:
         self.test_basic_health_check()
         self.test_public_endpoints()
         self.test_wallet_authentication_flow()
+        
+        # NEW: BCH Payment System Tests
+        self.test_bch_payment_system()
+        self.test_admin_payment_endpoints()
+        self.test_payment_integration_flow()
+        self.test_payment_error_scenarios()
+        self.test_bch_price_fallback()
+        
+        # Existing tests
         self.test_member_registration_endpoint()
         self.test_admin_data_seeding()
         self.test_database_integration()
