@@ -851,7 +851,8 @@ function App() {
   const [authState, setAuthState] = useState({
     isAuthenticated: false,
     memberAddress: null,
-    showAuth: false
+    showAuth: false,
+    showAdmin: false  // Add admin panel state
   });
 
   useEffect(() => {
