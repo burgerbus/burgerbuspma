@@ -9,17 +9,16 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
-from fastapi_walletauth import jwt_authorization_router, JWTWalletAuthDep
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# Set application name for wallet auth
-os.environ["FASTAPI_WALLETAUTH_APP"] = "Bitcoin Ben's Burger Bus Club"
+# Set wallet auth environment variables BEFORE importing the library
+os.environ["FASTAPI_WALLETAUTH_APP"] = "Bitcoin Ben's Burger Bus Club" 
+os.environ["FASTAPI_WALLETAUTH_SECRET"] = "bitcoin-bens-burger-bus-secret-key-2025-solana-members-only"
 
-# Ensure JWT secret is available
-if not os.environ.get("FASTAPI_WALLETAUTH_SECRET"):
-    os.environ["FASTAPI_WALLETAUTH_SECRET"] = "bitcoin-bens-burger-bus-secret-key-2025-solana-members-only"
+# Import wallet auth AFTER setting environment variables
+from fastapi_walletauth import jwt_authorization_router, JWTWalletAuthDep
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
