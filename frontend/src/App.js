@@ -536,12 +536,12 @@ const MemberDashboard = ({ memberAddress }) => {
           return;
         }
 
-        // Load member data
+        // Load member data (using debug endpoints temporarily)
         const [menuData, locationsData, eventsData, ordersData] = await Promise.all([
-          authService.get('/api/menu/member'),
-          authService.get('/api/locations/member'),
-          authService.get('/api/events'),
-          authService.get('/api/orders')
+          authService.get('/api/debug/menu'),
+          authService.get('/api/debug/locations'),
+          authService.get('/api/debug/events'),
+          authService.get('/api/debug/orders')
         ]);
 
         setMemberData(profile);
