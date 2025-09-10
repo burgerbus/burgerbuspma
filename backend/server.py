@@ -424,17 +424,18 @@ async def get_pending_payments():
         "count": len(pending_payments)
     }
 
+class AdminSendCashstampRequest(BaseModel):
+    payment_id: str
+    recipient_address: str
+    admin_wallet_address: Optional[str] = None
+
 @api_router.post("/admin/send-cashstamp")
-async def admin_send_cashstamp(
-    payment_id: str,
-    recipient_address: str,
-    admin_wallet_address: str = None
-):
+async def admin_send_cashstamp(request: AdminSendCashstampRequest):
     """Admin endpoint to send $15 BCH cashstamp (manual for now)"""
-    if payment_id not in payment_requests_db:
+    if request.payment_id not in payment_requests_db:
         raise HTTPException(status_code=404, detail="Payment not found")
     
-    payment = payment_requests_db[payment_id]
+    payment = payment_requests_db[request.payment_id]
     
     if payment.status != "verified":
         raise HTTPException(status_code=400, detail="Payment must be verified first")
@@ -447,17 +448,17 @@ async def admin_send_cashstamp(
         # Generate cashstamp instructions (manual for now)
         instructions = {
             "action": "send_bch",
-            "from_address": admin_wallet_address or "Your admin wallet",
-            "to_address": recipient_address,
+            "from_address": request.admin_wallet_address or "Your admin wallet",
+            "to_address": request.recipient_address,
             "amount_bch": round(cashstamp_bch, 8),
             "amount_usd": CASHSTAMP_AMOUNT_USD,
-            "memo": f"Bitcoin Ben's $15 BCH Cashstamp - Payment {payment_id}"
+            "memo": f"Bitcoin Ben's $15 BCH Cashstamp - Payment {request.payment_id}"
         }
         
         return {
             "success": True,
             "message": "Cashstamp instructions generated",
-            "payment_id": payment_id,
+            "payment_id": request.payment_id,
             "cashstamp_amount_bch": round(cashstamp_bch, 8),
             "cashstamp_amount_usd": CASHSTAMP_AMOUNT_USD,
             "instructions": instructions,
