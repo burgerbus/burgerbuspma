@@ -317,8 +317,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "JWT Authentication Fix Testing completed successfully"
-    - "All authentication fix requirements verified"
+    - "BCH Authentication Challenge Generation"
+    - "BCH Authentication Signature Verification" 
+    - "BCH JWT Token System"
+    - "BCH Protected Endpoints Integration"
+    - "BCH Authentication Error Handling"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
