@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the food truck membership site backend with comprehensive testing including API health checks, public endpoints, wallet authentication flow, admin data seeding, database integration, CORS and security, and error handling."
+user_problem_statement: "Test the new BCH (Bitcoin Cash) authentication system that replaced the old Solana authentication. Test challenge generation, signature verification, JWT tokens, protected endpoints, and error handling."
 
 backend:
   - task: "Basic API Health Check"
