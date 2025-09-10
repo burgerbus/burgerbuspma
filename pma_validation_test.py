@@ -418,13 +418,13 @@ class PMAValidationTester:
         
         try:
             # Test order with incomplete membership to check error message quality
-            order_data = {
-                "items": [{"item_id": "test_item", "quantity": 1}],
+            items_data = [{"item_id": "test_item", "quantity": 1}]
+            params = {
                 "pickup_location": "Test Location",
                 "pickup_time": "12:00"
             }
             
-            response = self.session.post(f"{self.base_url}/api/orders", json=order_data, headers=auth_headers)
+            response = self.session.post(f"{self.base_url}/api/orders", json=items_data, params=params, headers=auth_headers)
             
             if response.status_code == 403:
                 data = response.json()
