@@ -91,3 +91,5 @@ watchfiles==1.1.0
 bitcoin==1.1.42
 python-bitcoinlib==0.12.2
 bit==0.8.0
+qrcode==7.4.2
+Pillow==10.0.1
