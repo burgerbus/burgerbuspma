@@ -26,6 +26,78 @@ import base64 as b64
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# BCH Payment Configuration
+MEMBERSHIP_FEE_USD = 21.00
+CASHSTAMP_AMOUNT_USD = 15.00
+
+# BCH receiving address for membership payments (set your actual BCH address)
+BCH_RECEIVING_ADDRESS = os.environ.get("BCH_RECEIVING_ADDRESS", "bitcoincash:qph0duvh0zn0r2um7znh8gx20p50dr3ycc5lcp0sc4")
+
+# Simple payment tracking
+payment_requests_db = {}
+
+class PaymentRequest(BaseModel):
+    payment_id: str
+    user_address: str
+    amount_usd: float
+    amount_bch: float
+    bch_price_used: float
+    receiving_address: str
+    expires_at: str
+    status: str = "pending"  # pending, verified, expired
+    created_at: str
+    qr_code_data: Optional[str] = None
+    transaction_id: Optional[str] = None
+    verified_at: Optional[str] = None
+    verified_by: Optional[str] = None
+
+async def get_bch_price_usd() -> float:
+    """Get current BCH price from CoinGecko API"""
+    try:
+        response = requests.get(
+            'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin-cash&vs_currencies=usd',
+            timeout=10
+        )
+        if response.status_code == 200:
+            data = response.json()
+            return float(data['bitcoin-cash']['usd'])
+        else:
+            print(f"CoinGecko API error: {response.status_code}")
+            return 300.00  # Fallback price
+    except Exception as e:
+        print(f"Failed to fetch BCH price: {e}")
+        return 300.00  # Fallback price
+
+def generate_qr_code(bch_address: str, amount_bch: float, label: str = "Membership Payment") -> str:
+    """Generate QR code for BCH payment"""
+    try:
+        # Create BCH payment URI
+        payment_uri = f"bitcoincash:{bch_address}?amount={amount_bch:.8f}&label={label}"
+        
+        # Generate QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(payment_uri)
+        qr.make(fit=True)
+        
+        # Create image
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert to base64 string
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        img_str = b64.b64encode(buffered.getvalue()).decode()
+        
+        return f"data:image/png;base64,{img_str}"
+        
+    except Exception as e:
+        print(f"QR code generation failed: {e}")
+        return None
+
 # BCH Authentication Configuration
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "bch-bitcoin-bens-burger-bus-secret-key-2025")
 JWT_ALGORITHM = "HS256"
