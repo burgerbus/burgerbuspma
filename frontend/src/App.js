@@ -628,14 +628,16 @@ const MemberDashboard = ({ memberAddress }) => {
 
 // Main App
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [memberAddress, setMemberAddress] = useState(null);
-  const [showAuth, setShowAuth] = useState(false);
+  // Combine authentication state into a single object for atomic updates
+  const [authState, setAuthState] = useState({
+    isAuthenticated: false,
+    memberAddress: null,
+    showAuth: false
+  });
 
   useEffect(() => {
     const checkAuth = () => {
       const authenticated = bchAuthService.isAuthenticated();
-      setIsAuthenticated(authenticated);
       
       if (authenticated) {
         // Decode JWT to get address
@@ -643,56 +645,56 @@ function App() {
         if (token) {
           try {
             const payload = JSON.parse(atob(token.split('.')[1]));
-            setMemberAddress(payload.sub);
+            setAuthState(prev => ({
+              ...prev,
+              isAuthenticated: true,
+              memberAddress: payload.sub
+            }));
           } catch (e) {
             console.error('Token decode error:', e);
+            setAuthState(prev => ({
+              ...prev,
+              isAuthenticated: false,
+              memberAddress: null
+            }));
           }
         }
+      } else {
+        setAuthState(prev => ({
+          ...prev,
+          isAuthenticated: false,
+          memberAddress: null
+        }));
       }
     };
 
     checkAuth();
     
-    // Check authentication state periodically in case it changes
-    const interval = setInterval(checkAuth, 1000);
+    // Check authentication state less frequently to minimize interference
+    const interval = setInterval(checkAuth, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleAuthSuccess = (address) => {
+  const handleAuthSuccess = useCallback((address) => {
     console.log('Authentication successful for address:', address);
-    setIsAuthenticated(true);
-    setMemberAddress(address);
-    setShowAuth(false);
-    
-    // Force a re-check of authentication state after a brief delay
-    setTimeout(() => {
-      const authenticated = bchAuthService.isAuthenticated();
-      console.log('Re-checking auth state:', authenticated);
-      if (authenticated) {
-        const token = bchAuthService.getStoredToken();
-        if (token) {
-          try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            setMemberAddress(payload.sub);
-            setIsAuthenticated(true);
-            console.log('Auth state updated successfully');
-          } catch (e) {
-            console.error('Token decode error:', e);
-          }
-        }
-      }
-    }, 500);
-  };
+    // Atomic state update to prevent race conditions
+    setAuthState({
+      isAuthenticated: true,
+      memberAddress: address,
+      showAuth: false
+    });
+  }, []);
 
   const handleAuthError = (error) => {
     console.error('Auth error:', error);
   };
 
-  if (isAuthenticated && memberAddress) {
-    return <MemberDashboard memberAddress={memberAddress} />;
+  // Use the combined state for render condition
+  if (authState.isAuthenticated && authState.memberAddress) {
+    return <MemberDashboard memberAddress={authState.memberAddress} />;
   }
 
-  if (showAuth) {
+  if (authState.showAuth) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
