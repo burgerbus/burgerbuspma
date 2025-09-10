@@ -417,11 +417,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "BCH Authentication Challenge Generation"
-    - "BCH Authentication Signature Verification" 
-    - "BCH JWT Token System"
-    - "BCH Protected Endpoints Integration"
-    - "BCH Authentication Error Handling"
+    - "BCH Authentication Landing Page"
+    - "BCH Authentication Flow"
+    - "Member Dashboard Access"
+    - "Dashboard Content and Navigation"
+    - "JWT Token Persistence"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
