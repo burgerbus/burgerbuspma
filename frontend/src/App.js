@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { BCHAuthentication, bchAuthService } from './BCHAuth';
+import AdminPanel from './AdminPanel';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
