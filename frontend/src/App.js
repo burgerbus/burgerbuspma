@@ -432,11 +432,11 @@ const MemberDashboard = ({ memberAddress }) => {
       const loadMemberData = async () => {
         try {
           const [profile, menuData, locationsData, eventsData, ordersData] = await Promise.all([
-            authService.get('/api/debug/profile'),
-            authService.get('/api/debug/menu'),
-            authService.get('/api/debug/locations'),
-            authService.get('/api/debug/events'),
-            authService.get('/api/debug/orders')
+            bchAuthService.get('/api/debug/profile'),
+            bchAuthService.get('/api/debug/menu'),
+            bchAuthService.get('/api/debug/locations'),
+            bchAuthService.get('/api/debug/events'),
+            bchAuthService.get('/api/debug/orders')
           ]);
 
           setMemberData(profile);
