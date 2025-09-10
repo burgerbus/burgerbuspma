@@ -88,3 +88,7 @@ tzdata==2025.2
 urllib3==2.5.0
 uvicorn==0.25.0
 watchfiles==1.1.0
+bitcoin==1.1.42
+python-bitcoinlib==0.13.0
+bit==0.8.0
+secp256k1==0.14.0
