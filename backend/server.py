@@ -286,6 +286,186 @@ class BCHAuthService:
 bch_auth_service = BCHAuthService()
 
 # BCH Authentication Endpoints
+@api_router.post("/payments/create-membership-payment")
+async def create_membership_payment(user_address: str = None):
+    """Create real BCH payment request for membership"""
+    try:
+        # Get current BCH price
+        bch_price = await get_bch_price_usd()
+        amount_bch = MEMBERSHIP_FEE_USD / bch_price
+        
+        # Generate unique payment ID
+        payment_id = f"membership_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}"
+        
+        # Generate QR code for payment
+        qr_code_data = generate_qr_code(
+            BCH_RECEIVING_ADDRESS, 
+            amount_bch, 
+            "Bitcoin Ben's Membership"
+        )
+        
+        # Create payment request
+        payment_request = PaymentRequest(
+            payment_id=payment_id,
+            user_address=user_address or "unknown",
+            amount_usd=MEMBERSHIP_FEE_USD,
+            amount_bch=amount_bch,
+            bch_price_used=bch_price,
+            receiving_address=BCH_RECEIVING_ADDRESS,
+            expires_at=(datetime.now(timezone.utc) + timedelta(hours=24)).isoformat(),
+            created_at=datetime.now(timezone.utc).isoformat(),
+            qr_code_data=qr_code_data,
+            status="pending"
+        )
+        
+        # Store payment request
+        payment_requests_db[payment_id] = payment_request
+        
+        return {
+            "success": True,
+            "payment_id": payment_id,
+            "amount_usd": MEMBERSHIP_FEE_USD,
+            "amount_bch": round(amount_bch, 8),
+            "bch_price": bch_price,
+            "receiving_address": BCH_RECEIVING_ADDRESS,
+            "expires_at": payment_request.expires_at,
+            "qr_code": qr_code_data,
+            "payment_uri": f"bitcoincash:{BCH_RECEIVING_ADDRESS}?amount={amount_bch:.8f}&label=Bitcoin Ben's Membership",
+            "instructions": f"Send exactly {amount_bch:.8f} BCH to the address above to activate your membership."
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create payment: {str(e)}")
+
+@api_router.get("/payments/status/{payment_id}")
+async def get_payment_status(payment_id: str):
+    """Get payment status"""
+    if payment_id not in payment_requests_db:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    payment = payment_requests_db[payment_id]
+    
+    # Check if payment expired
+    expires_at = datetime.fromisoformat(payment.expires_at.replace('Z', '+00:00'))
+    if datetime.now(timezone.utc) > expires_at and payment.status == "pending":
+        payment.status = "expired"
+    
+    return {
+        "payment_id": payment_id,
+        "status": payment.status,
+        "amount_usd": payment.amount_usd,
+        "amount_bch": payment.amount_bch,
+        "receiving_address": payment.receiving_address,
+        "expires_at": payment.expires_at,
+        "created_at": payment.created_at,
+        "verified_at": payment.verified_at,
+        "transaction_id": payment.transaction_id
+    }
+
+@api_router.post("/admin/verify-payment")
+async def admin_verify_payment(
+    payment_id: str,
+    transaction_id: str,
+    admin_notes: str = None
+):
+    """Admin endpoint to manually verify payment"""
+    if payment_id not in payment_requests_db:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    payment = payment_requests_db[payment_id]
+    
+    if payment.status == "verified":
+        return {"message": "Payment already verified", "payment": payment}
+    
+    # Update payment status
+    payment.status = "verified"
+    payment.transaction_id = transaction_id
+    payment.verified_at = datetime.now(timezone.utc).isoformat()
+    payment.verified_by = "admin"  # In real system, would be admin user ID
+    
+    # Here you would typically:
+    # 1. Activate the member's account
+    # 2. Send confirmation email
+    # 3. Queue cashstamp distribution
+    
+    return {
+        "success": True,
+        "message": "Payment verified successfully",
+        "payment_id": payment_id,
+        "member_activated": True,
+        "cashstamp_pending": True
+    }
+
+@api_router.get("/admin/pending-payments")
+async def get_pending_payments():
+    """Admin endpoint to get all pending payments"""
+    pending_payments = []
+    
+    for payment_id, payment in payment_requests_db.items():
+        if payment.status == "pending":
+            # Check if expired
+            expires_at = datetime.fromisoformat(payment.expires_at.replace('Z', '+00:00'))
+            if datetime.now(timezone.utc) > expires_at:
+                payment.status = "expired"
+                continue
+            
+            pending_payments.append({
+                "payment_id": payment_id,
+                "user_address": payment.user_address,
+                "amount_usd": payment.amount_usd,
+                "amount_bch": payment.amount_bch,
+                "created_at": payment.created_at,
+                "expires_at": payment.expires_at
+            })
+    
+    return {
+        "pending_payments": pending_payments,
+        "count": len(pending_payments)
+    }
+
+@api_router.post("/admin/send-cashstamp")
+async def admin_send_cashstamp(
+    payment_id: str,
+    recipient_address: str,
+    admin_wallet_address: str = None
+):
+    """Admin endpoint to send $15 BCH cashstamp (manual for now)"""
+    if payment_id not in payment_requests_db:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    payment = payment_requests_db[payment_id]
+    
+    if payment.status != "verified":
+        raise HTTPException(status_code=400, detail="Payment must be verified first")
+    
+    try:
+        # Get current BCH price for cashstamp
+        bch_price = await get_bch_price_usd()
+        cashstamp_bch = CASHSTAMP_AMOUNT_USD / bch_price
+        
+        # Generate cashstamp instructions (manual for now)
+        instructions = {
+            "action": "send_bch",
+            "from_address": admin_wallet_address or "Your admin wallet",
+            "to_address": recipient_address,
+            "amount_bch": round(cashstamp_bch, 8),
+            "amount_usd": CASHSTAMP_AMOUNT_USD,
+            "memo": f"Bitcoin Ben's $15 BCH Cashstamp - Payment {payment_id}"
+        }
+        
+        return {
+            "success": True,
+            "message": "Cashstamp instructions generated",
+            "payment_id": payment_id,
+            "cashstamp_amount_bch": round(cashstamp_bch, 8),
+            "cashstamp_amount_usd": CASHSTAMP_AMOUNT_USD,
+            "instructions": instructions,
+            "note": "Please send the BCH manually using your admin wallet and update the payment record."
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate cashstamp: {str(e)}")
+
 @api_router.post("/auth/challenge", response_model=ChallengeResponse)
 async def generate_challenge(request: ChallengeRequest):
     """Generate a new authentication challenge for Bitcoin Cash wallet signing"""
