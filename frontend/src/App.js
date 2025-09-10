@@ -652,6 +652,10 @@ function App() {
     };
 
     checkAuth();
+    
+    // Check authentication state periodically in case it changes
+    const interval = setInterval(checkAuth, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleAuthSuccess = (address) => {
