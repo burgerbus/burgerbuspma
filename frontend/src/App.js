@@ -198,8 +198,8 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
 
     setProcessing(true);
     try {
-      // Create member profile with PMA agreement
-      await authService.post('/api/membership/register', {
+      // Create member profile with PMA agreement (using debug endpoint temporarily)
+      await authService.post('/api/debug/register', {
         ...memberInfo,
         pma_agreed: true,
         dues_paid: true,
