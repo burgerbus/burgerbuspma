@@ -524,10 +524,10 @@ const MemberDashboard = ({ memberAddress }) => {
         // Seed sample data first
         await authService.post('/api/admin/seed-data');
         
-        // Try to load member profile first
+        // Try to load member profile first (using debug endpoint temporarily)
         let profile;
         try {
-          profile = await authService.get('/api/profile');
+          profile = await authService.get('/api/debug/profile');
         } catch (profileError) {
           // If profile doesn't exist, show PMA page
           console.log('No profile found, showing PMA page');
