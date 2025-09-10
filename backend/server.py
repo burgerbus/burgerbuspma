@@ -362,24 +362,25 @@ async def get_payment_status(payment_id: str):
         "transaction_id": payment.transaction_id
     }
 
+class AdminVerifyPaymentRequest(BaseModel):
+    payment_id: str
+    transaction_id: str
+    admin_notes: Optional[str] = None
+
 @api_router.post("/admin/verify-payment")
-async def admin_verify_payment(
-    payment_id: str,
-    transaction_id: str,
-    admin_notes: str = None
-):
+async def admin_verify_payment(request: AdminVerifyPaymentRequest):
     """Admin endpoint to manually verify payment"""
-    if payment_id not in payment_requests_db:
+    if request.payment_id not in payment_requests_db:
         raise HTTPException(status_code=404, detail="Payment not found")
     
-    payment = payment_requests_db[payment_id]
+    payment = payment_requests_db[request.payment_id]
     
     if payment.status == "verified":
         return {"message": "Payment already verified", "payment": payment}
     
     # Update payment status
     payment.status = "verified"
-    payment.transaction_id = transaction_id
+    payment.transaction_id = request.transaction_id
     payment.verified_at = datetime.now(timezone.utc).isoformat()
     payment.verified_by = "admin"  # In real system, would be admin user ID
     
@@ -391,7 +392,7 @@ async def admin_verify_payment(
     return {
         "success": True,
         "message": "Payment verified successfully",
-        "payment_id": payment_id,
+        "payment_id": request.payment_id,
         "member_activated": True,
         "cashstamp_pending": True
     }
