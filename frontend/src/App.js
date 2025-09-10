@@ -462,7 +462,7 @@ const MemberDashboard = ({ memberAddress }) => {
               <h1 className="text-3xl font-bold text-white">Club Dashboard</h1>
               <p className="text-gray-400">Welcome to Bitcoin Ben's, {memberAddress?.slice(0, 8)}...</p>
             </div>
-            <WalletAuth />
+            <BCHAuthentication />
           </div>
         </div>
       </div>
