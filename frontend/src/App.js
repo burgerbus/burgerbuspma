@@ -917,9 +917,16 @@ function App() {
     if (urlParams.get('admin') === 'true') {
       setAuthState(prev => ({ ...prev, showAdmin: true }));
     }
+    if (urlParams.get('debug') === 'true') {
+      setAuthState(prev => ({ ...prev, showDebug: true }));
+    }
   }, []);
 
   // Use the combined state for render condition
+  if (authState.showDebug) {
+    return <WalletDebug />;
+  }
+
   if (authState.showAdmin) {
     return <AdminPanel />;
   }
