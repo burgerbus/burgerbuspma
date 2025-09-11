@@ -240,18 +240,46 @@ class BCHWalletManager {
     // Sign message using extension wallet
     async signWithExtension(message) {
         try {
-            const signature = await this.connectedWallet.instance.signMessage(
-                this.connectedWallet.address,
-                message
-            );
+            let signature;
+            
+            // Handle different wallet signing APIs
+            if (this.connectedWallet.name === 'Edge Wallet' && this.connectedWallet.instance) {
+                // Edge wallet specific signing
+                try {
+                    signature = await this.connectedWallet.instance.signMessage(
+                        this.connectedWallet.address,
+                        message
+                    );
+                } catch (error) {
+                    // Try alternative Edge signing methods
+                    if (this.connectedWallet.instance.sign) {
+                        signature = await this.connectedWallet.instance.sign(message);
+                    } else if (this.connectedWallet.instance.personal && this.connectedWallet.instance.personal.sign) {
+                        signature = await this.connectedWallet.instance.personal.sign(message, this.connectedWallet.address);
+                    }
+                }
+            } else if (this.connectedWallet.instance.signMessage) {
+                // Standard BCH wallet signing
+                signature = await this.connectedWallet.instance.signMessage(
+                    this.connectedWallet.address,
+                    message
+                );
+            } else if (this.connectedWallet.instance.sign) {
+                // Alternative signing method
+                signature = await this.connectedWallet.instance.sign(message);
+            } else {
+                throw new Error(`Wallet ${this.connectedWallet.name} does not support message signing`);
+            }
             
             return {
                 address: this.connectedWallet.address,
                 signature: signature,
                 message: message
             };
+            
         } catch (error) {
-            throw new Error(`Extension signing failed: ${error.message}`);
+            console.error(`Extension signing failed for ${this.connectedWallet.name}:`, error);
+            throw new Error(`${this.connectedWallet.name} signing failed: ${error.message}`);
         }
     }
 
