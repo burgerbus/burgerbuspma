@@ -12,6 +12,15 @@ class BCHWalletManager {
     async detectWallets() {
         const wallets = [];
         
+        // Check for Edge Wallet (popular BCH wallet)
+        if (window.edgeProvider) {
+            wallets.push({
+                name: 'Edge Wallet',
+                type: 'extension',
+                instance: window.edgeProvider
+            });
+        }
+        
         // Check for Bitcoin.com Wallet
         if (window.bitcoincom) {
             wallets.push({
@@ -36,6 +45,15 @@ class BCHWalletManager {
                 name: 'Bitcoin Cash Wallet',
                 type: 'extension',
                 instance: window.bitcoincash
+            });
+        }
+
+        // Check for web3-like BCH providers
+        if (window.bch) {
+            wallets.push({
+                name: 'BCH Web3 Wallet',
+                type: 'extension',
+                instance: window.bch
             });
         }
 
