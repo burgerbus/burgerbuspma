@@ -27,8 +27,8 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # BCH Payment Configuration
-MEMBERSHIP_FEE_USD = 21.00
-CASHSTAMP_AMOUNT_USD = 15.00
+MEMBERSHIP_FEE_USD = 2.00  # Testing amount - can be changed anytime
+CASHSTAMP_AMOUNT_USD = 1.00  # Testing amount - can be changed anytime
 
 # BCH receiving address for membership payments (set your actual BCH address)
 BCH_RECEIVING_ADDRESS = os.environ.get("BCH_RECEIVING_ADDRESS", "bitcoincash:qph0duvh0zn0r2um7znh8gx20p50dr3ycc5lcp0sc4")
