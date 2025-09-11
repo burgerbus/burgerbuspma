@@ -106,24 +106,53 @@ class BCHWalletManager {
     // Connect to browser extension wallet
     async connectExtensionWallet(wallet) {
         try {
-            // Request connection permission
-            const accounts = await wallet.instance.getAccounts();
+            let accounts = [];
             
-            if (accounts.length === 0) {
-                throw new Error('No accounts available in wallet');
+            // Handle different wallet APIs
+            if (wallet.name === 'Edge Wallet' && wallet.instance) {
+                // Edge wallet specific connection
+                try {
+                    await wallet.instance.enable();
+                    accounts = await wallet.instance.getAccounts();
+                } catch (error) {
+                    // Try alternative Edge wallet methods
+                    if (wallet.instance.requestAccounts) {
+                        accounts = await wallet.instance.requestAccounts();
+                    } else if (wallet.instance.enable) {
+                        await wallet.instance.enable();
+                        accounts = wallet.instance.accounts || [];
+                    }
+                }
+            } else if (wallet.instance && wallet.instance.getAccounts) {
+                // Standard BCH wallet API
+                accounts = await wallet.instance.getAccounts();
+            } else if (wallet.instance && wallet.instance.requestAccounts) {
+                // Web3-style API
+                accounts = await wallet.instance.requestAccounts();
+            } else {
+                throw new Error(`Wallet ${wallet.name} API not supported`);
             }
+            
+            if (!accounts || accounts.length === 0) {
+                throw new Error('No accounts available in wallet or user denied access');
+            }
+
+            // Get the first account
+            const address = Array.isArray(accounts) ? accounts[0] : accounts;
 
             this.connectedWallet = {
                 name: wallet.name,
                 type: wallet.type,
-                address: accounts[0],
+                address: address,
                 instance: wallet.instance
             };
 
             this.emit('walletConnected', this.connectedWallet);
             return this.connectedWallet;
+            
         } catch (error) {
-            throw new Error(`Extension wallet connection failed: ${error.message}`);
+            console.error(`Extension wallet connection failed for ${wallet.name}:`, error);
+            throw new Error(`${wallet.name} connection failed: ${error.message}`);
         }
     }
 
