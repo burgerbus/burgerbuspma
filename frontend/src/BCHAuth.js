@@ -174,26 +174,34 @@ export const BCHAuthentication = ({ onAuthSuccess, onAuthError }) => {
     setAuthState('connecting');
 
     try {
+      console.log(`🔄 Attempting to connect to ${walletName}...`);
+      
       // Step 1: Detect wallets first to populate availableWallets array
-      await walletManager.detectWallets();
+      console.log('🔍 Detecting available wallets...');
+      const detectedWallets = await walletManager.detectWallets();
+      console.log('✅ Detected wallets:', detectedWallets.map(w => w.name));
       
       // Step 2: Connect to wallet
       setAuthState('connecting');
+      console.log(`🔌 Connecting to ${walletName}...`);
       const wallet = await walletManager.connectWallet(walletName);
-      console.log('Wallet connected:', wallet);
+      console.log('✅ Wallet connected:', wallet);
       
-      // Step 2: Generate authentication challenge
+      // Step 3: Generate authentication challenge
       setAuthState('challenge');
+      console.log('🎯 Requesting authentication challenge...');
       const challengeResponse = await bchAuthService.requestChallenge();
-      console.log('Challenge received:', challengeResponse);
+      console.log('✅ Challenge received:', challengeResponse);
       
-      // Step 3: Sign challenge message
+      // Step 4: Sign challenge message
       setAuthState('signing');
+      console.log('✍️ Signing challenge message...');
       const signatureData = await walletManager.signMessage(challengeResponse.message);
-      console.log('Message signed:', signatureData);
+      console.log('✅ Message signed:', signatureData);
       
-      // Step 4: Verify signature and get token
+      // Step 5: Verify signature and get token
       setAuthState('verifying');
+      console.log('🔐 Verifying signature...');
       const tokenData = await bchAuthService.verifySignature(
         challengeResponse.challenge_id,
         signatureData.address,
@@ -201,13 +209,26 @@ export const BCHAuthentication = ({ onAuthSuccess, onAuthError }) => {
         signatureData.message
       );
       
-      console.log('Authentication successful:', tokenData);
+      console.log('🎉 Authentication successful:', tokenData);
       setAuthState('success');
       onAuthSuccess && onAuthSuccess(signatureData.address);
 
     } catch (error) {
-      console.error('Authentication failed:', error);
-      setError(error.response?.data?.detail || error.message || 'Authentication failed');
+      console.error('❌ Authentication failed:', error);
+      console.error('Error details:', error.stack);
+      
+      let errorMessage = error.message || 'Authentication failed';
+      
+      // Provide more specific error messages
+      if (error.message.includes('not available')) {
+        errorMessage = `${walletName} is not installed or not available. Please install the wallet extension and try again.`;
+      } else if (error.message.includes('denied')) {
+        errorMessage = 'Wallet connection was denied. Please approve the connection request in your wallet.';
+      } else if (error.message.includes('signing failed')) {
+        errorMessage = 'Message signing failed. Please approve the signing request in your wallet.';
+      }
+      
+      setError(errorMessage);
       setAuthState('error');
       onAuthError && onAuthError(error);
     }
