@@ -853,7 +853,8 @@ function App() {
     isAuthenticated: false,
     memberAddress: null,
     showAuth: false,
-    showAdmin: false  // Add admin panel state
+    showAdmin: false,  // Add admin panel state
+    showDebug: false   // Add debug panel state
   });
 
   useEffect(() => {
