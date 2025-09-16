@@ -558,7 +558,20 @@ const MemberDashboard = ({ memberAddress }) => {
               <h1 className="text-3xl font-bold text-white">Club Dashboard</h1>
               <p className="text-gray-400">Welcome to Bitcoin Ben's, {memberData?.full_name || 'Member'}!</p>
             </div>
-            <BCHAuthentication />
+            <div className="flex items-center gap-4">
+              <span className="text-green-400 text-sm">✓ Logged in as {memberData?.email || 'Member'}</span>
+              <button
+                onClick={() => {
+                  // Clear any stored tokens
+                  localStorage.clear();
+                  // Reload page to reset state
+                  window.location.reload();
+                }}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
