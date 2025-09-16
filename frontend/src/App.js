@@ -210,8 +210,8 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
                   The Club reserves the right to terminate membership for violations of club policies.
                 </p>
                 <p>
-                  <strong>5. BLOCKCHAIN AUTHENTICATION</strong><br />
-                  Membership is tied to your Bitcoin Cash wallet address: <code className="bg-gray-600 px-2 py-1 rounded text-orange-400">{memberAddress}</code>
+                  <strong>5. MEMBERSHIP AUTHENTICATION</strong><br />
+                  Membership is tied to your email address: <code className="bg-gray-600 px-2 py-1 rounded text-orange-400">{memberInfo.email}</code>
                 </p>
                 <p>
                   <strong>6. LIMITATION OF LIABILITY</strong><br />
