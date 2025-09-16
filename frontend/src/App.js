@@ -27,24 +27,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
     }
 
     setProcessing(true);
-    try {
-      // Create real BCH payment request
-      const response = await bchAuthService.post('/api/payments/create-membership-payment', null, {
-        params: { user_address: memberAddress }
-      });
-
-      if (response.success) {
-        setPaymentData(response);
-        setStep('payment');
-      } else {
-        throw new Error('Failed to create payment request');
-      }
-    } catch (error) {
-      console.error('Payment creation failed:', error);
-      alert(`Payment creation failed: ${error.response?.data?.detail || error.message}. Please try again.`);
-    } finally {
-      setProcessing(false);
-    }
+    setStep('payment');
   };
 
   const handlePaymentComplete = () => {
