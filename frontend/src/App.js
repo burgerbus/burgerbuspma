@@ -154,6 +154,17 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
                   placeholder="Enter your email"
                 />
               </div>
+              <div>
+                <label className="block text-white font-medium mb-2">Password *</label>
+                <input
+                  type="password"
+                  required
+                  value={memberInfo.password}
+                  onChange={(e) => setMemberInfo({...memberInfo, password: e.target.value})}
+                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none"
+                  placeholder="Create a password"
+                />
+              </div>
             </div>
 
             <div>
