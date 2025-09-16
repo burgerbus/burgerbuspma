@@ -40,28 +40,28 @@ PAYMENT_METHODS = {
         "display_name": "CashApp",
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": "Send $21.00 to $BitcoinBen with memo: 'BB Membership'"
+        "instructions": "Send $21.00 to $BitcoinBen with memo: 'BB Membership + [YOUR EMAIL]'"
     },
     "venmo": {
         "handle": "@BitcoinBen",  # Your Venmo handle
         "display_name": "Venmo", 
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": "Send $21.00 to @BitcoinBen with note: 'BB Membership'"
+        "instructions": "Send $21.00 to @BitcoinBen with note: 'BB Membership + [YOUR EMAIL]'"
     },
     "zelle": {
         "handle": "bitcoinben@example.com",  # Your Zelle email/phone
         "display_name": "Zelle",
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": "Send $21.00 via Zelle to bitcoinben@example.com with memo: 'BB Membership'"
+        "instructions": "Send $21.00 via Zelle to bitcoinben@example.com with memo: 'BB Membership + [YOUR EMAIL]'"
     },
     "bch": {
         "handle": BCH_RECEIVING_ADDRESS,
         "display_name": "Bitcoin Cash",
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": f"Send ${MEMBERSHIP_FEE_USD:.2f} worth of BCH to join the club!"
+        "instructions": f"Send ${MEMBERSHIP_FEE_USD:.2f} worth of BCH. Include your email in the transaction memo for verification."
     }
 }
 
