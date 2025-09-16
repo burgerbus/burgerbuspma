@@ -50,120 +50,35 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
     setTimeout(() => clearInterval(pollInterval), 3600000);
   };
 
-  if (step === 'payment' && paymentData) {
+  if (step === 'payment') {
     return (
       <div className="min-h-screen bg-gray-900 py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="bg-gray-800 rounded-lg p-8">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold text-white mb-4">
-                Complete Your <span className="text-orange-500">$21 Membership</span> Payment
+                Complete Your <span className="text-orange-500">PMA Membership</span>
               </h1>
               <p className="text-gray-400">
-                Send Bitcoin Cash to activate your membership and receive your $15 cashstamp bonus!
+                Choose your preferred peer-to-peer payment method
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Payment Instructions */}
-              <div className="space-y-6">
-                <div className="bg-gray-700 rounded-lg p-6">
-                  <h3 className="text-xl font-bold text-white mb-4">💰 Payment Details</h3>
-                  <div className="space-y-3 text-gray-300">
-                    <div className="flex justify-between">
-                      <span>Amount (USD):</span>
-                      <span className="text-orange-400 font-bold">${paymentData.amount_usd}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Amount (BCH):</span>
-                      <span className="text-orange-400 font-bold">{paymentData.amount_bch} BCH</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>BCH Price:</span>
-                      <span>${paymentData.bch_price.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Cashstamp Bonus:</span>
-                      <span className="text-green-400 font-bold">$15 BCH</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-700 rounded-lg p-6">
-                  <h3 className="text-xl font-bold text-white mb-4">📱 Send Payment</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        BCH Address:
-                      </label>
-                      <div className="bg-gray-600 rounded p-3 break-all text-sm font-mono text-orange-400">
-                        {paymentData.receiving_address}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <button
-                        onClick={() => navigator.clipboard.writeText(paymentData.receiving_address)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                      >
-                        Copy Address
-                      </button>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(paymentData.amount_bch.toString())}
-                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                      >
-                        Copy Amount
-                      </button>
-                    </div>
-
-                    <div className="text-center">
-                      <a
-                        href={paymentData.payment_uri}
-                        className="inline-block px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors"
-                      >
-                        📱 Open in BCH Wallet
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-center">
-                  <button
-                    onClick={handlePaymentComplete}
-                    className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
-                  >
-                    ✅ I've Sent the Payment
-                  </button>
-                </div>
-              </div>
-
-              {/* QR Code */}
-              <div className="text-center">
-                <h3 className="text-xl font-bold text-white mb-4">📷 QR Code Payment</h3>
-                {paymentData.qr_code && (
-                  <div className="bg-white rounded-lg p-4 inline-block">
-                    <img
-                      src={paymentData.qr_code}
-                      alt="BCH Payment QR Code"
-                      className="w-64 h-64"
-                    />
-                  </div>
-                )}
-                <p className="text-gray-400 mt-4 text-sm">
-                  Scan with your BCH wallet to pay instantly
-                </p>
-              </div>
-            </div>
+            <P2PPaymentSelector
+              memberEmail={memberInfo.email}
+              onPaymentSelected={(paymentData) => {
+                console.log('Payment selected:', paymentData);
+                // Could store payment data or update state as needed
+              }}
+            />
 
             <div className="mt-8 text-center">
-              <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-4">
-                <p className="text-yellow-400 font-medium">
-                  ⏰ Payment expires in 24 hours
-                </p>
-                <p className="text-gray-300 text-sm mt-2">
-                  After payment, admin will verify and activate your membership within 24 hours.
-                </p>
-              </div>
+              <button
+                onClick={() => setStep('agreement')}
+                className="text-orange-400 hover:text-orange-300 transition-colors"
+              >
+                ← Back to PMA Agreement
+              </button>
             </div>
           </div>
         </div>
