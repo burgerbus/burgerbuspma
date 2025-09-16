@@ -220,6 +220,15 @@ const PaymentInstructionsView = ({ instructions, onPaymentSent, onBack, copyToCl
                 {instructions.instructions}
               </p>
               
+              <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-3 mb-4">
+                <p className="text-yellow-400 font-bold text-sm">
+                  ⚠️ IMPORTANT: Include your email address in the payment memo/note
+                </p>
+                <p className="text-yellow-300 text-xs mt-1">
+                  This helps us verify your payment and activate your membership quickly
+                </p>
+              </div>
+              
               <div className="space-y-2">
                 <button
                   onClick={() => copyToClipboard(instructions.handle, 'Payment handle')}
@@ -233,6 +242,13 @@ const PaymentInstructionsView = ({ instructions, onPaymentSent, onBack, copyToCl
                   className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
                 >
                   💰 Copy Amount (${instructions.amount})
+                </button>
+
+                <button
+                  onClick={() => copyToClipboard(instructions.user_email || 'your-email@example.com', 'Your Email')}
+                  className="w-full px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-sm transition-colors"
+                >
+                  📧 Copy Your Email (for memo)
                 </button>
               </div>
             </div>
