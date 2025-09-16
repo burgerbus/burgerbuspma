@@ -16,7 +16,8 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
   const [memberInfo, setMemberInfo] = useState({
     fullName: '',
     email: '',
-    phone: ''
+    phone: '',
+    password: ''
   });
 
   const handleSubmit = async (e) => {
