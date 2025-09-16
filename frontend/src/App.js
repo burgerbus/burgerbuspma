@@ -303,7 +303,7 @@ const LandingPage = ({ onGetStarted }) => {
           <div className="flex flex-col items-center gap-6">
             <button
               onClick={onGetStarted}
-              className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white text-lg font-bold rounded-lg transition-colors transform hover:scale-105"
+              className="px-8 py-4 bg-yellow-600 hover:bg-yellow-700 text-black text-lg font-bold rounded-lg transition-colors transform hover:scale-105"
             >
               Connect Wallet & Join
             </button>
