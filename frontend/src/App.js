@@ -556,7 +556,7 @@ const MemberDashboard = ({ memberAddress }) => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-white">Club Dashboard</h1>
-              <p className="text-gray-400">Welcome to Bitcoin Ben's, {memberAddress?.slice(0, 8)}...</p>
+              <p className="text-gray-400">Welcome to Bitcoin Ben's, {memberData?.full_name || 'Member'}!</p>
             </div>
             <BCHAuthentication />
           </div>
