@@ -291,7 +291,7 @@ const LandingPage = ({ onGetStarted }) => {
               }}
             />
             <h1 className="text-6xl font-bold text-white text-center">
-              <span className="text-orange-500">Bitcoin Ben's</span><br />
+              <span className="text-yellow-400">Bitcoin Ben's</span><br />
               <span className="text-white">Burger Bus Club</span>
             </h1>
           </div>
