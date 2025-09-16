@@ -246,7 +246,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
                 <span className="text-2xl font-bold text-orange-400">$21.00</span>
               </div>
               <p className="text-gray-400 text-sm mt-2">
-                Payment processing via crypto-friendly methods. Your membership activates immediately upon agreement.
+                Payment processing via P2P payment methods. Your membership activates immediately upon agreement.
               </p>
             </div>
 
