@@ -91,6 +91,9 @@ const P2PPaymentSelector = ({ memberEmail, onPaymentSelected }) => {
           <p className="text-blue-300 text-xs mt-1">
             Plus crypto discounts on menu items when you pay with Bitcoin Cash
           </p>
+          <p className="text-blue-300 text-xs mt-2 font-medium">
+            📧 Include member's email in the memo section of each transaction for verification.
+          </p>
         </div>
       </div>
 
