@@ -167,7 +167,7 @@ const PaymentMethodCard = ({ methodKey, method, onSelect }) => {
       
       {methodKey === 'bch' && (
         <div className="mt-2 text-green-400 text-xs">
-          🎁 Net cost: $0.80 (after $1 cashstamp)
+          🎁 Net cost: $6.00 (after $15 cashstamp)
         </div>
       )}
     </button>
