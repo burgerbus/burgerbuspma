@@ -847,30 +847,11 @@ function App() {
   }
 
   if (authState.showAuth) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
-          <h2 className="text-2xl font-bold text-white text-center mb-6">
-            Connect Your Bitcoin Cash Wallet
-          </h2>
-          <p className="text-gray-400 text-center mb-8">
-            Sign a message with your wallet to join Bitcoin Ben's Burger Bus Club
-          </p>
-          
-          <BCHAuthentication 
-            onAuthSuccess={handleAuthSuccess}
-            onAuthError={handleAuthError}
-          />
-          
-          <button
-            onClick={() => setAuthState(prev => ({ ...prev, showAuth: false }))}
-            className="w-full mt-4 text-gray-400 hover:text-white transition-colors"
-          >
-            ← Back to landing page
-          </button>
-        </div>
-      </div>
-    );
+    return <PMAgreementPage memberAddress="" onComplete={() => {
+      setAuthState(prev => ({ ...prev, showAuth: false }));
+      // After PMA completion, user would login with username/password
+      // For now, we'll redirect back to landing page
+    }} />;
   }
 
   return <LandingPage onGetStarted={() => setAuthState(prev => ({ ...prev, showAuth: true }))} />;
