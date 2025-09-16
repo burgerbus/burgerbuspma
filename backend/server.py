@@ -30,7 +30,7 @@ load_dotenv(ROOT_DIR / '.env')
 BCH_RECEIVING_ADDRESS = os.environ.get("BCH_RECEIVING_ADDRESS", "bitcoincash:qph0duvh0zn0r2um7znh8gx20p50dr3ycc5lcp0sc4")
 
 # PMA P2P Payment Configuration
-MEMBERSHIP_FEE_USD = 2.00  # Same for all payment methods
+MEMBERSHIP_FEE_USD = 21.00  # All members pay $21 dues
 CASHSTAMP_AMOUNT_USD = 15.00  # All members receive $15 BCH cashstamp
 
 # P2P Payment Methods (Update these with your actual handles)
@@ -40,21 +40,21 @@ PAYMENT_METHODS = {
         "display_name": "CashApp",
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": "Send $2.00 to $BitcoinBen with memo: 'BB Membership'"
+        "instructions": "Send $21.00 to $BitcoinBen with memo: 'BB Membership'"
     },
     "venmo": {
         "handle": "@BitcoinBen",  # Your Venmo handle
         "display_name": "Venmo", 
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": "Send $2.00 to @BitcoinBen with note: 'BB Membership'"
+        "instructions": "Send $21.00 to @BitcoinBen with note: 'BB Membership'"
     },
     "zelle": {
         "handle": "bitcoinben@example.com",  # Your Zelle email/phone
         "display_name": "Zelle",
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": "Send $2.00 via Zelle to bitcoinben@example.com with memo: 'BB Membership'"
+        "instructions": "Send $21.00 via Zelle to bitcoinben@example.com with memo: 'BB Membership'"
     },
     "bch": {
         "handle": BCH_RECEIVING_ADDRESS,
