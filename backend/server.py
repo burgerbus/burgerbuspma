@@ -316,9 +316,72 @@ class BCHAuthService:
 bch_auth_service = BCHAuthService()
 
 # BCH Authentication Endpoints
+@api_router.get("/payments/methods")
+async def get_payment_methods():
+    """Get available P2P payment methods for PMA membership"""
+    return {
+        "success": True,
+        "payment_methods": PAYMENT_METHODS,
+        "membership_type": "Private Membership Association",
+        "note": "All payments are member-to-member (P2P) transactions, not merchant transactions"
+    }
+
+@api_router.post("/payments/create-p2p-payment")
+async def create_p2p_payment(
+    payment_method: str,
+    user_address: str = None,
+    user_email: str = None
+):
+    """Create P2P payment instruction for membership"""
+    if payment_method not in PAYMENT_METHODS:
+        raise HTTPException(status_code=400, detail="Invalid payment method")
+    
+    method = PAYMENT_METHODS[payment_method]
+    
+    # Generate unique payment ID for tracking
+    payment_id = f"pma_{payment_method}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}"
+    
+    # For BCH, still generate QR code
+    qr_code_data = None
+    if payment_method == "bch":
+        bch_price = await get_bch_price_usd()
+        amount_bch = method["amount"] / bch_price
+        qr_code_data = generate_qr_code(
+            method["handle"], 
+            amount_bch, 
+            "Bitcoin Ben's PMA Membership"
+        )
+    
+    # Create payment instruction
+    payment_instruction = {
+        "payment_id": payment_id,
+        "method": payment_method,
+        "display_name": method["display_name"],
+        "handle": method["handle"],
+        "amount": method["amount"],
+        "instructions": method["instructions"],
+        "user_email": user_email,
+        "user_address": user_address,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat(),
+        "status": "pending",
+        "qr_code": qr_code_data if payment_method == "bch" else None,
+        "cashstamp_bonus": method.get("cashstamp", 0)
+    }
+    
+    # Store payment instruction for admin tracking
+    payment_requests_db[payment_id] = payment_instruction
+    
+    return {
+        "success": True,
+        "payment_id": payment_id,
+        **payment_instruction
+    }
+
 @api_router.post("/payments/create-membership-payment")
 async def create_membership_payment(user_address: str = None):
-    """Create real BCH payment request for membership"""
+    """Legacy endpoint - redirect to BCH P2P payment"""
+    return await create_p2p_payment("bch", user_address=user_address)
     try:
         # Get current BCH price
         bch_price = await get_bch_price_usd()
