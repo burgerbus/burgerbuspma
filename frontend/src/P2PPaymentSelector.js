@@ -129,8 +129,8 @@ const PaymentMethodCard = ({ methodKey, method, onSelect }) => {
       case 'cashapp': return 'Popular mobile payments';
       case 'venmo': return 'Social payments platform';
       case 'zelle': return 'Bank-to-bank transfers';
-      case 'bch': return 'Cryptocurrency with bonus!';
-      default: return 'Peer-to-peer payment';
+      case 'bch': return 'Cryptocurrency payments + menu discounts!';
+      default: return 'Peer-to-peer payment + $15 cashstamp';
     }
   };
 
