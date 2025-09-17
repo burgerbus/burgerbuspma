@@ -3,8 +3,10 @@ import { bchAuthService } from './BCHAuth';
 
 const AdminPanel = () => {
   const [pendingPayments, setPendingPayments] = useState([]);
+  const [affiliatePayouts, setAffiliatePayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState({});
+  const [activeTab, setActiveTab] = useState('payments');
 
   useEffect(() => {
     loadPendingPayments();
