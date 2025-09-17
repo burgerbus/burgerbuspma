@@ -687,7 +687,7 @@ async def get_pump_member_rewards(member: MemberProfile = Depends(get_current_us
 @api_router.post("/pump/claim-rewards")
 async def claim_pump_rewards(
     wallet_address: str,
-    member: MemberProfile = Depends(get_authenticated_member)
+    member: MemberProfile = Depends(get_current_user)
 ):
     """Claim pump.fun token rewards (admin approval required)"""
     try:
