@@ -291,6 +291,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
             </button>
           </form>
         </div>
+        </div>
       </div>
     </div>
   );
