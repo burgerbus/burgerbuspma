@@ -32,7 +32,7 @@ PMA_NET_AMOUNT_USD = MEMBERSHIP_FEE_USD - AFFILIATE_COMMISSION_USD  # $18 to PMA
 # Pump.fun Token Configuration
 PUMP_TOKEN_MINT = os.getenv("PUMP_FUN_TOKEN_ADDRESS", "mWusXdRfsYAoFtYdaDcf8tmG7hnRNvnVc2TuvNEpump")
 PUMP_TOKEN_NAME = "Bitcoin Ben's Club Token"
-PUMP_TOKEN_SYMBOL = "BBTC"
+PUMP_TOKEN_SYMBOL = "BBC"
 PUMP_TOKEN_DECIMALS = 9
 
 # P2P Payment Methods (Update these with your actual handles)
