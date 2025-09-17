@@ -16,9 +16,9 @@ def get_backend_url():
                     return line.split('=', 1)[1].strip()
     except Exception as e:
         print(f"Error reading frontend .env: {e}")
-        return "https://blockchain-eats.preview.emergentagent.com"
+        return "https://burgerbuspma.preview.emergentagent.com"
     
-    return "https://blockchain-eats.preview.emergentagent.com"
+    return "https://burgerbuspma.preview.emergentagent.com"
 
 def get_auth_token_for_address(bch_address):
     """Get authentication token for a specific BCH address"""
