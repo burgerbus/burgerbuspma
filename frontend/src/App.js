@@ -96,8 +96,12 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
 
   if (step === 'waiting') {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4 text-center">
+      <div className="min-h-screen bg-gray-900">
+        {/* Pump.fun Token Ticker */}
+        <PumpTokenTicker />
+        
+        <div className="flex items-center justify-center min-h-screen pt-16">
+          <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4 text-center">
           <div className="text-6xl mb-4">⏳</div>
           <h2 className="text-2xl font-bold text-white mb-4">Payment Submitted!</h2>
           <p className="text-gray-400 mb-6">
