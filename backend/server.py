@@ -1,24 +1,18 @@
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Request
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone, timedelta
 import secrets
-import hashlib
-import hmac
-import base64
-import json
-from collections import defaultdict
 from jose import JWTError, jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import requests
-from decimal import Decimal
 import qrcode
 from io import BytesIO
 import base64 as b64
