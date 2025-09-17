@@ -618,11 +618,12 @@ async def get_pump_token_price():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch token price: {str(e)}")
 
+class BuyLinkRequest(BaseModel):
+    amount_sol: Optional[float] = None
+    amount_usd: Optional[float] = None
+
 @api_router.post("/pump/buy-link")
-async def generate_pump_buy_link(
-    amount_sol: float = None,
-    amount_usd: float = None
-):
+async def generate_pump_buy_link(request: BuyLinkRequest):
     """Generate pump.fun buy link for the token"""
     try:
         # Construct pump.fun buy URL
