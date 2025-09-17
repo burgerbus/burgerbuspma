@@ -121,6 +121,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
           >
             ← Back to agreement
           </button>
+          </div>
         </div>
       </div>
     );
