@@ -5,6 +5,7 @@ import AdminPanel from './AdminPanel';
 import WalletDebug from './WalletDebug';
 import P2PPaymentSelector from './P2PPaymentSelector';
 import AffiliateDashboard from './AffiliateDashboard';
+import PumpTokenTicker from './PumpTokenTicker';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
