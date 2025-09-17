@@ -402,6 +402,18 @@ backend:
           agent: "testing"
           comment: "PMA Validation System testing completed with 100% success rate (3/3 core scenarios passed). All PMA validation requirements working perfectly: 1) POST /api/orders correctly validates PMA requirements - blocks orders when pma_agreed=false with descriptive error message, 2) POST /api/orders correctly validates dues payment - blocks orders when dues_paid=false with descriptive error about $21 annual dues, 3) POST /api/orders allows orders when both pma_agreed=true AND dues_paid=true, 4) GET /api/debug/profile returns incomplete membership status for testing PMA flow, 5) POST /api/debug/register properly updates PMA status, 6) Error messages are descriptive and provide helpful guidance, 7) Appropriate 403 Forbidden status codes returned. PMA validation system enforces critical business requirement that users must complete PMA agreement and pay dues before placing orders."
 
+  - task: "Pump.fun Token Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented pump.fun token integration with ticker display, rewards system, and food discounts. Added backend endpoints: GET /api/pump/token-info, GET /api/pump/token-price, POST /api/pump/buy-link, GET /api/pump/member-rewards, POST /api/pump/claim-rewards. Added admin endpoints for managing rewards claims. Created PumpTokenTicker React component for homepage display with link to pump.fun. Ready for testing."
+
 frontend:
   - task: "BCH Authentication Landing Page"
     implemented: true
