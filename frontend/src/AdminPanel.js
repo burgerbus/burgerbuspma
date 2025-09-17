@@ -9,18 +9,23 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('payments');
 
   useEffect(() => {
-    loadPendingPayments();
+    loadData();
     // Refresh every 30 seconds
-    const interval = setInterval(loadPendingPayments, 30000);
+    const interval = setInterval(loadData, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  const loadPendingPayments = async () => {
+  const loadData = async () => {
     try {
-      const response = await bchAuthService.get('/api/admin/pending-payments');
-      setPendingPayments(response.pending_payments || []);
+      const [paymentsResponse, affiliatesResponse] = await Promise.all([
+        bchAuthService.get('/api/admin/pending-payments'),
+        bchAuthService.get('/api/admin/affiliate-payouts')
+      ]);
+      
+      setPendingPayments(paymentsResponse.pending_payments || []);
+      setAffiliatePayouts(affiliatesResponse.pending_payouts || []);
     } catch (error) {
-      console.error('Failed to load pending payments:', error);
+      console.error('Failed to load admin data:', error);
     } finally {
       setLoading(false);
     }
