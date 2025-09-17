@@ -630,6 +630,9 @@ async def generate_pump_buy_link(request: BuyLinkRequest):
         base_url = f"https://pump.fun/{PUMP_TOKEN_MINT}"
         
         params = []
+        amount_sol = request.amount_sol
+        amount_usd = request.amount_usd
+        
         if amount_sol:
             params.append(f"amount={amount_sol}")
         elif amount_usd:
