@@ -488,14 +488,14 @@ async def admin_verify_payment(request: AdminVerifyPaymentRequest):
     
     payment = payment_requests_db[request.payment_id]
     
-    if payment.status == "verified":
+    if payment["status"] == "verified":
         return {"message": "Payment already verified", "payment": payment}
     
     # Update payment status
-    payment.status = "verified"
-    payment.transaction_id = request.transaction_id
-    payment.verified_at = datetime.now(timezone.utc).isoformat()
-    payment.verified_by = "admin"  # In real system, would be admin user ID
+    payment["status"] = "verified"
+    payment["transaction_id"] = request.transaction_id
+    payment["verified_at"] = datetime.now(timezone.utc).isoformat()
+    payment["verified_by"] = "admin"  # In real system, would be admin user ID
     
     # Here you would typically:
     # 1. Activate the member's account
