@@ -750,6 +750,21 @@ async def approve_pump_claim(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to approve claim: {str(e)}")
 
+# BCH Authentication Endpoints
+@api_router.post("/auth/challenge", response_model=ChallengeResponse)
+async def create_challenge(request: ChallengeRequest):
+    """Create authentication challenge for Bitcoin Cash wallet signing"""
+    challenge_data = bch_auth_service.generate_challenge(request.app_name)
+    challenge_id = str(uuid.uuid4())
+    
+    # Store challenge temporarily
+    active_challenges[challenge_id] = challenge_data
+    
+    return ChallengeResponse(
+        challenge_id=challenge_id,
+        message=challenge_data["message"],
+        expires_at=challenge_data["expires_at"]
+    )
 
 @api_router.post("/auth/verify", response_model=TokenResponse)
 async def verify_signature(request: SignatureRequest):
