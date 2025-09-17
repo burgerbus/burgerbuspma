@@ -1531,6 +1531,13 @@ class FoodTruckBackendTester:
         self.test_payment_error_scenarios()
         self.test_bch_price_fallback()
         
+        # NEW: Pump.fun Token Integration Tests
+        self.test_pump_fun_token_integration()
+        self.test_pump_fun_member_rewards()
+        self.test_pump_fun_admin_endpoints()
+        self.test_pump_fun_authentication_requirements()
+        self.test_pump_fun_error_handling()
+        
         # Existing tests
         self.test_member_registration_endpoint()
         self.test_admin_data_seeding()
