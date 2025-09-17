@@ -151,17 +151,33 @@ api_router = APIRouter(prefix="/api")
 # Models
 class MemberProfile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    wallet_address: str
+    wallet_address: str = ""
+    membership_tier: str = "basic"
     full_name: str = ""
     email: str = ""
     phone: str = ""
-    membership_tier: str = "basic"  # basic, premium, vip
-    joined_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    favorite_items: List[str] = []
-    total_orders: int = 0
     pma_agreed: bool = False
     dues_paid: bool = False
     payment_amount: float = 0.0
+    total_orders: int = 0
+    favorite_items: List[str] = []
+    
+    # Affiliate system fields
+    referral_code: str = Field(default_factory=lambda: f"BITCOINBEN-{secrets.token_hex(4).upper()}")
+    referred_by: Optional[str] = None  # Referral code of who referred them
+    total_referrals: int = 0
+    total_commissions_earned: float = 0.0
+    unpaid_commissions: float = 0.0
+
+class AffiliateReferral(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    referrer_email: str
+    referrer_code: str  
+    new_member_email: str
+    commission_amount: float = AFFILIATE_COMMISSION_USD
+    status: str = "pending"  # pending, paid
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    paid_at: Optional[str] = None
 
 class MenuItem(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
