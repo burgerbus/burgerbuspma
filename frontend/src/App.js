@@ -166,6 +166,21 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
                   placeholder="Create a password"
                 />
               </div>
+              <div>
+                <label className="block text-white font-medium mb-2">
+                  Referral Code <span className="text-yellow-400">(Optional - Earn $3!)</span>
+                </label>
+                <input
+                  type="text"
+                  value={memberInfo.referralCode}
+                  onChange={(e) => setMemberInfo({...memberInfo, referralCode: e.target.value.toUpperCase()})}
+                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-yellow-500 focus:outline-none"
+                  placeholder="BITCOINBEN-XXXX (optional)"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Have a referral code? The member who referred you earns $3 commission!
+                </p>
+              </div>
             </div>
 
             <div>
