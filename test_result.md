@@ -517,6 +517,18 @@ frontend:
           agent: "testing"
           comment: "All API endpoints working correctly: POST /api/auth/challenge (200), POST /api/auth/verify (200), GET /api/debug/profile (200), GET /api/debug/menu (200), GET /api/debug/locations (200), GET /api/debug/events (200), GET /api/debug/orders (200). Backend integration fully functional."
 
+  - task: "Pump.fun Token Ticker Display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/PumpTokenTicker.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Created PumpTokenTicker React component displaying token price, market cap, volume, holders count. Added ticker to top of landing page, dashboard, and PMA agreement pages. Includes animated design with link to pump.fun token page. Auto-refreshes every 30 seconds. Ready for testing."
+
 metadata:
   created_by: "testing_agent"
   version: "1.1"
