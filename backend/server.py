@@ -722,12 +722,13 @@ async def get_pending_pump_claims():
         "total_tokens_pending": 0
     }
 
+class ApproveClaimRequest(BaseModel):
+    claim_id: str
+    transaction_signature: Optional[str] = None
+    admin_notes: Optional[str] = None
+
 @api_router.post("/admin/pump/approve-claim")
-async def approve_pump_claim(
-    claim_id: str,
-    transaction_signature: str = None,
-    admin_notes: str = None
-):
+async def approve_pump_claim(request: ApproveClaimRequest):
     """Admin: Approve and process pump.fun token reward claim"""
     try:
         # In a real implementation, this would:
