@@ -89,6 +89,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
                 </button>
               </div>
             </div>
+          </div>
         </div>
       </div>
     );
