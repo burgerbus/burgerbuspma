@@ -782,6 +782,10 @@ const MemberDashboard = ({ memberAddress }) => {
             )}
           </div>
         )}
+
+        {activeTab === 'affiliates' && (
+          <AffiliateDashboard />
+        )}
       </div>
     </div>
   );
