@@ -701,7 +701,7 @@ async def claim_pump_rewards(
             "message": "Reward claim submitted for admin approval",
             "claim_id": f"claim_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}",
             "member_address": member.wallet_address,
-            "reward_wallet": wallet_address,
+            "reward_wallet": request.wallet_address,
             "reward_amount": rewards_info["total_reward_tokens"],
             "token_symbol": PUMP_TOKEN_SYMBOL,
             "status": "pending_approval",
