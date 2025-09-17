@@ -581,29 +581,6 @@ async def admin_send_cashstamp(request: AdminSendCashstampRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate cashstamp: {str(e)}")
 
-@api_router.post("/auth/challenge", response_model=ChallengeResponse)
-async def generate_challenge(request: ChallengeRequest):
-    """Generate a new authentication challenge for Bitcoin Cash wallet signing"""
-    try:
-        challenge_data = bch_auth_service.generate_challenge(request.app_name)
-        challenge_id = secrets.token_hex(16)
-        
-        # Store challenge for verification
-        active_challenges[challenge_id] = {
-            **challenge_data,
-            "created_at": datetime.utcnow().isoformat()
-        }
-        
-        return ChallengeResponse(
-            challenge_id=challenge_id,
-            message=challenge_data["message"],
-            expires_at=challenge_data["expires_at"]
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Challenge generation failed: {str(e)}"
-        )
 
 @api_router.post("/auth/verify", response_model=TokenResponse)
 async def verify_signature(request: SignatureRequest):
