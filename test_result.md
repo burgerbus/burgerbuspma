@@ -537,12 +537,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "BCH Payment Creation Endpoint"
-    - "BCH Payment Status Endpoint"
-    - "Admin Payment Verification Endpoint"
-    - "Admin Payment Management Endpoints"
-    - "BCH Payment Integration Flow"
-    - "BCH Price Fetching and QR Code Generation"
+    - "Pump.fun Token Integration"
+    - "Pump.fun Token Ticker Display"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
