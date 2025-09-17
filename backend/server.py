@@ -740,10 +740,10 @@ async def approve_pump_claim(request: ApproveClaimRequest):
         return {
             "success": True,
             "message": "Token reward claim approved and processed",
-            "claim_id": claim_id,
-            "transaction_signature": transaction_signature,
+            "claim_id": request.claim_id,
+            "transaction_signature": request.transaction_signature,
             "processed_at": datetime.now(timezone.utc).isoformat(),
-            "admin_notes": admin_notes
+            "admin_notes": request.admin_notes
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to approve claim: {str(e)}")
