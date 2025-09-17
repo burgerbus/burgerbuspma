@@ -4,6 +4,7 @@ import { BCHAuthentication, bchAuthService } from './BCHAuth';
 import AdminPanel from './AdminPanel';
 import WalletDebug from './WalletDebug';
 import P2PPaymentSelector from './P2PPaymentSelector';
+import AffiliateDashboard from './AffiliateDashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
