@@ -550,7 +550,7 @@ async def admin_send_cashstamp(request: AdminSendCashstampRequest):
     
     payment = payment_requests_db[request.payment_id]
     
-    if payment.status != "verified":
+    if payment["status"] != "verified":
         raise HTTPException(status_code=400, detail="Payment must be verified first")
     
     try:
