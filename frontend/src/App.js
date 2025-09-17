@@ -72,15 +72,15 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
               </p>
             </div>
 
-            <P2PPaymentSelector
-              memberEmail={memberInfo.email}
-              onPaymentSelected={(paymentData) => {
-                console.log('Payment selected:', paymentData);
-                // Could store payment data or update state as needed
-              }}
-            />
+              <P2PPaymentSelector
+                memberEmail={memberInfo.email}
+                onPaymentSelected={(paymentData) => {
+                  console.log('Payment selected:', paymentData);
+                  // Could store payment data or update state as needed
+                }}
+              />
 
-            <div className="mt-8 text-center">
+              <div className="mt-8 text-center">
               <button
                 onClick={() => setStep('agreement')}
                 className="text-orange-400 hover:text-orange-300 transition-colors"
