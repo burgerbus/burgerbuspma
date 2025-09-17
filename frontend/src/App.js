@@ -81,14 +81,14 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
               />
 
               <div className="mt-8 text-center">
-              <button
-                onClick={() => setStep('agreement')}
-                className="text-orange-400 hover:text-orange-300 transition-colors"
-              >
-                ← Back to PMA Agreement
-              </button>
+                <button
+                  onClick={() => setStep('agreement')}
+                  className="text-orange-400 hover:text-orange-300 transition-colors"
+                >
+                  ← Back to PMA Agreement
+                </button>
+              </div>
             </div>
-          </div>
         </div>
       </div>
     );
