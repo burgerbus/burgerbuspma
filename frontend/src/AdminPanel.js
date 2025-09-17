@@ -49,7 +49,7 @@ const AdminPanel = () => {
 
       if (response.success) {
         alert('Payment verified successfully! Member activated.');
-        loadPendingPayments(); // Refresh the list
+        loadData(); // Refresh the data
       }
     } catch (error) {
       console.error('Verification failed:', error);
