@@ -17,7 +17,8 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
     fullName: '',
     email: '',
     phone: '',
-    password: ''
+    password: '',
+    referralCode: ''
   });
 
   const handleSubmit = async (e) => {
