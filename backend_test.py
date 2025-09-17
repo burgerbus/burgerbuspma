@@ -1040,6 +1040,443 @@ class FoodTruckBackendTester:
         except Exception as e:
             self.log_test("BCH Price Testing", False, f"Error testing price fetching: {str(e)}")
 
+    def test_pump_fun_token_integration(self):
+        """Test pump.fun token integration endpoints"""
+        print("\n=== Testing Pump.fun Token Integration ===")
+        
+        # Test 1: Token Info Endpoint
+        try:
+            response = self.session.get(f"{self.base_url}/api/pump/token-info")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "token"]
+                
+                if all(field in data for field in required_fields):
+                    token_info = data["token"]
+                    token_fields = ["mint", "name", "symbol", "decimals", "description"]
+                    
+                    if all(field in token_info for field in token_fields):
+                        self.log_test("Pump Token Info Endpoint", True, f"All token fields present. Symbol: {token_info.get('symbol')}")
+                        
+                        # Validate specific token configuration
+                        if token_info["mint"] == "mWusXdRfsYAoFtYdaDcf8tmG7hnRNvnVc2TuvNEpump":
+                            self.log_test("Token Mint Address", True, f"Correct mint: {token_info['mint']}")
+                        else:
+                            self.log_test("Token Mint Address", False, f"Expected mWusXdRfsYAoFtYdaDcf8tmG7hnRNvnVc2TuvNEpump, got {token_info['mint']}")
+                        
+                        if token_info["symbol"] == "BBTC":
+                            self.log_test("Token Symbol", True, f"Correct symbol: {token_info['symbol']}")
+                        else:
+                            self.log_test("Token Symbol", False, f"Expected BBTC, got {token_info['symbol']}")
+                        
+                        if token_info["name"] == "Bitcoin Ben's Club Token":
+                            self.log_test("Token Name", True, f"Correct name: {token_info['name']}")
+                        else:
+                            self.log_test("Token Name", False, f"Expected Bitcoin Ben's Club Token, got {token_info['name']}")
+                        
+                        if token_info["decimals"] == 9:
+                            self.log_test("Token Decimals", True, f"Correct decimals: {token_info['decimals']}")
+                        else:
+                            self.log_test("Token Decimals", False, f"Expected 9, got {token_info['decimals']}")
+                    else:
+                        missing_fields = [f for f in token_fields if f not in token_info]
+                        self.log_test("Pump Token Info Endpoint", False, f"Missing token fields: {missing_fields}")
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Pump Token Info Endpoint", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Pump Token Info Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Pump Token Info Endpoint", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Token Price Endpoint
+        try:
+            response = self.session.get(f"{self.base_url}/api/pump/token-price")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "token_mint", "price_sol", "price_usd", "market_cap", "volume_24h", "holders", "last_updated"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Pump Token Price Endpoint", True, f"All price fields present. Price USD: ${data.get('price_usd')}")
+                    
+                    # Validate price data structure
+                    if data["token_mint"] == "mWusXdRfsYAoFtYdaDcf8tmG7hnRNvnVc2TuvNEpump":
+                        self.log_test("Price Token Mint", True, "Correct token mint in price data")
+                    else:
+                        self.log_test("Price Token Mint", False, f"Mint mismatch: {data['token_mint']}")
+                    
+                    # Validate numeric fields are positive
+                    numeric_fields = ["price_sol", "price_usd", "market_cap", "volume_24h", "holders"]
+                    all_positive = all(isinstance(data[field], (int, float)) and data[field] > 0 for field in numeric_fields)
+                    
+                    if all_positive:
+                        self.log_test("Price Data Validation", True, "All numeric price fields are positive")
+                    else:
+                        invalid_fields = [f for f in numeric_fields if not (isinstance(data[f], (int, float)) and data[f] > 0)]
+                        self.log_test("Price Data Validation", False, f"Invalid numeric fields: {invalid_fields}")
+                    
+                    # Validate timestamp format
+                    try:
+                        from datetime import datetime
+                        datetime.fromisoformat(data["last_updated"].replace('Z', '+00:00'))
+                        self.log_test("Price Timestamp Format", True, "Valid ISO timestamp format")
+                    except Exception:
+                        self.log_test("Price Timestamp Format", False, f"Invalid timestamp: {data['last_updated']}")
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Pump Token Price Endpoint", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Pump Token Price Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Pump Token Price Endpoint", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Buy Link Generation
+        try:
+            # Test with USD amount
+            buy_data = {"amount_usd": 100}
+            response = self.session.post(f"{self.base_url}/api/pump/buy-link", json=buy_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "buy_url", "token_mint", "amount_sol", "amount_usd", "instructions"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Pump Buy Link Generation", True, f"Buy link generated: {data.get('buy_url')}")
+                    
+                    # Validate buy URL format
+                    expected_base = f"https://pump.fun/{data['token_mint']}"
+                    if data["buy_url"].startswith(expected_base):
+                        self.log_test("Buy Link URL Format", True, "Correct pump.fun URL format")
+                    else:
+                        self.log_test("Buy Link URL Format", False, f"Invalid URL format: {data['buy_url']}")
+                    
+                    # Validate amount conversion
+                    if data["amount_usd"] == 100 and data["amount_sol"] > 0:
+                        self.log_test("Buy Link Amount Conversion", True, f"USD to SOL conversion: ${data['amount_usd']} = {data['amount_sol']} SOL")
+                    else:
+                        self.log_test("Buy Link Amount Conversion", False, f"Invalid conversion: USD={data['amount_usd']}, SOL={data['amount_sol']}")
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Pump Buy Link Generation", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Pump Buy Link Generation", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Pump Buy Link Generation", False, f"Connection error: {str(e)}")
+        
+        # Test 4: Buy Link with SOL amount
+        try:
+            buy_data = {"amount_sol": 0.5}
+            response = self.session.post(f"{self.base_url}/api/pump/buy-link", json=buy_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data["amount_sol"] == 0.5:
+                    self.log_test("Buy Link SOL Amount", True, f"SOL amount preserved: {data['amount_sol']}")
+                else:
+                    self.log_test("Buy Link SOL Amount", False, f"Expected 0.5 SOL, got {data['amount_sol']}")
+            else:
+                self.log_test("Buy Link SOL Amount", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Buy Link SOL Amount", False, f"Connection error: {str(e)}")
+    
+    def test_pump_fun_member_rewards(self):
+        """Test pump.fun member rewards system (requires authentication)"""
+        print("\n=== Testing Pump.fun Member Rewards ===")
+        
+        if not hasattr(self, 'access_token'):
+            self.log_test("Pump Member Rewards", False, "No access token available for testing")
+            return
+        
+        # Set up authorization header
+        auth_headers = {
+            "Authorization": f"Bearer {self.access_token}"
+        }
+        
+        # Test 1: Get Member Rewards
+        try:
+            response = self.session.get(f"{self.base_url}/api/pump/member-rewards", headers=auth_headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "member_address", "membership_tier", "base_reward", 
+                                 "tier_multiplier", "activity_bonus", "total_reward_tokens", 
+                                 "token_symbol", "claim_status", "instructions"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Member Rewards Calculation", True, f"Total rewards: {data.get('total_reward_tokens')} {data.get('token_symbol')}")
+                    
+                    # Validate reward calculation logic
+                    expected_total = data["base_reward"] * data["tier_multiplier"] + data["activity_bonus"]
+                    if abs(data["total_reward_tokens"] - expected_total) < 0.01:
+                        self.log_test("Reward Calculation Logic", True, f"Correct calculation: {data['base_reward']} * {data['tier_multiplier']} + {data['activity_bonus']} = {data['total_reward_tokens']}")
+                    else:
+                        self.log_test("Reward Calculation Logic", False, f"Calculation error: expected {expected_total}, got {data['total_reward_tokens']}")
+                    
+                    # Validate tier multiplier
+                    tier = data["membership_tier"]
+                    multiplier = data["tier_multiplier"]
+                    expected_multipliers = {"basic": 1.0, "premium": 2.0, "vip": 5.0}
+                    
+                    if multiplier == expected_multipliers.get(tier, 1.0):
+                        self.log_test("Tier Multiplier Logic", True, f"{tier} tier has {multiplier}x multiplier")
+                    else:
+                        self.log_test("Tier Multiplier Logic", False, f"Expected {expected_multipliers.get(tier, 1.0)}x for {tier}, got {multiplier}x")
+                    
+                    # Validate token symbol
+                    if data["token_symbol"] == "BBTC":
+                        self.log_test("Reward Token Symbol", True, "Correct token symbol: BBTC")
+                    else:
+                        self.log_test("Reward Token Symbol", False, f"Expected BBTC, got {data['token_symbol']}")
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Member Rewards Calculation", False, f"Missing fields: {missing_fields}")
+            elif response.status_code in [401, 403]:
+                self.log_test("Member Rewards Authentication", False, "Authentication failed for rewards endpoint")
+            else:
+                self.log_test("Member Rewards Calculation", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Member Rewards Calculation", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Claim Rewards
+        try:
+            claim_data = {
+                "wallet_address": "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2"
+            }
+            response = self.session.post(f"{self.base_url}/api/pump/claim-rewards", json=claim_data, headers=auth_headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "claim_id", "member_address", "reward_wallet", 
+                                 "reward_amount", "token_symbol", "status", "estimated_processing"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Reward Claim Submission", True, f"Claim submitted: {data.get('claim_id')}")
+                    
+                    # Store claim_id for admin testing
+                    self.reward_claim_id = data["claim_id"]
+                    
+                    # Validate claim status
+                    if data["status"] == "pending_approval":
+                        self.log_test("Claim Status", True, "Claim status set to pending_approval")
+                    else:
+                        self.log_test("Claim Status", False, f"Expected pending_approval, got {data['status']}")
+                    
+                    # Validate reward amount is positive
+                    if isinstance(data["reward_amount"], (int, float)) and data["reward_amount"] > 0:
+                        self.log_test("Claim Reward Amount", True, f"Valid reward amount: {data['reward_amount']}")
+                    else:
+                        self.log_test("Claim Reward Amount", False, f"Invalid reward amount: {data['reward_amount']}")
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Reward Claim Submission", False, f"Missing fields: {missing_fields}")
+            elif response.status_code in [401, 403]:
+                self.log_test("Reward Claim Authentication", False, "Authentication failed for claim endpoint")
+            else:
+                self.log_test("Reward Claim Submission", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Reward Claim Submission", False, f"Connection error: {str(e)}")
+    
+    def test_pump_fun_admin_endpoints(self):
+        """Test pump.fun admin endpoints for reward management"""
+        print("\n=== Testing Pump.fun Admin Endpoints ===")
+        
+        # Test 1: Get Pending Claims
+        try:
+            response = self.session.get(f"{self.base_url}/api/admin/pump/pending-claims")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "pending_claims", "total_pending", "total_tokens_pending"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Admin Pending Claims", True, f"Found {data.get('total_pending')} pending claims")
+                    
+                    # Validate data structure
+                    if isinstance(data["pending_claims"], list):
+                        self.log_test("Pending Claims Structure", True, "Claims returned as list")
+                    else:
+                        self.log_test("Pending Claims Structure", False, f"Expected list, got {type(data['pending_claims'])}")
+                    
+                    # Validate numeric fields
+                    if isinstance(data["total_pending"], int) and isinstance(data["total_tokens_pending"], (int, float)):
+                        self.log_test("Pending Claims Totals", True, f"Valid totals: {data['total_pending']} claims, {data['total_tokens_pending']} tokens")
+                    else:
+                        self.log_test("Pending Claims Totals", False, "Invalid total field types")
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Admin Pending Claims", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Admin Pending Claims", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Admin Pending Claims", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Approve Claim
+        try:
+            # Use a test claim ID
+            test_claim_id = getattr(self, 'reward_claim_id', 'test_claim_12345')
+            approve_data = {
+                "claim_id": test_claim_id,
+                "transaction_signature": "test_signature_abc123def456",
+                "admin_notes": "Test approval for pump.fun integration testing"
+            }
+            response = self.session.post(f"{self.base_url}/api/admin/pump/approve-claim", json=approve_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "claim_id", "processed_at"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Admin Approve Claim", True, f"Claim approved: {data.get('message')}")
+                    
+                    # Validate claim_id matches
+                    if data["claim_id"] == test_claim_id:
+                        self.log_test("Claim ID Validation", True, "Claim ID matches request")
+                    else:
+                        self.log_test("Claim ID Validation", False, f"Expected {test_claim_id}, got {data['claim_id']}")
+                    
+                    # Validate processed_at timestamp
+                    try:
+                        from datetime import datetime
+                        datetime.fromisoformat(data["processed_at"].replace('Z', '+00:00'))
+                        self.log_test("Claim Processing Timestamp", True, "Valid processing timestamp")
+                    except Exception:
+                        self.log_test("Claim Processing Timestamp", False, f"Invalid timestamp: {data['processed_at']}")
+                    
+                    # Validate transaction signature is recorded
+                    if approve_data.get("transaction_signature") and data.get("transaction_signature"):
+                        self.log_test("Transaction Signature Recording", True, "Transaction signature recorded")
+                    else:
+                        self.log_test("Transaction Signature Recording", False, "Transaction signature not recorded")
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Admin Approve Claim", False, f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Admin Approve Claim", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Admin Approve Claim", False, f"Connection error: {str(e)}")
+    
+    def test_pump_fun_authentication_requirements(self):
+        """Test that pump.fun endpoints properly require authentication where needed"""
+        print("\n=== Testing Pump.fun Authentication Requirements ===")
+        
+        # Test 1: Member rewards without auth (should fail)
+        try:
+            response = self.session.get(f"{self.base_url}/api/pump/member-rewards")
+            
+            if response.status_code in [401, 403]:
+                self.log_test("Member Rewards Auth Required", True, f"Properly requires authentication: {response.status_code}")
+            else:
+                self.log_test("Member Rewards Auth Required", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Rewards Auth Required", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Claim rewards without auth (should fail)
+        try:
+            claim_data = {"wallet_address": "test_wallet"}
+            response = self.session.post(f"{self.base_url}/api/pump/claim-rewards", json=claim_data)
+            
+            if response.status_code in [401, 403]:
+                self.log_test("Claim Rewards Auth Required", True, f"Properly requires authentication: {response.status_code}")
+            else:
+                self.log_test("Claim Rewards Auth Required", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_test("Claim Rewards Auth Required", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Public endpoints should work without auth
+        public_endpoints = [
+            ("/api/pump/token-info", "Token Info"),
+            ("/api/pump/token-price", "Token Price")
+        ]
+        
+        for endpoint, name in public_endpoints:
+            try:
+                response = self.session.get(f"{self.base_url}{endpoint}")
+                if response.status_code == 200:
+                    self.log_test(f"Public Access ({name})", True, f"Public endpoint accessible: {response.status_code}")
+                else:
+                    self.log_test(f"Public Access ({name})", False, f"Public endpoint failed: {response.status_code}")
+            except Exception as e:
+                self.log_test(f"Public Access ({name})", False, f"Connection error: {str(e)}")
+        
+        # Test 4: Buy link generation should work without auth
+        try:
+            buy_data = {"amount_usd": 50}
+            response = self.session.post(f"{self.base_url}/api/pump/buy-link", json=buy_data)
+            
+            if response.status_code == 200:
+                self.log_test("Buy Link Public Access", True, "Buy link generation works without auth")
+            else:
+                self.log_test("Buy Link Public Access", False, f"Buy link generation failed: {response.status_code}")
+        except Exception as e:
+            self.log_test("Buy Link Public Access", False, f"Connection error: {str(e)}")
+    
+    def test_pump_fun_error_handling(self):
+        """Test pump.fun endpoints error handling"""
+        print("\n=== Testing Pump.fun Error Handling ===")
+        
+        # Test 1: Buy link with invalid parameters
+        try:
+            # Test with negative amount
+            buy_data = {"amount_usd": -50}
+            response = self.session.post(f"{self.base_url}/api/pump/buy-link", json=buy_data)
+            
+            # Should either handle gracefully or return error
+            if response.status_code in [200, 400, 422]:
+                self.log_test("Buy Link Invalid Amount", True, f"Handled invalid amount appropriately: {response.status_code}")
+            else:
+                self.log_test("Buy Link Invalid Amount", False, f"Unexpected status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Buy Link Invalid Amount", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Buy link with no parameters
+        try:
+            response = self.session.post(f"{self.base_url}/api/pump/buy-link", json={})
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Should generate basic buy link without amount
+                if "buy_url" in data:
+                    self.log_test("Buy Link No Parameters", True, "Generated basic buy link without amount")
+                else:
+                    self.log_test("Buy Link No Parameters", False, "No buy URL in response")
+            else:
+                self.log_test("Buy Link No Parameters", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Buy Link No Parameters", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Claim rewards with invalid wallet address (if authenticated)
+        if hasattr(self, 'access_token'):
+            try:
+                auth_headers = {"Authorization": f"Bearer {self.access_token}"}
+                claim_data = {"wallet_address": "invalid_wallet_address"}
+                response = self.session.post(f"{self.base_url}/api/pump/claim-rewards", json=claim_data, headers=auth_headers)
+                
+                # Should handle gracefully (may accept any string as wallet address for testing)
+                if response.status_code in [200, 400, 422]:
+                    self.log_test("Claim Invalid Wallet", True, f"Handled invalid wallet appropriately: {response.status_code}")
+                else:
+                    self.log_test("Claim Invalid Wallet", False, f"Unexpected status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Claim Invalid Wallet", False, f"Connection error: {str(e)}")
+        
+        # Test 4: Admin approve non-existent claim
+        try:
+            approve_data = {
+                "claim_id": "non_existent_claim_12345",
+                "transaction_signature": "test_sig"
+            }
+            response = self.session.post(f"{self.base_url}/api/admin/pump/approve-claim", json=approve_data)
+            
+            # Should handle gracefully (may accept any claim_id for testing)
+            if response.status_code in [200, 404, 400]:
+                self.log_test("Admin Approve Non-existent Claim", True, f"Handled non-existent claim appropriately: {response.status_code}")
+            else:
+                self.log_test("Admin Approve Non-existent Claim", False, f"Unexpected status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Approve Non-existent Claim", False, f"Connection error: {str(e)}")
+
     def test_error_handling(self):
         """Test error handling for invalid requests"""
         print("\n=== Testing Error Handling ===")
