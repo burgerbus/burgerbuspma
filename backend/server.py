@@ -658,6 +658,131 @@ async def verify_signature(request: SignatureRequest):
 async def get_authenticated_member(member: MemberProfile = Depends(get_current_user)) -> MemberProfile:
     return member
 
+# Affiliate System Endpoints
+@api_router.get("/affiliate/my-stats")
+async def get_affiliate_stats(member: MemberProfile = Depends(get_authenticated_member)):
+    """Get affiliate statistics for current member"""
+    return {
+        "referral_code": member.referral_code,
+        "total_referrals": member.total_referrals,
+        "total_commissions_earned": member.total_commissions_earned,
+        "unpaid_commissions": member.unpaid_commissions,
+        "commission_per_referral": AFFILIATE_COMMISSION_USD
+    }
+
+@api_router.post("/affiliate/process-referral")
+async def process_referral(
+    referral_code: str,
+    new_member_email: str
+):
+    """Process a new referral (called during registration)"""
+    if not referral_code or referral_code == "":
+        return {"success": False, "message": "No referral code provided"}
+    
+    # Find the referrer by their referral code
+    referrer = await db.members.find_one({"referral_code": referral_code})
+    if not referrer:
+        return {"success": False, "message": "Invalid referral code"}
+    
+    # Create referral record
+    referral = AffiliateReferral(
+        referrer_email=referrer["email"],
+        referrer_code=referral_code,
+        new_member_email=new_member_email
+    )
+    
+    await db.affiliate_referrals.insert_one(referral.dict())
+    
+    # Update referrer's stats
+    await db.members.update_one(
+        {"referral_code": referral_code},
+        {
+            "$inc": {
+                "total_referrals": 1,
+                "total_commissions_earned": AFFILIATE_COMMISSION_USD,
+                "unpaid_commissions": AFFILIATE_COMMISSION_USD
+            }
+        }
+    )
+    
+    return {
+        "success": True,
+        "message": f"Referral processed! {referrer['full_name']} will earn ${AFFILIATE_COMMISSION_USD}",
+        "commission_amount": AFFILIATE_COMMISSION_USD
+    }
+
+@api_router.get("/admin/affiliate-payouts")
+async def get_pending_affiliate_payouts():
+    """Admin: Get all pending affiliate commission payouts"""
+    
+    # Get all members with unpaid commissions
+    members_with_commissions = await db.members.find({
+        "unpaid_commissions": {"$gt": 0}
+    }).to_list(100)
+    
+    payouts = []
+    for member in members_with_commissions:
+        # Get their pending referrals
+        pending_referrals = await db.affiliate_referrals.find({
+            "referrer_email": member["email"],
+            "status": "pending"
+        }).to_list(100)
+        
+        payouts.append({
+            "member_email": member["email"],
+            "member_name": member["full_name"],
+            "referral_code": member["referral_code"],
+            "total_unpaid": member["unpaid_commissions"],
+            "pending_referrals": len(pending_referrals),
+            "referrals": [{"new_member": r["new_member_email"], "amount": r["commission_amount"]} for r in pending_referrals]
+        })
+    
+    return {
+        "pending_payouts": payouts,
+        "total_amount_owed": sum(p["total_unpaid"] for p in payouts)
+    }
+
+@api_router.post("/admin/pay-affiliate-commission")
+async def pay_affiliate_commission(
+    member_email: str,
+    payment_method: str = "manual",
+    transaction_id: str = None
+):
+    """Admin: Mark affiliate commissions as paid"""
+    
+    member = await db.members.find_one({"email": member_email})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    unpaid_amount = member.get("unpaid_commissions", 0)
+    if unpaid_amount <= 0:
+        return {"message": "No unpaid commissions for this member"}
+    
+    # Mark all pending referrals as paid
+    await db.affiliate_referrals.update_many(
+        {"referrer_email": member_email, "status": "pending"},
+        {
+            "$set": {
+                "status": "paid",
+                "paid_at": datetime.now(timezone.utc).isoformat(),
+                "payment_method": payment_method,
+                "transaction_id": transaction_id
+            }
+        }
+    )
+    
+    # Reset unpaid commissions to 0
+    await db.members.update_one(
+        {"email": member_email},
+        {"$set": {"unpaid_commissions": 0}}
+    )
+    
+    return {
+        "success": True,
+        "message": f"Paid ${unpaid_amount} in commissions to {member['full_name']}",
+        "amount_paid": unpaid_amount
+    }
+
 # Public routes (no auth required)
 @api_router.get("/")
 async def root():
