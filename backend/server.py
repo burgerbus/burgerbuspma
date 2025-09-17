@@ -587,6 +587,169 @@ async def admin_send_cashstamp(request: AdminSendCashstampRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate cashstamp: {str(e)}")
 
+# Pump.fun Token Integration Endpoints
+@api_router.get("/pump/token-info")
+async def get_pump_token_info():
+    """Get pump.fun token information"""
+    return {
+        "success": True,
+        "token": {
+            "mint": PUMP_TOKEN_MINT,
+            "name": PUMP_TOKEN_NAME,
+            "symbol": PUMP_TOKEN_SYMBOL,
+            "decimals": PUMP_TOKEN_DECIMALS,
+            "description": "Official token for Bitcoin Ben's Burger Bus Club members",
+            "website": "https://bitcoinben.com",
+            "twitter": "@BitcoinBen",
+            "telegram": "https://t.me/bitcoinben"
+        }
+    }
+
+@api_router.get("/pump/token-price")
+async def get_pump_token_price():
+    """Get current pump.fun token price from DEX"""
+    try:
+        # In a real implementation, you would fetch from pump.fun API or DEX
+        # For now, return mock data
+        return {
+            "success": True,
+            "token_mint": PUMP_TOKEN_MINT,
+            "price_sol": 0.000123,  # Price in SOL
+            "price_usd": 0.0245,    # Price in USD
+            "market_cap": 245000,   # Market cap in USD
+            "volume_24h": 12500,    # 24h volume in USD
+            "holders": 1250,        # Number of holders
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch token price: {str(e)}")
+
+@api_router.post("/pump/buy-link")
+async def generate_pump_buy_link(
+    amount_sol: float = None,
+    amount_usd: float = None
+):
+    """Generate pump.fun buy link for the token"""
+    try:
+        # Construct pump.fun buy URL
+        base_url = f"https://pump.fun/{PUMP_TOKEN_MINT}"
+        
+        params = []
+        if amount_sol:
+            params.append(f"amount={amount_sol}")
+        elif amount_usd:
+            # Convert USD to SOL (mock conversion rate)
+            sol_price = 200  # Mock SOL price in USD
+            amount_sol = amount_usd / sol_price
+            params.append(f"amount={amount_sol}")
+        
+        buy_url = base_url
+        if params:
+            buy_url += "?" + "&".join(params)
+        
+        return {
+            "success": True,
+            "buy_url": buy_url,
+            "token_mint": PUMP_TOKEN_MINT,
+            "amount_sol": amount_sol,
+            "amount_usd": amount_usd,
+            "instructions": "Click the link to buy tokens on pump.fun. Make sure you have SOL in your wallet."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate buy link: {str(e)}")
+
+@api_router.get("/pump/member-rewards")
+async def get_pump_member_rewards(member: MemberProfile = Depends(get_authenticated_member)):
+    """Get pump.fun token rewards for members"""
+    try:
+        # Calculate member rewards based on membership tier and activity
+        base_reward = 100  # Base tokens for basic members
+        tier_multiplier = {"basic": 1.0, "premium": 2.0, "vip": 5.0}
+        activity_bonus = member.total_orders * 10  # 10 tokens per order
+        
+        total_reward = base_reward * tier_multiplier.get(member.membership_tier, 1.0) + activity_bonus
+        
+        return {
+            "success": True,
+            "member_address": member.wallet_address,
+            "membership_tier": member.membership_tier,
+            "base_reward": base_reward,
+            "tier_multiplier": tier_multiplier.get(member.membership_tier, 1.0),
+            "activity_bonus": activity_bonus,
+            "total_reward_tokens": total_reward,
+            "token_symbol": PUMP_TOKEN_SYMBOL,
+            "claim_status": "available",  # In real implementation, track claimed rewards
+            "instructions": "Rewards will be distributed weekly to qualifying members"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to calculate rewards: {str(e)}")
+
+@api_router.post("/pump/claim-rewards")
+async def claim_pump_rewards(
+    wallet_address: str,
+    member: MemberProfile = Depends(get_authenticated_member)
+):
+    """Claim pump.fun token rewards (admin approval required)"""
+    try:
+        # In a real implementation, this would:
+        # 1. Verify member eligibility
+        # 2. Calculate exact reward amount
+        # 3. Queue token transfer
+        # 4. Update claim status
+        
+        rewards_info = await get_pump_member_rewards(member)
+        
+        return {
+            "success": True,
+            "message": "Reward claim submitted for admin approval",
+            "claim_id": f"claim_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}",
+            "member_address": member.wallet_address,
+            "reward_wallet": wallet_address,
+            "reward_amount": rewards_info["total_reward_tokens"],
+            "token_symbol": PUMP_TOKEN_SYMBOL,
+            "status": "pending_approval",
+            "estimated_processing": "1-3 business days"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to claim rewards: {str(e)}")
+
+@api_router.get("/admin/pump/pending-claims")
+async def get_pending_pump_claims():
+    """Admin: Get all pending pump.fun token reward claims"""
+    # In a real implementation, this would fetch from database
+    # For now, return empty list
+    return {
+        "success": True,
+        "pending_claims": [],
+        "total_pending": 0,
+        "total_tokens_pending": 0
+    }
+
+@api_router.post("/admin/pump/approve-claim")
+async def approve_pump_claim(
+    claim_id: str,
+    transaction_signature: str = None,
+    admin_notes: str = None
+):
+    """Admin: Approve and process pump.fun token reward claim"""
+    try:
+        # In a real implementation, this would:
+        # 1. Validate claim exists
+        # 2. Execute token transfer
+        # 3. Update claim status
+        # 4. Notify member
+        
+        return {
+            "success": True,
+            "message": "Token reward claim approved and processed",
+            "claim_id": claim_id,
+            "transaction_signature": transaction_signature,
+            "processed_at": datetime.now(timezone.utc).isoformat(),
+            "admin_notes": admin_notes
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to approve claim: {str(e)}")
+
 
 @api_router.post("/auth/verify", response_model=TokenResponse)
 async def verify_signature(request: SignatureRequest):
