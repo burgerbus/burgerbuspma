@@ -287,6 +287,9 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
 const LandingPage = ({ onGetStarted }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900">
+      {/* Pump.fun Token Ticker */}
+      <PumpTokenTicker />
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
