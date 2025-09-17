@@ -516,20 +516,20 @@ async def get_pending_payments():
     pending_payments = []
     
     for payment_id, payment in payment_requests_db.items():
-        if payment.status == "pending":
+        if payment["status"] == "pending":
             # Check if expired
-            expires_at = datetime.fromisoformat(payment.expires_at.replace('Z', '+00:00'))
+            expires_at = datetime.fromisoformat(payment["expires_at"].replace('Z', '+00:00'))
             if datetime.now(timezone.utc) > expires_at:
-                payment.status = "expired"
+                payment["status"] = "expired"
                 continue
             
             pending_payments.append({
                 "payment_id": payment_id,
-                "user_address": payment.user_address,
-                "amount_usd": payment.amount_usd,
-                "amount_bch": payment.amount_bch,
-                "created_at": payment.created_at,
-                "expires_at": payment.expires_at
+                "user_address": payment["user_address"],
+                "amount_usd": payment["amount_usd"],
+                "amount_bch": payment["amount_bch"],
+                "created_at": payment["created_at"],
+                "expires_at": payment["expires_at"]
             })
     
     return {
