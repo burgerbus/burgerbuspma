@@ -540,7 +540,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Pump.fun Token Integration"
     - "Pump.fun Token Ticker Display"
   stuck_tasks: []
   test_all: false
