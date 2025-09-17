@@ -603,17 +603,75 @@ async def get_pump_token_info():
 async def get_pump_token_price():
     """Get current pump.fun token price from DEX"""
     try:
-        # In a real implementation, you would fetch from pump.fun API or DEX
-        # For now, return mock data
+        # Try to fetch from pump.fun frontend API
+        try:
+            # Try multiple pump.fun API endpoints
+            api_urls = [
+                f"https://frontend-api.pump.fun/coins/{PUMP_TOKEN_MINT}",
+                f"https://frontend-api-v2.pump.fun/coins/{PUMP_TOKEN_MINT}",
+                f"https://frontend-api-v3.pump.fun/coins/{PUMP_TOKEN_MINT}"
+            ]
+            
+            token_data = None
+            for api_url in api_urls:
+                try:
+                    response = requests.get(api_url, timeout=10)
+                    if response.status_code == 200:
+                        token_data = response.json()
+                        break
+                except:
+                    continue
+            
+            if token_data:
+                # Extract real data from pump.fun API response
+                return {
+                    "success": True,
+                    "token_mint": PUMP_TOKEN_MINT,
+                    "price_sol": float(token_data.get("price_per_sol", 0)),
+                    "price_usd": float(token_data.get("usd_market_cap", 0)) / float(token_data.get("total_supply", 1)) if token_data.get("total_supply") else 0,
+                    "market_cap": float(token_data.get("usd_market_cap", 0)),
+                    "volume_24h": float(token_data.get("volume_24h", 0)),
+                    "holders": int(token_data.get("holder_count", 0)),
+                    "last_updated": datetime.now(timezone.utc).isoformat(),
+                    "source": "pump.fun_api"
+                }
+        except Exception as api_error:
+            print(f"API fetch failed: {api_error}")
+        
+        # Fallback: Try to fetch from DexScreener API
+        try:
+            dexscreener_url = f"https://api.dexscreener.com/latest/dex/tokens/{PUMP_TOKEN_MINT}"
+            response = requests.get(dexscreener_url, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("pairs") and len(data["pairs"]) > 0:
+                    pair = data["pairs"][0]
+                    return {
+                        "success": True,
+                        "token_mint": PUMP_TOKEN_MINT,
+                        "price_sol": float(pair.get("priceNative", 0)),
+                        "price_usd": float(pair.get("priceUsd", 0)),
+                        "market_cap": float(pair.get("marketCap", 0)),
+                        "volume_24h": float(pair.get("volume", {}).get("h24", 0)),
+                        "holders": int(pair.get("info", {}).get("holders", 0)),
+                        "last_updated": datetime.now(timezone.utc).isoformat(),
+                        "source": "dexscreener_api"
+                    }
+        except Exception as dex_error:
+            print(f"DexScreener fetch failed: {dex_error}")
+        
+        # Final fallback: Return mock data with warning
         return {
             "success": True,
             "token_mint": PUMP_TOKEN_MINT,
-            "price_sol": 0.000123,  # Price in SOL
-            "price_usd": 0.0245,    # Price in USD
-            "market_cap": 245000,   # Market cap in USD
-            "volume_24h": 12500,    # 24h volume in USD
-            "holders": 1250,        # Number of holders
-            "last_updated": datetime.now(timezone.utc).isoformat()
+            "price_sol": 0.000123,  # Mock Price in SOL
+            "price_usd": 0.0245,    # Mock Price in USD
+            "market_cap": 245000,   # Mock Market cap in USD
+            "volume_24h": 12500,    # Mock 24h volume in USD
+            "holders": 1250,        # Mock Number of holders
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "source": "mock_data",
+            "warning": "Real API data unavailable, showing mock data"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch token price: {str(e)}")
