@@ -459,20 +459,20 @@ async def get_payment_status(payment_id: str):
     payment = payment_requests_db[payment_id]
     
     # Check if payment expired
-    expires_at = datetime.fromisoformat(payment.expires_at.replace('Z', '+00:00'))
-    if datetime.now(timezone.utc) > expires_at and payment.status == "pending":
-        payment.status = "expired"
+    expires_at = datetime.fromisoformat(payment["expires_at"].replace('Z', '+00:00'))
+    if datetime.now(timezone.utc) > expires_at and payment["status"] == "pending":
+        payment["status"] = "expired"
     
     return {
         "payment_id": payment_id,
-        "status": payment.status,
-        "amount_usd": payment.amount_usd,
-        "amount_bch": payment.amount_bch,
-        "receiving_address": payment.receiving_address,
-        "expires_at": payment.expires_at,
-        "created_at": payment.created_at,
-        "verified_at": payment.verified_at,
-        "transaction_id": payment.transaction_id
+        "status": payment["status"],
+        "amount_usd": payment["amount_usd"],
+        "amount_bch": payment["amount_bch"],
+        "receiving_address": payment["receiving_address"],
+        "expires_at": payment["expires_at"],
+        "created_at": payment["created_at"],
+        "verified_at": payment.get("verified_at"),
+        "transaction_id": payment.get("transaction_id")
     }
 
 class AdminVerifyPaymentRequest(BaseModel):
