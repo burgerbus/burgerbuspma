@@ -111,7 +111,7 @@ Please send this amount manually from your admin wallet.
               🔐 Bitcoin Ben's Admin Panel
             </h1>
             <button
-              onClick={loadPendingPayments}
+              onClick={loadData}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               🔄 Refresh
