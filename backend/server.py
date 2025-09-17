@@ -35,6 +35,12 @@ CASHSTAMP_AMOUNT_USD = 15.00  # All members receive $15 BCH cashstamp
 AFFILIATE_COMMISSION_USD = 3.00  # Affiliates earn $3 per referral
 PMA_NET_AMOUNT_USD = MEMBERSHIP_FEE_USD - AFFILIATE_COMMISSION_USD  # $18 to PMA
 
+# Pump.fun Token Configuration
+PUMP_TOKEN_MINT = "mWusXdRfsYAoFtYdaDcf8tmG7hnRNvnVc2TuvNEpump"
+PUMP_TOKEN_DECIMALS = 6  # Pump.fun tokens use 6 decimals
+PUMP_TOKEN_NAME = "Bitcoin Ben's Token"
+PUMP_TOKEN_SYMBOL = "BBBC"
+
 # P2P Payment Methods (Update these with your actual handles)
 PAYMENT_METHODS = {
     "cashapp": {
