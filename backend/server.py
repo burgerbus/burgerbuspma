@@ -659,7 +659,7 @@ async def generate_pump_buy_link(
         raise HTTPException(status_code=500, detail=f"Failed to generate buy link: {str(e)}")
 
 @api_router.get("/pump/member-rewards")
-async def get_pump_member_rewards(member: MemberProfile = Depends(get_authenticated_member)):
+async def get_pump_member_rewards(member: MemberProfile = Depends(get_current_user)):
     """Get pump.fun token rewards for members"""
     try:
         # Calculate member rewards based on membership tier and activity
