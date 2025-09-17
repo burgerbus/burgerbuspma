@@ -678,9 +678,12 @@ async def get_pump_member_rewards(member: MemberProfile = Depends(get_current_us
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to calculate rewards: {str(e)}")
 
+class ClaimRewardsRequest(BaseModel):
+    wallet_address: str
+
 @api_router.post("/pump/claim-rewards")
 async def claim_pump_rewards(
-    wallet_address: str,
+    request: ClaimRewardsRequest,
     member: MemberProfile = Depends(get_current_user)
 ):
     """Claim pump.fun token rewards (admin approval required)"""
