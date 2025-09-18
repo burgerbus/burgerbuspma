@@ -38,14 +38,14 @@ PUMP_TOKEN_DECIMALS = 9
 # P2P Payment Methods (Update these with your actual handles)
 PAYMENT_METHODS = {
     "cashapp": {
-        "handle": "$BitcoinBen",  # Your CashApp $cashtag
+        "handle": "Coming Soon",  # Coming soon
         "display_name": "CashApp",
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": "Send $21.00 to $BitcoinBen with memo: 'BB Membership + [YOUR EMAIL]'"
+        "instructions": "CashApp payment option coming soon"
     },
     "venmo": {
-        "handle": "@BitcoinBen",  # Your Venmo handle
+        "handle": "Coming Soon",  # Coming soon
         "display_name": "Venmo", 
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
