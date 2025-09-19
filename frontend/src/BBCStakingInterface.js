@@ -34,7 +34,14 @@ const BBCStakingInterface = () => {
   useEffect(() => {
     const getMemberInfo = async () => {
       try {
-        const profile = await bchAuthService.get('/api/profile');
+        // Set a timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 10000)
+        );
+        
+        const profilePromise = bchAuthService.get('/api/profile');
+        
+        const profile = await Promise.race([profilePromise, timeoutPromise]);
         setMemberInfo(profile);
         
         if (profile?.wallet_address) {
