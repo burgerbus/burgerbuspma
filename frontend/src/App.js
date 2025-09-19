@@ -998,10 +998,19 @@ function App() {
   if (authState.showAuth) {
     return (
       <BBCStakingProvider>
-        <PMAgreementPage memberAddress="" onComplete={() => {
-          setAuthState(prev => ({ ...prev, showAuth: false }));
-          // After PMA completion, user would login with username/password
-          // For now, we'll redirect back to landing page
+        <PMAgreementPage memberAddress="" onComplete={(userData) => {
+          if (userData) {
+            // User successfully registered and is now authenticated
+            setAuthState(prev => ({ 
+              ...prev, 
+              showAuth: false,
+              isAuthenticated: true,
+              memberAddress: userData.email
+            }));
+          } else {
+            // Just hide the auth screen and go back to landing
+            setAuthState(prev => ({ ...prev, showAuth: false }));
+          }
         }} />
       </BBCStakingProvider>
     );
