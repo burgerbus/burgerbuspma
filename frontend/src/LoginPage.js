@@ -39,8 +39,9 @@ const LoginPage = ({ onLoginSuccess, onBackToHome }) => {
       });
 
       if (response.success) {
-        // Store token and user data
-        localStorage.setItem('accessToken', response.access_token);
+        // Store token using the same key as bchAuthService expects
+        localStorage.setItem('bch_auth_token', response.access_token);
+        localStorage.setItem('accessToken', response.access_token); // Keep for compatibility
         localStorage.setItem('memberData', JSON.stringify(response.user));
         
         // Call success callback
