@@ -1657,6 +1657,9 @@ class FoodTruckBackendTester:
         print(f"🔗 Backend URL: {self.base_url}")
         print("=" * 80)
         
+        # PRIORITY: Authentication and Member Dashboard Flow (as requested)
+        self.test_authentication_and_dashboard_flow()
+        
         # Run all test suites
         self.test_basic_health_check()
         self.test_public_endpoints()
