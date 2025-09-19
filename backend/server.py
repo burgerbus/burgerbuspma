@@ -2258,6 +2258,155 @@ async def get_all_stake_accounts(admin_wallet: str = Header(...), skip: int = 0,
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get stake accounts: {str(e)}")
 
+# =======================
+# REWARDS TREASURY MANAGEMENT
+# =======================
+
+@api_router.post("/admin/treasury/initialize")
+async def initialize_treasury(request: dict, admin_wallet: str = Header(...)):
+    """Initialize the rewards treasury with initial funding (Admin only)"""
+    try:
+        if admin_wallet != "admin-wallet-address":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        from rewards_treasury import RewardsTreasury
+        from decimal import Decimal
+        
+        initial_funding = Decimal(str(request.get("initial_funding", "1000000")))  # Default 1M BBC
+        
+        treasury = RewardsTreasury(client)
+        result = await treasury.initialize_treasury(initial_funding)
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=500, detail=result["error"])
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Treasury initialization failed: {str(e)}")
+
+@api_router.post("/admin/treasury/fund")
+async def add_treasury_funding(request: dict, admin_wallet: str = Header(...)):
+    """Add funding to the rewards treasury (Admin only)"""
+    try:
+        if admin_wallet != "admin-wallet-address":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        from rewards_treasury import RewardsTreasury
+        from decimal import Decimal
+        
+        amount = Decimal(str(request.get("amount", "0")))
+        funding_source = request.get("funding_source", "manual_admin")
+        
+        if amount <= 0:
+            raise HTTPException(status_code=400, detail="Funding amount must be greater than 0")
+        
+        treasury = RewardsTreasury(client)
+        result = await treasury.add_funding(amount, funding_source)
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=500, detail=result["error"])
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Treasury funding failed: {str(e)}")
+
+@api_router.get("/admin/treasury/status")
+async def get_treasury_status(admin_wallet: str = Header(...)):
+    """Get current treasury status and metrics (Admin only)"""
+    try:
+        if admin_wallet != "admin-wallet-address":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        from rewards_treasury import RewardsTreasury
+        
+        treasury = RewardsTreasury(client)
+        result = await treasury.get_treasury_status()
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=500, detail=result["error"])
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Treasury status check failed: {str(e)}")
+
+@api_router.post("/admin/treasury/distribute-rewards")
+async def distribute_rewards(admin_wallet: str = Header(...)):
+    """Manually trigger reward distribution to all stakers (Admin only)"""
+    try:
+        if admin_wallet != "admin-wallet-address":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        from rewards_treasury import RewardsTreasury
+        
+        treasury = RewardsTreasury(client)
+        result = await treasury.distribute_rewards()
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=500, detail=result["error"])
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Reward distribution failed: {str(e)}")
+
+@api_router.get("/admin/treasury/calculate-optimal-funding")
+async def calculate_optimal_funding(projected_stakes: float = 10000000, time_horizon_days: int = 365, admin_wallet: str = Header(...)):
+    """Calculate optimal treasury funding amount (Admin only)"""
+    try:
+        if admin_wallet != "admin-wallet-address":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        from rewards_treasury import calculate_optimal_funding_amount
+        
+        recommended_funding = await calculate_optimal_funding_amount(projected_stakes, time_horizon_days)
+        
+        return {
+            "success": True,
+            "projections": {
+                "projected_stakes_bbc": projected_stakes,
+                "time_horizon_days": time_horizon_days,
+                "recommended_funding_bbc": recommended_funding,
+                "base_apy": "7%",
+                "member_bonus_apy": "2%",
+                "safety_buffer": "20%"
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Funding calculation failed: {str(e)}")
+
+@api_router.get("/treasury/public-stats")
+async def get_public_treasury_stats():
+    """Get public treasury statistics (no auth required)"""
+    try:
+        from rewards_treasury import RewardsTreasury
+        
+        treasury = RewardsTreasury(client)
+        status = await treasury.get_treasury_status()
+        
+        if status["success"]:
+            # Return only public information
+            public_stats = {
+                "success": True,
+                "public_metrics": {
+                    "total_distributed_rewards": status["status"]["treasury"]["total_distributed"],
+                    "total_active_stakes": status["status"]["staking_metrics"]["total_active_stakes"],
+                    "treasury_utilization_rate": round(status["status"]["treasury"]["utilization_rate"], 2),
+                    "base_apy": "7%",
+                    "member_bonus_apy": "+2%",
+                    "total_member_apy": "9%"
+                }
+            }
+            return public_stats
+        else:
+            return {"success": False, "error": "Treasury data unavailable"}
+            
+    except Exception as e:
+        return {"success": False, "error": f"Failed to get public stats: {str(e)}"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
