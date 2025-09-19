@@ -540,9 +540,12 @@ const MemberDashboard = ({ memberAddress }) => {
         setEvents(eventsData);
         setOrders(ordersData);
         
-        // Check if member has paid dues
-        if (!profile.dues_paid) {
+        // Check if member has completed PMA requirements
+        if (!profile.pma_agreed || !profile.dues_paid) {
+          console.log('Member has not completed PMA requirements:', { pma_agreed: profile.pma_agreed, dues_paid: profile.dues_paid });
           setShowPMAPage(true);
+        } else {
+          console.log('Member has completed PMA requirements, showing dashboard');
         }
       } catch (error) {
         console.error('Error loading member data:', error);
