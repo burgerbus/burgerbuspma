@@ -237,6 +237,47 @@ class MemberEvent(BaseModel):
     max_attendees: int
     current_attendees: int = 0
 
+# Solana Staking Models
+class StakeAccount(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    member_wallet: str  # Member's wallet address
+    stake_account_pubkey: str  # Solana stake account public key
+    validator_vote_account: str  # Validator being staked to
+    stake_amount_sol: float  # Amount staked in SOL
+    stake_amount_lamports: int  # Amount staked in lamports
+    status: str = "pending"  # pending, active, deactivating, inactive
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    activated_at: Optional[str] = None
+    deactivated_at: Optional[str] = None
+    last_reward_calculation: Optional[str] = None
+    total_rewards_earned: float = 0.0
+    member_bonus_earned: float = 0.0
+
+class StakeReward(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    stake_account_id: str
+    member_wallet: str
+    epoch: int
+    base_reward_sol: float
+    member_bonus_sol: float
+    total_reward_sol: float
+    calculated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    distributed_at: Optional[str] = None
+    transaction_signature: Optional[str] = None
+
+class StakeRequest(BaseModel):
+    wallet_address: str
+    amount_sol: float
+    validator_vote_account: Optional[str] = None
+
+class UnstakeRequest(BaseModel):
+    stake_account_pubkey: str
+    wallet_address: str
+
+class StakeRewardsRequest(BaseModel):
+    wallet_address: str
+    stake_account_pubkey: Optional[str] = None
+
 # Database helper functions
 async def get_or_create_member(wallet_address: str) -> MemberProfile:
     member = await db.members.find_one({"wallet_address": wallet_address})
