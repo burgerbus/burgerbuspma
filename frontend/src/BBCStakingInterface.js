@@ -27,6 +27,8 @@ const BBCStakingInterface = () => {
   const [activeTab, setActiveTab] = useState('stake');
   const [memberInfo, setMemberInfo] = useState(null);
   const [userTokenBalance, setUserTokenBalance] = useState(0);
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletConnected, setWalletConnected] = useState(false);
 
   // Get member info on mount
   useEffect(() => {
