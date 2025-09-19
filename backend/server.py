@@ -826,7 +826,7 @@ async def get_pump_token_price():
                     if response.status_code == 200:
                         token_data = response.json()
                         break
-                except:
+                except Exception:
                     continue
             
             if token_data:
