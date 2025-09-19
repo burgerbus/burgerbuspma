@@ -604,7 +604,7 @@ async def create_p2p_payment(request: P2PPaymentRequest):
     # Create payment instruction
     payment_instruction = {
         "payment_id": payment_id,
-        "method": payment_method,
+        "method": request.payment_method,
         "display_name": method["display_name"],
         "handle": method["handle"],
         "amount": method["amount"],
