@@ -52,6 +52,9 @@ const BBCStakingInterface = () => {
         }
       } catch (error) {
         console.error('Failed to get member info:', error);
+        // Set empty member info to stop loading
+        setMemberInfo({});
+        setWalletConnected(false);
       }
     };
 
