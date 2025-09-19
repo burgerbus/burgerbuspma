@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useBBCStaking } from './BBCStakingProvider';
 import { bchAuthService } from './BCHAuth';
+import WalletConnectionModal from './WalletConnectionModal';
 
 const BBCStakingInterface = () => {
   const {
