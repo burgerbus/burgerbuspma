@@ -34,7 +34,7 @@ const BBCStakingInterface = () => {
   useEffect(() => {
     const getMemberInfo = async () => {
       try {
-        const profile = await bchAuthService.getProfile();
+        const profile = await bchAuthService.get('/api/profile');
         setMemberInfo(profile);
         
         if (profile?.wallet_address) {
