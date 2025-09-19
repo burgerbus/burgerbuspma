@@ -233,7 +233,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
                 </p>
                 <p>
                   <strong>3. MEMBERSHIP DUES</strong><br />
-                  Annual membership dues are $21.00, payable upon joining and annually thereafter. 
+                  Membership is currently FREE! Simply complete the PMA agreement to join. 
                   Dues are non-refundable and provide access to all club benefits for one year.
                 </p>
                 <p>
