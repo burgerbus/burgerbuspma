@@ -1648,6 +1648,148 @@ async def generate_cashstamp(member_id: str, admin_wallet: str = Header(...)):
         raise HTTPException(status_code=500, detail=f"Cashstamp generation failed: {str(e)}")
 
 # =======================
+# AUTHENTICATION ENDPOINTS
+# =======================
+
+@api_router.post("/auth/login")
+async def login_member(request: MemberLoginRequest):
+    """Authenticate member with email and password"""
+    try:
+        # Find member by email
+        member = await db.members.find_one({"email": request.email})
+        if not member:
+            raise HTTPException(status_code=404, detail="Member not found. Please check your email or sign up for a new account.")
+        
+        # For now, we'll use a simple password check
+        # In production, you should hash passwords properly
+        stored_password = member.get("password", member.get("temp_password", ""))
+        
+        if not stored_password or stored_password != request.password:
+            raise HTTPException(status_code=401, detail="Invalid password. Please try again.")
+        
+        # Create JWT token
+        token_data = {
+            "email": member["email"],
+            "member_id": member["id"],
+            "exp": datetime.now(timezone.utc) + timedelta(days=7)  # 7 day token
+        }
+        
+        access_token = jwt.encode(token_data, JWT_SECRET_KEY, algorithm="HS256")
+        
+        # Update last login
+        await db.members.update_one(
+            {"id": member["id"]},
+            {"$set": {"last_login": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        return {
+            "success": True,
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": member["id"],
+                "email": member["email"],
+                "name": member["name"],
+                "pma_agreed": member.get("pma_agreed", False),
+                "dues_paid": member.get("dues_paid", False),
+                "wallet_address": member.get("wallet_address", ""),
+                "referral_code": member.get("referral_code", ""),
+                "is_member": member.get("pma_agreed", False) and member.get("dues_paid", False)
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+@api_router.post("/auth/register")
+async def register_member(request: MemberRegistrationRequest):
+    """Register a new member with PMA agreement"""
+    try:
+        # Check if member already exists
+        existing_member = await db.members.find_one({"email": request.email})
+        if existing_member:
+            raise HTTPException(status_code=409, detail="Member with this email already exists")
+        
+        # Generate member ID and referral code
+        member_id = str(uuid.uuid4())
+        referral_code = f"BITCOINBEN-{secrets.token_urlsafe(8).upper()}"
+        
+        # Create member record
+        member_data = {
+            "id": member_id,
+            "name": request.name,
+            "email": request.email,
+            "password": request.password,  # In production, hash this!
+            "phone": request.phone or "",
+            "address": request.address or "",
+            "city": request.city or "",
+            "state": request.state or "",
+            "zip_code": request.zip_code or "",
+            "pma_agreed": request.pma_agreed,
+            "dues_paid": True,  # Since membership is free now
+            "referral_code": referral_code,
+            "referred_by": request.referral_code or "",
+            "wallet_address": "",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "last_login": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Insert member
+        await db.members.insert_one(member_data)
+        
+        # Process referral if provided
+        if request.referral_code:
+            try:
+                referrer = await db.members.find_one({"referral_code": request.referral_code})
+                if referrer:
+                    # Record referral
+                    referral_record = {
+                        "id": str(uuid.uuid4()),
+                        "referrer_id": referrer["id"],
+                        "referred_id": member_id,
+                        "commission_amount_usd": AFFILIATE_COMMISSION_USD,
+                        "status": "pending",
+                        "created_at": datetime.now(timezone.utc).isoformat()
+                    }
+                    await db.referrals.insert_one(referral_record)
+            except Exception as e:
+                print(f"Referral processing error: {e}")
+        
+        # Create JWT token
+        token_data = {
+            "email": member_data["email"],
+            "member_id": member_id,
+            "exp": datetime.now(timezone.utc) + timedelta(days=7)
+        }
+        
+        access_token = jwt.encode(token_data, JWT_SECRET_KEY, algorithm="HS256")
+        
+        return {
+            "success": True,
+            "access_token": access_token,
+            "token_type": "bearer",
+            "member_id": member_id,
+            "referral_code": referral_code,
+            "user": {
+                "id": member_id,
+                "email": member_data["email"],
+                "name": member_data["name"],
+                "pma_agreed": True,
+                "dues_paid": True,
+                "wallet_address": "",
+                "referral_code": referral_code,
+                "is_member": True
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
+
+# =======================
 # BBC TOKEN STAKING ENDPOINTS
 # =======================
 
