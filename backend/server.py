@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, BackgroundTasks
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -16,6 +16,14 @@ import requests
 import qrcode
 from io import BytesIO
 import base64 as b64
+
+# Solana imports for staking integration
+import base58
+from solders.pubkey import Pubkey
+from solders.signature import Signature
+import nacl.signing
+import nacl.encoding
+import nacl.exceptions
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
