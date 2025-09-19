@@ -890,6 +890,9 @@ function App() {
     if (urlParams.get('debug') === 'true') {
       setAuthState(prev => ({ ...prev, showDebug: true }));
     }
+    if (urlParams.get('staking') === 'true') {
+      setAuthState(prev => ({ ...prev, showStaking: true }));
+    }
   }, []);
 
   // Use the combined state for render condition
