@@ -588,11 +588,11 @@ async def create_p2p_payment(request: P2PPaymentRequest):
     method = PAYMENT_METHODS[request.payment_method]
     
     # Generate unique payment ID for tracking
-    payment_id = f"pma_{payment_method}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}"
+    payment_id = f"pma_{request.payment_method}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}"
     
     # For BCH, still generate QR code
     qr_code_data = None
-    if payment_method == "bch":
+    if request.payment_method == "bch":
         bch_price = await get_bch_price_usd()
         amount_bch = method["amount"] / bch_price
         qr_code_data = generate_qr_code(
