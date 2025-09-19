@@ -275,7 +275,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
               <h3 className="text-xl font-bold text-orange-400 mb-2">Membership Investment</h3>
               <div className="flex justify-between items-center text-white">
                 <span>Annual Membership Dues:</span>
-                <span className="text-2xl font-bold text-orange-400">$21.00</span>
+                <span className="text-2xl font-bold text-green-400">FREE</span>
               </div>
               <p className="text-gray-400 text-sm mt-2">
                 Payment processing via P2P payment methods. Your membership activates immediately upon agreement.
