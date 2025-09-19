@@ -810,6 +810,10 @@ const MemberDashboard = ({ memberAddress }) => {
         {activeTab === 'affiliates' && (
           <AffiliateDashboard />
         )}
+        
+        {activeTab === 'staking' && (
+          <BBCStakingInterface />
+        )}
       </div>
     </div>
   );
