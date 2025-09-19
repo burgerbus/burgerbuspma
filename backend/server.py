@@ -630,55 +630,11 @@ async def create_p2p_payment(request: P2PPaymentRequest):
 @api_router.post("/payments/create-membership-payment")
 async def create_membership_payment(user_address: str = None):
     """Legacy endpoint - redirect to BCH P2P payment"""
-    request = P2PPaymentRequest(payment_method="bch", user_address=user_address)
-    return await create_p2p_payment(request)
     try:
-        # Get current BCH price
-        bch_price = await get_bch_price_usd()
-        amount_bch = MEMBERSHIP_FEE_USD / bch_price
-        
-        # Generate unique payment ID
-        payment_id = f"membership_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}"
-        
-        # Generate QR code for payment
-        qr_code_data = generate_qr_code(
-            BCH_RECEIVING_ADDRESS, 
-            amount_bch, 
-            "Bitcoin Ben's Membership"
-        )
-        
-        # Create payment request
-        payment_request = PaymentRequest(
-            payment_id=payment_id,
-            user_address=user_address or "unknown",
-            amount_usd=MEMBERSHIP_FEE_USD,
-            amount_bch=amount_bch,
-            bch_price_used=bch_price,
-            receiving_address=BCH_RECEIVING_ADDRESS,
-            expires_at=(datetime.now(timezone.utc) + timedelta(hours=24)).isoformat(),
-            created_at=datetime.now(timezone.utc).isoformat(),
-            qr_code_data=qr_code_data,
-            status="pending"
-        )
-        
-        # Store payment request
-        payment_requests_db[payment_id] = payment_request
-        
-        return {
-            "success": True,
-            "payment_id": payment_id,
-            "amount_usd": MEMBERSHIP_FEE_USD,
-            "amount_bch": round(amount_bch, 8),
-            "bch_price": bch_price,
-            "receiving_address": BCH_RECEIVING_ADDRESS,
-            "expires_at": payment_request.expires_at,
-            "qr_code": qr_code_data,
-            "payment_uri": f"bitcoincash:{BCH_RECEIVING_ADDRESS}?amount={amount_bch:.8f}&label=Bitcoin Ben's Membership",
-            "instructions": f"Send exactly {amount_bch:.8f} BCH to the address above to activate your membership."
-        }
-        
+        request = P2PPaymentRequest(payment_method="bch", user_address=user_address)
+        return await create_p2p_payment(request)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to create payment: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Payment creation failed: {str(e)}")
 
 @api_router.get("/payments/status/{payment_id}")
 async def get_payment_status(payment_id: str):
