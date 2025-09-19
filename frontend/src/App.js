@@ -678,7 +678,7 @@ const MemberDashboard = ({ memberAddress }) => {
       </div>
 
       {/* Member Stats */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* PMA Status Warning */}
         {memberData && (!memberData.pma_agreed || !memberData.dues_paid) && (
           <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
