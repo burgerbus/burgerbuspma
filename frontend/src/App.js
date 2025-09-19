@@ -653,14 +653,14 @@ const MemberDashboard = ({ memberAddress }) => {
       
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Club Dashboard</h1>
-              <p className="text-gray-400">Welcome to Bitcoin Ben's, {memberData?.full_name || 'Member'}!</p>
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white truncate">Club Dashboard</h1>
+              <p className="text-gray-400 text-sm sm:text-base truncate">Welcome to Bitcoin Ben's, {memberData?.full_name || 'Member'}!</p>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-green-400 text-sm">✓ Logged in as {memberData?.email || 'Member'}</span>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <span className="text-green-400 text-xs sm:text-sm truncate">✓ {memberData?.email || 'Member'}</span>
               <button
                 onClick={() => {
                   // Clear any stored tokens
@@ -668,7 +668,7 @@ const MemberDashboard = ({ memberAddress }) => {
                   // Reload page to reset state
                   window.location.reload();
                 }}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
+                className="px-3 py-2 sm:px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors w-full sm:w-auto"
               >
                 Logout
               </button>
