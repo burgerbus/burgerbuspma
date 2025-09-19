@@ -189,6 +189,32 @@ const BBCStakingInterface = () => {
             </span>
           </div>
           
+          {/* Wallet Connection Status */}
+          <div className="mt-4 pt-4 border-t border-gray-600">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className={`w-3 h-3 rounded-full mr-2 ${walletConnected ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                <span className="text-sm text-gray-300">
+                  {walletConnected ? 'Wallet Connected' : 'Wallet Not Connected'}
+                </span>
+              </div>
+              {!walletConnected && (
+                <button
+                  onClick={() => setShowWalletModal(true)}
+                  className="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded transition-colors"
+                >
+                  Connect Wallet
+                </button>
+              )}
+            </div>
+            
+            {walletConnected && memberInfo?.wallet_address && (
+              <div className="mt-2 text-xs text-gray-400 font-mono break-all">
+                {memberInfo.wallet_address}
+              </div>
+            )}
+          </div>
+          
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-400">Required Stake:</span>
