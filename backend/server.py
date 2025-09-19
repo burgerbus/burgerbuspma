@@ -1541,8 +1541,6 @@ async def verify_signature(request: SignatureRequest):
 async def get_authenticated_member(member: MemberProfile = Depends(get_current_user)) -> MemberProfile:
     return member
 
-# Removed - moved to before staking endpoints
-
 # Affiliate System Endpoints
 @api_router.get("/affiliate/my-stats")
 async def get_affiliate_stats(member: MemberProfile = Depends(get_authenticated_member)):
