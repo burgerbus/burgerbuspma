@@ -6,6 +6,8 @@ import WalletDebug from './WalletDebug';
 import P2PPaymentSelector from './P2PPaymentSelector';
 import AffiliateDashboard from './AffiliateDashboard';
 import PumpTokenTicker from './PumpTokenTicker';
+import { BBCStakingProvider } from './BBCStakingProvider';
+import BBCStakingInterface from './BBCStakingInterface';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
