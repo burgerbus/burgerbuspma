@@ -546,8 +546,19 @@ const MemberDashboard = ({ memberAddress }) => {
         }
       } catch (error) {
         console.error('Error loading member data:', error);
-        // Show PMA page on error
-        setShowPMAPage(true);
+        
+        // Only show PMA page if it's an authentication issue
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          console.log('Authentication error, showing PMA page');
+          setShowPMAPage(true);
+        } else {
+          // For other errors, show dashboard with empty data
+          console.log('Non-auth error, showing dashboard with limited data');
+          setMenu([]);
+          setLocations([]);
+          setEvents([]);
+          setOrders([]);
+        }
       } finally {
         setLoading(false);
       }
