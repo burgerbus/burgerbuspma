@@ -109,6 +109,77 @@
   .grid-responsive {
     @apply grid-cols-1;
   }
+  
+  /* Mobile-specific dashboard improvements */
+  .mobile-padding {
+    @apply px-3 py-4;
+  }
+  
+  /* Improved touch targets for mobile */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better mobile typography */
+  .mobile-text-sm {
+    @apply text-sm leading-relaxed;
+  }
+  
+  .mobile-text-base {
+    @apply text-base leading-relaxed;
+  }
+  
+  /* Mobile-friendly cards */
+  .mobile-card {
+    @apply p-4 rounded-lg;
+  }
+  
+  /* Mobile tab navigation */
+  .mobile-tab-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .mobile-tab-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Enhanced mobile responsiveness for very small screens */
+@media (max-width: 480px) {
+  .container {
+    @apply px-2;
+  }
+  
+  .text-responsive-sm {
+    @apply text-xs;
+  }
+  
+  .text-responsive-base {
+    @apply text-sm;
+  }
+  
+  .text-responsive-lg {
+    @apply text-base;
+  }
+  
+  .text-responsive-xl {
+    @apply text-lg;
+  }
+  
+  /* Compact mobile stats cards */
+  .mobile-stats-compact {
+    @apply p-3;
+  }
+  
+  .mobile-stats-compact .stat-number {
+    @apply text-lg;
+  }
+  
+  .mobile-stats-compact .stat-label {
+    @apply text-xs;
+  }
 }
 
 /* Dark theme scrollbar */
