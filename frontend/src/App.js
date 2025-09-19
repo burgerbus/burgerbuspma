@@ -816,22 +816,22 @@ const MemberDashboard = ({ memberAddress }) => {
         )}
 
         {activeTab === 'events' && (
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {events.map((event) => (
-              <div key={event.id} className="bg-gray-800 rounded-lg p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-white">{event.title}</h3>
-                  <span className="text-xs bg-orange-600 text-white px-2 py-1 rounded">
+              <div key={event.id} className="bg-gray-800 rounded-lg p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-white flex-1">{event.title}</h3>
+                  <span className="text-xs bg-orange-600 text-white px-2 py-1 rounded w-fit">
                     {event.tier_required.toUpperCase()}
                   </span>
                 </div>
-                <p className="text-gray-400 mb-4">{event.description}</p>
-                <div className="text-gray-400 mb-4">
+                <p className="text-gray-400 mb-4 text-sm sm:text-base">{event.description}</p>
+                <div className="text-gray-400 mb-4 space-y-1 text-sm sm:text-base">
                   <p>📅 {event.date} at {event.time}</p>
                   <p>📍 {event.location}</p>
                   <p>👥 {event.current_attendees}/{event.max_attendees} attendees</p>
                 </div>
-                <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg font-medium transition-colors">
+                <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 sm:py-2 rounded-lg font-medium transition-colors text-sm sm:text-base">
                   Join Event
                 </button>
               </div>
