@@ -34,13 +34,8 @@ const WalletConnectionModal = ({ isOpen, onClose, onWalletConnected }) => {
     }
   };
 
-  const handleDisconnect = async () => {
-    try {
-      await disconnect();
-      setError('');
-    } catch (error) {
-      console.error('Error disconnecting wallet:', error);
-    }
+  const handleWalletConnected = async (walletAddress) => {
+    await updateMemberWallet(walletAddress);
   };
 
   if (!isOpen) return null;
@@ -73,14 +68,14 @@ const WalletConnectionModal = ({ isOpen, onClose, onWalletConnected }) => {
           )}
 
           {/* Wallet Connection Status */}
-          {connected && publicKey ? (
+          {connectedWallet ? (
             <div className="bg-green-900/20 border border-green-600 rounded-lg p-4">
               <div className="flex items-center mb-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
                 <span className="text-green-400 font-semibold">Wallet Connected</span>
               </div>
               <div className="text-gray-300 text-sm font-mono break-all">
-                {publicKey.toString()}
+                {connectedWallet}
               </div>
               
               {isUpdatingProfile && (
@@ -90,40 +85,11 @@ const WalletConnectionModal = ({ isOpen, onClose, onWalletConnected }) => {
               )}
             </div>
           ) : (
-            <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <p className="text-gray-400 text-sm mb-4">
-                No wallet connected. Click below to connect your Solana wallet.
-              </p>
-            </div>
+            <SimpleWalletConnect 
+              onWalletConnected={handleWalletConnected}
+              onClose={onClose}
+            />
           )}
-
-          {/* Wallet Connect Button */}
-          <div className="flex justify-center">
-            <WalletMultiButton className="!bg-orange-600 hover:!bg-orange-700 !rounded-lg !font-semibold" />
-          </div>
-
-          {/* Additional Actions */}
-          {connected && (
-            <div className="flex gap-3">
-              <button
-                onClick={handleDisconnect}
-                className="flex-1 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-              >
-                Disconnect
-              </button>
-            </div>
-          )}
-
-          {/* Supported Wallets Info */}
-          <div className="bg-gray-700 rounded-lg p-3">
-            <h4 className="text-white font-semibold text-sm mb-2">Supported Wallets:</h4>
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-300">
-              <div>• Phantom</div>
-              <div>• Solflare</div>
-              <div>• Backpack</div>
-              <div>• Torus</div>
-            </div>
-          </div>
 
           {/* Requirements Info */}
           <div className="bg-blue-900/20 border border-blue-600 rounded-lg p-3">
