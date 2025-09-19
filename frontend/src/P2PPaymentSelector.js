@@ -84,15 +84,15 @@ const P2PPaymentSelector = ({ memberEmail, onPaymentSelected }) => {
         <p className="text-gray-400 mb-2">
           Private Membership Association - No Payment Required
         </p>
-        <div className="bg-blue-900/20 border border-blue-600 rounded-lg p-3 mb-6">
-          <p className="text-blue-400 text-sm">
-            💰 <strong>All members</strong> receive a $15 BCH cashstamp bonus after membership activation!
+        <div className="bg-green-900/20 border border-green-600 rounded-lg p-3 mb-6">
+          <p className="text-green-400 text-sm">
+            🎉 <strong>FREE Membership!</strong> No payment required to join the club!
           </p>
-          <p className="text-blue-300 text-xs mt-1">
-            Plus crypto discounts on menu items when you pay with Bitcoin Cash
+          <p className="text-green-300 text-xs mt-1">
+            Bitcoin Cash payment option available for future menu purchases
           </p>
-          <p className="text-blue-300 text-xs mt-2 font-medium">
-            📧 Include member's email in the memo section of each transaction for verification.
+          <p className="text-green-300 text-xs mt-2 font-medium">
+            Simply complete your PMA agreement to become a member
           </p>
         </div>
       </div>
