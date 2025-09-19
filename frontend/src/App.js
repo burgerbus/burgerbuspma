@@ -625,7 +625,7 @@ const MemberDashboard = ({ memberAddress }) => {
       const loadMemberData = async () => {
         try {
           const [profile, menuData, locationsData, eventsData, ordersData] = await Promise.all([
-            bchAuthService.get('/api/debug/profile'),
+            bchAuthService.get('/api/profile'),
             bchAuthService.get('/api/debug/menu'),
             bchAuthService.get('/api/debug/locations'),
             bchAuthService.get('/api/debug/events'),
