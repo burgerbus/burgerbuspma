@@ -726,20 +726,22 @@ const MemberDashboard = ({ memberAddress }) => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-gray-800 rounded-lg p-1 mb-6">
-          {['menu', 'locations', 'events', 'orders', 'affiliates', 'staking'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 rounded-md font-medium capitalize transition-colors ${
-                activeTab === tab
-                  ? 'bg-orange-600 text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              {tab === 'staking' ? '🪙 BBC Staking' : tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+        <div className="bg-gray-800 rounded-lg p-1 mb-6 overflow-x-auto">
+          <div className="flex space-x-1 min-w-max">
+            {['menu', 'locations', 'events', 'orders', 'affiliates', 'staking'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-3 py-2 sm:px-6 sm:py-3 rounded-md font-medium capitalize transition-colors whitespace-nowrap text-sm sm:text-base ${
+                  activeTab === tab
+                    ? 'bg-orange-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {tab === 'staking' ? '🪙 BBC Staking' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Tab Content */}
