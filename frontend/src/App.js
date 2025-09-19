@@ -977,7 +977,10 @@ function App() {
 
   return (
     <BBCStakingProvider>
-      <LandingPage onGetStarted={() => setAuthState(prev => ({ ...prev, showAuth: true }))} />
+      <LandingPage 
+        onGetStarted={() => setAuthState(prev => ({ ...prev, showAuth: true }))}
+        onMemberLogin={() => setAuthState(prev => ({ ...prev, showLogin: true }))}
+      />
     </BBCStakingProvider>
   );
 }
