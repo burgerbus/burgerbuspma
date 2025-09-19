@@ -609,12 +609,12 @@ async def create_p2p_payment(request: P2PPaymentRequest):
         "handle": method["handle"],
         "amount": method["amount"],
         "instructions": method["instructions"],
-        "user_email": user_email,
-        "user_address": user_address,
+        "user_email": request.user_email,
+        "user_address": request.user_address,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat(),
         "status": "pending",
-        "qr_code": qr_code_data if payment_method == "bch" else None,
+        "qr_code": qr_code_data if request.payment_method == "bch" else None,
         "cashstamp_bonus": method.get("cashstamp", 0)
     }
     
