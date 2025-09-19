@@ -1022,6 +1022,447 @@ async def approve_pump_claim(request: ApproveClaimRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to approve claim: {str(e)}")
 
+# Solana Staking Endpoints
+@api_router.get("/staking/info")
+async def get_staking_info():
+    """Get general staking information and configuration"""
+    return {
+        "success": True,
+        "staking_config": {
+            "validator_vote_account": VALIDATOR_VOTE_ACCOUNT,
+            "min_stake_amount_sol": MIN_STAKE_AMOUNT,
+            "base_apy": STAKING_REWARDS_RATE,
+            "member_bonus_apy": MEMBER_BONUS_RATE,
+            "total_member_apy": STAKING_REWARDS_RATE + MEMBER_BONUS_RATE
+        },
+        "benefits": {
+            "base_staking": f"{STAKING_REWARDS_RATE * 100:.1f}% APY for all users",
+            "member_bonus": f"Additional {MEMBER_BONUS_RATE * 100:.1f}% APY for Burger Bus Club members",
+            "total_member_rate": f"{(STAKING_REWARDS_RATE + MEMBER_BONUS_RATE) * 100:.1f}% total APY for members"
+        },
+        "requirements": {
+            "minimum_stake": f"{MIN_STAKE_AMOUNT} SOL",
+            "membership_required": False,
+            "membership_bonus": True
+        }
+    }
+
+@api_router.post("/staking/calculate-rewards")
+async def calculate_staking_rewards(
+    amount_sol: float,
+    days: int = 30,
+    member: Optional[MemberProfile] = Depends(get_current_user)
+):
+    """Calculate potential staking rewards"""
+    try:
+        if amount_sol < MIN_STAKE_AMOUNT:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Minimum stake amount is {MIN_STAKE_AMOUNT} SOL"
+            )
+        
+        is_member = member is not None and member.pma_agreed and member.dues_paid
+        rewards = await solana_staking_service.calculate_staking_rewards(
+            amount_sol, is_member, days
+        )
+        
+        return {
+            "success": True,
+            "stake_amount_sol": amount_sol,
+            "calculation_period_days": days,
+            "is_member": is_member,
+            "rewards": rewards,
+            "projections": {
+                "daily": await solana_staking_service.calculate_staking_rewards(amount_sol, is_member, 1),
+                "weekly": await solana_staking_service.calculate_staking_rewards(amount_sol, is_member, 7),
+                "monthly": await solana_staking_service.calculate_staking_rewards(amount_sol, is_member, 30),
+                "yearly": await solana_staking_service.calculate_staking_rewards(amount_sol, is_member, 365)
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to calculate rewards: {str(e)}")
+
+@api_router.post("/staking/create-stake")
+async def create_stake_account(
+    request: StakeRequest,
+    background_tasks: BackgroundTasks,
+    member: Optional[MemberProfile] = Depends(get_current_user)
+):
+    """Create a new stake account (returns transaction instructions)"""
+    try:
+        # Validate inputs
+        if request.amount_sol < MIN_STAKE_AMOUNT:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Minimum stake amount is {MIN_STAKE_AMOUNT} SOL"
+            )
+        
+        if not await solana_staking_service.validate_wallet_address(request.wallet_address):
+            raise HTTPException(status_code=400, detail="Invalid Solana wallet address")
+        
+        # Use provided validator or default
+        validator = request.validator_vote_account or VALIDATOR_VOTE_ACCOUNT
+        
+        # Create staking instructions
+        instructions = await solana_staking_service.create_stake_instruction(
+            request.wallet_address, 
+            request.amount_sol
+        )
+        
+        if not instructions["success"]:
+            raise HTTPException(status_code=500, detail=instructions["error"])
+        
+        # Create stake account record
+        stake_account = StakeAccount(
+            member_wallet=request.wallet_address,
+            stake_account_pubkey=instructions["stake_account_pubkey"],
+            validator_vote_account=validator,
+            stake_amount_sol=request.amount_sol,
+            stake_amount_lamports=int(request.amount_sol * 1_000_000_000),
+            status="pending"
+        )
+        
+        # Store in database
+        await db.stake_accounts.insert_one(stake_account.dict())
+        
+        # Calculate potential rewards
+        is_member = member is not None and member.pma_agreed and member.dues_paid
+        rewards_info = await solana_staking_service.calculate_staking_rewards(
+            request.amount_sol, is_member, 365
+        )
+        
+        return {
+            "success": True,
+            "stake_account_id": stake_account.id,
+            "stake_account_pubkey": stake_account.stake_account_pubkey,
+            "instructions": instructions["instructions"],
+            "estimated_fee": instructions["estimated_fee"],
+            "member_benefits": {
+                "is_member": is_member,
+                "annual_rewards": rewards_info,
+                "membership_bonus": f"Members earn an additional {MEMBER_BONUS_RATE * 100:.1f}% APY"
+            },
+            "next_steps": [
+                "Sign and submit the transactions in your Solana wallet",
+                "Transactions must be submitted in the order provided",
+                "Stake activation typically takes 1-2 epochs (2-4 days)",
+                "Rewards are calculated and distributed automatically"
+            ]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create stake: {str(e)}")
+
+@api_router.get("/staking/my-stakes")
+async def get_my_stake_accounts(member: MemberProfile = Depends(get_current_user)):
+    """Get all stake accounts for the authenticated member"""
+    try:
+        # Find all stake accounts for this member
+        stake_accounts = await db.stake_accounts.find({
+            "member_wallet": member.wallet_address
+        }).to_list(100)
+        
+        total_staked = sum(account["stake_amount_sol"] for account in stake_accounts)
+        total_rewards = sum(account.get("total_rewards_earned", 0) for account in stake_accounts)
+        
+        # Calculate current rewards for active stakes
+        is_member = member.pma_agreed and member.dues_paid
+        current_rewards = 0
+        for account in stake_accounts:
+            if account["status"] == "active":
+                # Calculate days since activation
+                if account.get("activated_at"):
+                    activated_date = datetime.fromisoformat(account["activated_at"])
+                    days_staked = (datetime.now(timezone.utc) - activated_date).days
+                    if days_staked > 0:
+                        rewards = await solana_staking_service.calculate_staking_rewards(
+                            account["stake_amount_sol"], is_member, days_staked
+                        )
+                        current_rewards += rewards["total_reward_sol"]
+        
+        return {
+            "success": True,
+            "member_wallet": member.wallet_address,
+            "is_member": is_member,
+            "summary": {
+                "total_stake_accounts": len(stake_accounts),
+                "total_staked_sol": total_staked,
+                "total_rewards_earned_sol": total_rewards,
+                "pending_rewards_sol": current_rewards,
+                "member_bonus_active": is_member
+            },
+            "stake_accounts": [StakeAccount(**account) for account in stake_accounts]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get stake accounts: {str(e)}")
+
+@api_router.get("/staking/account/{stake_account_pubkey}")
+async def get_stake_account_details(
+    stake_account_pubkey: str,
+    member: MemberProfile = Depends(get_current_user)
+):
+    """Get detailed information about a specific stake account"""
+    try:
+        # Validate stake account format
+        if not await solana_staking_service.validate_stake_account(stake_account_pubkey):
+            raise HTTPException(status_code=400, detail="Invalid stake account address")
+        
+        # Find stake account in database
+        stake_account = await db.stake_accounts.find_one({
+            "stake_account_pubkey": stake_account_pubkey,
+            "member_wallet": member.wallet_address
+        })
+        
+        if not stake_account:
+            raise HTTPException(status_code=404, detail="Stake account not found")
+        
+        # Get on-chain information
+        chain_info = await solana_staking_service.get_stake_account_info(stake_account_pubkey)
+        
+        # Calculate current rewards
+        is_member = member.pma_agreed and member.dues_paid
+        current_rewards = {"base_reward_sol": 0, "member_bonus_sol": 0, "total_reward_sol": 0}
+        
+        if stake_account["status"] == "active" and stake_account.get("activated_at"):
+            activated_date = datetime.fromisoformat(stake_account["activated_at"])
+            days_staked = (datetime.now(timezone.utc) - activated_date).days
+            if days_staked > 0:
+                current_rewards = await solana_staking_service.calculate_staking_rewards(
+                    stake_account["stake_amount_sol"], is_member, days_staked
+                )
+        
+        return {
+            "success": True,
+            "stake_account": StakeAccount(**stake_account),
+            "chain_info": chain_info,
+            "current_rewards": current_rewards,
+            "member_benefits": {
+                "is_member": is_member,
+                "bonus_apy": MEMBER_BONUS_RATE if is_member else 0,
+                "total_apy": STAKING_REWARDS_RATE + (MEMBER_BONUS_RATE if is_member else 0)
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get stake account details: {str(e)}")
+
+@api_router.post("/staking/unstake")
+async def unstake_account(
+    request: UnstakeRequest,
+    member: MemberProfile = Depends(get_current_user)
+):
+    """Create unstaking instructions for a stake account"""
+    try:
+        # Validate inputs
+        if not await solana_staking_service.validate_stake_account(request.stake_account_pubkey):
+            raise HTTPException(status_code=400, detail="Invalid stake account address")
+        
+        # Find stake account
+        stake_account = await db.stake_accounts.find_one({
+            "stake_account_pubkey": request.stake_account_pubkey,
+            "member_wallet": member.wallet_address
+        })
+        
+        if not stake_account:
+            raise HTTPException(status_code=404, detail="Stake account not found")
+        
+        if stake_account["status"] != "active":
+            raise HTTPException(status_code=400, detail="Stake account is not active")
+        
+        # Create unstaking instructions
+        instructions = await solana_staking_service.create_unstake_instruction(
+            request.stake_account_pubkey,
+            request.wallet_address
+        )
+        
+        if not instructions["success"]:
+            raise HTTPException(status_code=500, detail=instructions["error"])
+        
+        # Update stake account status
+        await db.stake_accounts.update_one(
+            {"stake_account_pubkey": request.stake_account_pubkey},
+            {"$set": {"status": "deactivating"}}
+        )
+        
+        return {
+            "success": True,
+            "stake_account_pubkey": request.stake_account_pubkey,
+            "instructions": instructions["instructions"],
+            "estimated_fee": instructions["estimated_fee"],
+            "cooldown_info": {
+                "period": instructions["cooldown_period"],
+                "description": "Your stake will be deactivated and available for withdrawal after the cooldown period"
+            },
+            "next_steps": [
+                "Sign and submit the deactivation transaction",
+                "Wait for the cooldown period (2-3 epochs)",
+                "Use the withdraw endpoint to claim your SOL + rewards"
+            ]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create unstake instructions: {str(e)}")
+
+@api_router.get("/staking/rewards/{stake_account_pubkey}")
+async def get_stake_rewards_history(
+    stake_account_pubkey: str,
+    member: MemberProfile = Depends(get_current_user)
+):
+    """Get rewards history for a stake account"""
+    try:
+        # Validate stake account
+        stake_account = await db.stake_accounts.find_one({
+            "stake_account_pubkey": stake_account_pubkey,
+            "member_wallet": member.wallet_address
+        })
+        
+        if not stake_account:
+            raise HTTPException(status_code=404, detail="Stake account not found")
+        
+        # Get rewards history
+        rewards = await db.stake_rewards.find({
+            "stake_account_id": stake_account["id"]
+        }).sort("epoch", -1).to_list(100)
+        
+        total_rewards = sum(reward["total_reward_sol"] for reward in rewards)
+        total_base = sum(reward["base_reward_sol"] for reward in rewards)
+        total_bonus = sum(reward["member_bonus_sol"] for reward in rewards)
+        
+        return {
+            "success": True,
+            "stake_account_pubkey": stake_account_pubkey,
+            "rewards_summary": {
+                "total_rewards_sol": total_rewards,
+                "base_rewards_sol": total_base,
+                "member_bonus_sol": total_bonus,
+                "total_epochs": len(rewards)
+            },
+            "rewards_history": [StakeReward(**reward) for reward in rewards]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get rewards history: {str(e)}")
+
+@api_router.post("/staking/claim-rewards")
+async def claim_staking_rewards(
+    request: StakeRewardsRequest,
+    member: MemberProfile = Depends(get_current_user)
+):
+    """Claim accumulated staking rewards"""
+    try:
+        # Find stake accounts to claim from
+        query = {"member_wallet": member.wallet_address}
+        if request.stake_account_pubkey:
+            query["stake_account_pubkey"] = request.stake_account_pubkey
+        
+        stake_accounts = await db.stake_accounts.find(query).to_list(100)
+        
+        if not stake_accounts:
+            raise HTTPException(status_code=404, detail="No stake accounts found")
+        
+        # Calculate total claimable rewards
+        total_claimable = 0
+        claim_details = []
+        
+        is_member = member.pma_agreed and member.dues_paid
+        
+        for account in stake_accounts:
+            if account["status"] == "active" and account.get("activated_at"):
+                activated_date = datetime.fromisoformat(account["activated_at"])
+                days_staked = (datetime.now(timezone.utc) - activated_date).days
+                
+                if days_staked > 0:
+                    rewards = await solana_staking_service.calculate_staking_rewards(
+                        account["stake_amount_sol"], is_member, days_staked
+                    )
+                    
+                    total_claimable += rewards["total_reward_sol"]
+                    claim_details.append({
+                        "stake_account_pubkey": account["stake_account_pubkey"],
+                        "rewards": rewards,
+                        "days_staked": days_staked
+                    })
+        
+        if total_claimable == 0:
+            return {
+                "success": True,
+                "message": "No rewards available to claim",
+                "total_claimable_sol": 0
+            }
+        
+        # Create claim record (in real implementation, this would trigger actual token transfer)
+        claim_id = f"claim_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}"
+        
+        return {
+            "success": True,
+            "claim_id": claim_id,
+            "total_claimable_sol": total_claimable,
+            "claim_details": claim_details,
+            "member_benefits": {
+                "is_member": is_member,
+                "bonus_earned": sum(detail["rewards"]["member_bonus_sol"] for detail in claim_details)
+            },
+            "status": "pending_processing",
+            "note": "Rewards will be distributed to your wallet within 24 hours"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to claim rewards: {str(e)}")
+
+# Admin Staking Endpoints
+@api_router.get("/admin/staking/overview")
+async def admin_staking_overview():
+    """Admin: Get overall staking statistics"""
+    try:
+        # Get all stake accounts
+        all_stakes = await db.stake_accounts.find().to_list(1000)
+        
+        # Calculate statistics
+        total_accounts = len(all_stakes)
+        total_staked = sum(account["stake_amount_sol"] for account in all_stakes)
+        active_accounts = len([a for a in all_stakes if a["status"] == "active"])
+        
+        # Group by status
+        status_counts = {}
+        for account in all_stakes:
+            status = account["status"]
+            status_counts[status] = status_counts.get(status, 0) + 1
+        
+        return {
+            "success": True,
+            "overview": {
+                "total_stake_accounts": total_accounts,
+                "active_stake_accounts": active_accounts,
+                "total_staked_sol": total_staked,
+                "status_breakdown": status_counts
+            },
+            "configuration": {
+                "validator_vote_account": VALIDATOR_VOTE_ACCOUNT,
+                "min_stake_amount": MIN_STAKE_AMOUNT,
+                "base_apy": STAKING_REWARDS_RATE,
+                "member_bonus_apy": MEMBER_BONUS_RATE
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get staking overview: {str(e)}")
+
+@api_router.get("/admin/staking/accounts")
+async def admin_get_all_stake_accounts():
+    """Admin: Get all stake accounts with details"""
+    try:
+        stake_accounts = await db.stake_accounts.find().sort("created_at", -1).to_list(1000)
+        
+        return {
+            "success": True,
+            "total_accounts": len(stake_accounts),
+            "stake_accounts": [StakeAccount(**account) for account in stake_accounts]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get stake accounts: {str(e)}")
+
 # BCH Authentication Endpoints
 @api_router.post("/auth/challenge", response_model=ChallengeResponse)
 async def create_challenge(request: ChallengeRequest):
