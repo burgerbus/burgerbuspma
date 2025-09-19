@@ -574,12 +574,13 @@ async def get_payment_methods():
         "note": "All payments are member-to-member (P2P) transactions, not merchant transactions"
     }
 
+class P2PPaymentRequest(BaseModel):
+    payment_method: str
+    user_address: Optional[str] = None
+    user_email: Optional[str] = None
+
 @api_router.post("/payments/create-p2p-payment")
-async def create_p2p_payment(
-    payment_method: str,
-    user_address: str = None,
-    user_email: str = None
-):
+async def create_p2p_payment(request: P2PPaymentRequest):
     """Create P2P payment instruction for membership"""
     if payment_method not in PAYMENT_METHODS:
         raise HTTPException(status_code=400, detail="Invalid payment method")
