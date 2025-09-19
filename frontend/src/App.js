@@ -8,6 +8,7 @@ import AffiliateDashboard from './AffiliateDashboard';
 import PumpTokenTicker from './PumpTokenTicker';
 import { BBCStakingProvider } from './BBCStakingProvider';
 import BBCStakingInterface from './BBCStakingInterface';
+import LoginPage from './LoginPage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
