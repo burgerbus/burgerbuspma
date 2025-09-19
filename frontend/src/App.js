@@ -513,11 +513,12 @@ const MemberDashboard = ({ memberAddress }) => {
         // Seed sample data first
         await bchAuthService.post('/api/admin/seed-data');
         
-        // Try to load member profile first (using debug endpoint temporarily)
+        // Try to load member profile first (using real authenticated endpoint)
         let profile;
         try {
-          profile = await bchAuthService.get('/api/debug/profile');
+          profile = await bchAuthService.get('/api/profile');
         } catch (profileError) {
+          console.error('Profile fetch error:', profileError);
           // If profile doesn't exist, show PMA page
           console.log('No profile found, showing PMA page');
           setShowPMAPage(true);
