@@ -1930,7 +1930,7 @@ async def create_stake(request: StakeRequest, current_member: MemberProfile = De
 
 # Get member's stake accounts
 @api_router.get("/staking/my-stakes")
-async def get_my_stakes(current_member: MemberProfile = Depends(verify_member_auth)):
+async def get_my_stakes(current_member: MemberProfile = Depends(get_authenticated_member_jwt)):
     """Get all stake accounts for the authenticated member"""
     try:
         stakes = await db.stake_accounts.find(
