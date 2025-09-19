@@ -901,19 +901,42 @@ function App() {
     return <AdminPanel />;
   }
 
+  if (authState.showStaking) {
+    return (
+      <BBCStakingProvider>
+        <div className="min-h-screen bg-gray-900">
+          <PumpTokenTicker />
+          <BBCStakingInterface />
+        </div>
+      </BBCStakingProvider>
+    );
+  }
+
   if (authState.isAuthenticated && authState.memberAddress) {
-    return <MemberDashboard memberAddress={authState.memberAddress} />;
+    return (
+      <BBCStakingProvider>
+        <MemberDashboard memberAddress={authState.memberAddress} />
+      </BBCStakingProvider>
+    );
   }
 
   if (authState.showAuth) {
-    return <PMAgreementPage memberAddress="" onComplete={() => {
-      setAuthState(prev => ({ ...prev, showAuth: false }));
-      // After PMA completion, user would login with username/password
-      // For now, we'll redirect back to landing page
-    }} />;
+    return (
+      <BBCStakingProvider>
+        <PMAgreementPage memberAddress="" onComplete={() => {
+          setAuthState(prev => ({ ...prev, showAuth: false }));
+          // After PMA completion, user would login with username/password
+          // For now, we'll redirect back to landing page
+        }} />
+      </BBCStakingProvider>
+    );
   }
 
-  return <LandingPage onGetStarted={() => setAuthState(prev => ({ ...prev, showAuth: true }))} />;
+  return (
+    <BBCStakingProvider>
+      <LandingPage onGetStarted={() => setAuthState(prev => ({ ...prev, showAuth: true }))} />
+    </BBCStakingProvider>
+  );
 }
 
 export default App;
