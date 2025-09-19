@@ -9,8 +9,8 @@ import {
 } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 
-// Import default styles (you may need to install these)
-require('@solana/wallet-adapter-react-ui/styles.css');
+// Import default styles
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 const SolanaWalletProvider = ({ children }) => {
     // Network can be 'devnet', 'testnet', or 'mainnet-beta'
