@@ -19,11 +19,6 @@ import base64 as b64
 
 # Solana imports for staking integration
 import base58
-from solders.pubkey import Pubkey
-from solders.signature import Signature
-import nacl.signing
-import nacl.encoding
-import nacl.exceptions
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -79,7 +74,7 @@ PAYMENT_METHODS = {
         "display_name": "Bitcoin Cash",
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": f"Bitcoin Cash payments available. Membership is currently FREE - just complete the PMA agreement!"
+        "instructions": "Bitcoin Cash payments available. Membership is currently FREE - just complete the PMA agreement!"
     }
 }
 
