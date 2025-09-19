@@ -630,7 +630,8 @@ async def create_p2p_payment(request: P2PPaymentRequest):
 @api_router.post("/payments/create-membership-payment")
 async def create_membership_payment(user_address: str = None):
     """Legacy endpoint - redirect to BCH P2P payment"""
-    return await create_p2p_payment("bch", user_address=user_address)
+    request = P2PPaymentRequest(payment_method="bch", user_address=user_address)
+    return await create_p2p_payment(request)
     try:
         # Get current BCH price
         bch_price = await get_bch_price_usd()
