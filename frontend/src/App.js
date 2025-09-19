@@ -41,11 +41,11 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
         name: memberInfo.fullName,
         email: memberInfo.email,
         password: memberInfo.password,
-        phone: memberInfo.phone,
-        address: memberInfo.address || '',
-        city: memberInfo.city || '',
-        state: memberInfo.state || '',
-        zip_code: memberInfo.zipCode || '',
+        phone: memberInfo.phone || '',
+        address: '',  // Optional field not in current form
+        city: '',     // Optional field not in current form  
+        state: '',    // Optional field not in current form
+        zip_code: '', // Optional field not in current form
         pma_agreed: agreed,
         referral_code: memberInfo.referralCode || ''
       };
