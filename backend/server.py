@@ -1046,7 +1046,7 @@ async def get_staking_info():
 async def calculate_staking_rewards(
     amount_sol: float,
     days: int = 30,
-    member: Optional[MemberProfile] = Depends(get_current_user)
+    member: Optional[MemberProfile] = Depends(get_optional_member)
 ):
     """Calculate potential staking rewards"""
     try:
