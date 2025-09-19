@@ -901,10 +901,12 @@ function App() {
         if (token) {
           try {
             const payload = JSON.parse(atob(token.split('.')[1]));
+            // Handle both wallet auth (payload.sub) and email auth (payload.email)
+            const memberAddress = payload.sub || payload.email || payload.member_id;
             setAuthState(prev => ({
               ...prev,
               isAuthenticated: true,
-              memberAddress: payload.sub
+              memberAddress: memberAddress
             }));
           } catch (e) {
             console.error('Token decode error:', e);
