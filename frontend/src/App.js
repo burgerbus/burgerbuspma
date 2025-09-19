@@ -288,7 +288,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
               disabled={!agreed || processing}
               className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-4 rounded-lg font-bold text-lg transition-colors"
             >
-              {processing ? 'Processing Membership...' : 'Join Club & Pay $21 Dues'}
+              {processing ? 'Processing Membership...' : 'Join Club - FREE Membership'}
             </button>
           </form>
         </div>
