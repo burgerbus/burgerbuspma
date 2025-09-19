@@ -9,6 +9,7 @@ import PumpTokenTicker from './PumpTokenTicker';
 import { BBCStakingProvider } from './BBCStakingProvider';
 import BBCStakingInterface from './BBCStakingInterface';
 import LoginPage from './LoginPage';
+import SolanaWalletProvider from './SolanaWalletProvider';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
