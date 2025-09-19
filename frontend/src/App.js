@@ -53,8 +53,9 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
       const response = await bchAuthService.post('/api/auth/register', registrationData);
       
       if (response.success) {
-        // Store token and user data
-        localStorage.setItem('accessToken', response.access_token);
+        // Store token using the same key as bchAuthService expects
+        localStorage.setItem('bch_auth_token', response.access_token);
+        localStorage.setItem('accessToken', response.access_token); // Keep for compatibility
         localStorage.setItem('memberData', JSON.stringify(response.user));
         
         alert('🎉 Welcome to Bitcoin Ben\'s Burger Bus Club! Your FREE membership is active!');
