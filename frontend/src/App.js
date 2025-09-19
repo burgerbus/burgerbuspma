@@ -704,24 +704,24 @@ const MemberDashboard = ({ memberAddress }) => {
           </div>
         )}
 
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-lg p-6">
-            <div className="text-orange-500 text-2xl font-bold">{memberData?.membership_tier?.toUpperCase()}</div>
-            <div className="text-gray-400">Membership Tier</div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-gray-800 rounded-lg p-4 sm:p-6">
+            <div className="text-orange-500 text-lg sm:text-2xl font-bold">{memberData?.membership_tier?.toUpperCase()}</div>
+            <div className="text-gray-400 text-sm sm:text-base">Membership Tier</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-6">
-            <div className="text-orange-500 text-2xl font-bold">{memberData?.total_orders || 0}</div>
-            <div className="text-gray-400">Total Orders</div>
+          <div className="bg-gray-800 rounded-lg p-4 sm:p-6">
+            <div className="text-orange-500 text-lg sm:text-2xl font-bold">{memberData?.total_orders || 0}</div>
+            <div className="text-gray-400 text-sm sm:text-base">Total Orders</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-6">
-            <div className="text-orange-500 text-2xl font-bold">{locations.length}</div>
-            <div className="text-gray-400">Available Locations</div>
+          <div className="bg-gray-800 rounded-lg p-4 sm:p-6">
+            <div className="text-orange-500 text-lg sm:text-2xl font-bold">{locations.length}</div>
+            <div className="text-gray-400 text-sm sm:text-base">Available Locations</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-6">
-            <div className={`text-2xl font-bold ${memberData?.pma_agreed && memberData?.dues_paid ? 'text-green-500' : 'text-red-500'}`}>
+          <div className="bg-gray-800 rounded-lg p-4 sm:p-6">
+            <div className={`text-lg sm:text-2xl font-bold ${memberData?.pma_agreed && memberData?.dues_paid ? 'text-green-500' : 'text-red-500'}`}>
               {memberData?.pma_agreed && memberData?.dues_paid ? '✅' : '❌'}
             </div>
-            <div className="text-gray-400">PMA Status</div>
+            <div className="text-gray-400 text-sm sm:text-base">PMA Status</div>
           </div>
         </div>
 
