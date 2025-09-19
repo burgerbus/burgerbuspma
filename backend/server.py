@@ -582,10 +582,10 @@ class P2PPaymentRequest(BaseModel):
 @api_router.post("/payments/create-p2p-payment")
 async def create_p2p_payment(request: P2PPaymentRequest):
     """Create P2P payment instruction for membership"""
-    if payment_method not in PAYMENT_METHODS:
+    if request.payment_method not in PAYMENT_METHODS:
         raise HTTPException(status_code=400, detail="Invalid payment method")
     
-    method = PAYMENT_METHODS[payment_method]
+    method = PAYMENT_METHODS[request.payment_method]
     
     # Generate unique payment ID for tracking
     payment_id = f"pma_{payment_method}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}"
