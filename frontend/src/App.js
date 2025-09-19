@@ -339,15 +339,25 @@ const LandingPage = ({ onGetStarted }) => {
           </p>
           
           <div className="flex flex-col items-center gap-6">
-            <button
-              onClick={onGetStarted}
-              className="px-8 py-4 bg-yellow-600 hover:bg-yellow-700 text-black text-lg font-bold rounded-lg transition-colors transform hover:scale-105"
-            >
-              Join the Club
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={onGetStarted}
+                className="px-8 py-4 bg-yellow-600 hover:bg-yellow-700 text-black text-lg font-bold rounded-lg transition-colors transform hover:scale-105"
+              >
+                Join the Club
+              </button>
+              
+              <button
+                onClick={() => window.location.href = '/login'}
+                className="px-8 py-4 bg-transparent border-2 border-yellow-600 hover:bg-yellow-600 hover:text-black text-yellow-600 text-lg font-bold rounded-lg transition-colors transform hover:scale-105"
+              >
+                Member Login
+              </button>
+            </div>
             
-            <div className="text-gray-400 text-sm">
-              🔐 Private Membership Association with P2P payment options | 🍔 Premium Bitcoin Burgers
+            <div className="text-gray-400 text-sm text-center">
+              🔐 Private Membership Association with P2P payment options | 🍔 Premium Bitcoin Burgers<br/>
+              <span className="text-yellow-400">Existing members:</span> Use your email and password to access your dashboard
             </div>
           </div>
         </div>
