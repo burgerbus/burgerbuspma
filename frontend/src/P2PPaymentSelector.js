@@ -129,11 +129,11 @@ const PaymentMethodCard = ({ methodKey, method, onSelect }) => {
 
   const getDescription = (key) => {
     switch (key) {
-      case 'cashapp': return 'Popular mobile payments';
-      case 'venmo': return 'Social payments platform';
-      case 'zelle': return 'Bank-to-bank transfers';
-      case 'bch': return 'Cryptocurrency payments + menu discounts!';
-      default: return 'Peer-to-peer payment + $15 cashstamp';
+      case 'cashapp': return 'Coming Soon';
+      case 'venmo': return 'Coming Soon';
+      case 'zelle': return 'Coming Soon';
+      case 'bch': return 'Bitcoin Cash - Available for future purchases';
+      default: return 'Payment option coming soon';
     }
   };
 
