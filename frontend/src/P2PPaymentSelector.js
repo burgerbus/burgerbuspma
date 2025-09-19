@@ -130,7 +130,7 @@ const PaymentMethodCard = ({ methodKey, method, onSelect }) => {
   const getDescription = (key) => {
     switch (key) {
       case 'cashapp': return 'Coming Soon';
-      case 'venmo': return 'Coming Soon';
+      case 'venmo': return 'P2P Payment • Active';
       case 'zelle': return 'Coming Soon';
       case 'bch': return 'Bitcoin Cash - Available for future purchases';
       default: return 'Payment option coming soon';
