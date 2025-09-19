@@ -746,25 +746,25 @@ const MemberDashboard = ({ memberAddress }) => {
 
         {/* Tab Content */}
         {activeTab === 'menu' && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {menu.map((item) => (
               <div key={item.id} className="bg-gray-800 rounded-lg overflow-hidden">
                 <img 
                   src={item.image_url}
                   alt={item.name}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-40 sm:h-48 object-cover"
                 />
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-white">{item.name}</h3>
+                    <h3 className="text-lg sm:text-xl font-bold text-white flex-1 pr-2">{item.name}</h3>
                     {item.tier_required !== 'basic' && (
-                      <span className="text-xs bg-orange-600 text-white px-2 py-1 rounded">
+                      <span className="text-xs bg-orange-600 text-white px-2 py-1 rounded flex-shrink-0">
                         {item.tier_required.toUpperCase()}
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-400 mb-4">{item.description}</p>
-                  <div className="flex justify-between items-center mb-4">
+                  <p className="text-gray-400 mb-4 text-sm sm:text-base">{item.description}</p>
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
                     <div>
                       <span className="text-orange-500 font-bold text-lg">${item.member_price}</span>
                       <span className="text-gray-400 line-through ml-2">${item.price}</span>
@@ -776,7 +776,7 @@ const MemberDashboard = ({ memberAddress }) => {
                   <button
                     onClick={() => handlePreOrder(item)}
                     disabled={!memberData?.pma_agreed || !memberData?.dues_paid}
-                    className={`w-full py-2 rounded-lg font-medium transition-colors ${
+                    className={`w-full py-3 sm:py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                       memberData?.pma_agreed && memberData?.dues_paid
                         ? 'bg-orange-600 hover:bg-orange-700 text-white'
                         : 'bg-gray-600 text-gray-400 cursor-not-allowed'
