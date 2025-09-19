@@ -436,23 +436,23 @@ const LandingPage = ({ onGetStarted, onMemberLogin }) => {
       </div>
 
       {/* Sample Menu Preview */}
-      <div className="bg-gray-800/50 py-16">
+      <div className="bg-gray-800/50 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-4xl font-bold text-white text-center mb-12">Bitcoin Ben's Exclusive Menu</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white text-center mb-8 sm:mb-12">Bitcoin Ben's Exclusive Menu</h2>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="bg-gray-800 rounded-lg overflow-hidden">
               <img 
                 src="https://images.unsplash.com/photo-1628838463043-b81a343794d6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85"
                 alt="Artisanal Fruit Bowl"
-                className="w-full h-48 object-cover"
+                className="w-full h-40 sm:h-48 object-cover"
               />
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-white mb-2">The Satoshi Stacker</h3>
-                <p className="text-gray-400 mb-4">Triple-stacked wagyu beef with crypto-gold sauce</p>
+              <div className="p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">The Satoshi Stacker</h3>
+                <p className="text-gray-400 mb-4 text-sm sm:text-base">Triple-stacked wagyu beef with crypto-gold sauce</p>
                 <div className="text-center">
-                  <div className="text-orange-500 font-bold text-lg">Members Only Pricing</div>
-                  <div className="text-gray-400 text-sm">Connect wallet to view prices</div>
+                  <div className="text-orange-500 font-bold text-base sm:text-lg">Members Only Pricing</div>
+                  <div className="text-gray-400 text-xs sm:text-sm">Connect wallet to view prices</div>
                 </div>
               </div>
             </div>
@@ -461,31 +461,31 @@ const LandingPage = ({ onGetStarted, onMemberLogin }) => {
               <img 
                 src="https://images.unsplash.com/photo-1623073284788-0d846f75e329?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85"
                 alt="Truffle Mac & Cheese"
-                className="w-full h-48 object-cover"
+                className="w-full h-40 sm:h-48 object-cover"
               />
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-white mb-2">The Hodl Burger</h3>
-                <p className="text-gray-400 mb-4">Premium beef that gets better with time</p>
+              <div className="p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">The Hodl Burger</h3>
+                <p className="text-gray-400 mb-4 text-sm sm:text-base">Premium beef that gets better with time</p>
                 <div className="text-center">
-                  <div className="text-orange-500 font-bold text-lg">Members Only Pricing</div>
-                  <div className="text-gray-400 text-sm">Connect wallet to view prices</div>
+                  <div className="text-orange-500 font-bold text-base sm:text-lg">Members Only Pricing</div>
+                  <div className="text-gray-400 text-xs sm:text-sm">Connect wallet to view prices</div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gray-800 rounded-lg overflow-hidden border-2 border-orange-600">
+            <div className="bg-gray-800 rounded-lg overflow-hidden border-2 border-orange-600 sm:col-span-2 lg:col-span-1">
               <img 
                 src="https://images.unsplash.com/photo-1616671285410-2a676a9a433d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHw0fHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85"
                 alt="Wagyu Beef Sliders"
-                className="w-full h-48 object-cover"
+                className="w-full h-40 sm:h-48 object-cover"
               />
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-white mb-2">The Bitcoin Mining Rig</h3>
-                <p className="text-gray-400 mb-2">Ultimate burger stack for serious crypto miners</p>
+              <div className="p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">The Bitcoin Mining Rig</h3>
+                <p className="text-gray-400 mb-2 text-sm sm:text-base">Ultimate burger stack for serious crypto miners</p>
                 <div className="text-orange-400 text-sm mb-4">🥇 Premium Members Only</div>
                 <div className="text-center">
-                  <div className="text-orange-500 font-bold text-lg">Members Only Pricing</div>
-                  <div className="text-gray-400 text-sm">Connect wallet to view prices</div>
+                  <div className="text-orange-500 font-bold text-base sm:text-lg">Members Only Pricing</div>
+                  <div className="text-gray-400 text-xs sm:text-sm">Connect wallet to view prices</div>
                 </div>
               </div>
             </div>
