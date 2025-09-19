@@ -495,6 +495,13 @@ const BBCStakingInterface = () => {
           )}
         </div>
       </div>
+      
+      {/* Wallet Connection Modal */}
+      <WalletConnectionModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        onWalletConnected={handleWalletConnected}
+      />
     </div>
   );
 };
