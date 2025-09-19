@@ -354,6 +354,49 @@ async def verify_member_auth(credentials: HTTPAuthorizationCredentials = Depends
     """Verify member authentication and return member profile"""
     return await get_current_user(credentials)
 
+async def get_authenticated_member_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Get authenticated member from JWT token (email/password auth)"""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET_KEY, algorithms=["HS256"])
+        email: str = payload.get("email")
+        member_id: str = payload.get("member_id")
+        
+        if email is None or member_id is None:
+            raise credentials_exception
+        
+        # Find member by email
+        member = await db.members.find_one({"email": email, "id": member_id})
+        if not member:
+            raise credentials_exception
+            
+        # Convert to MemberProfile format
+        member_profile = MemberProfile(
+            id=member.get("id", ""),
+            wallet_address=member.get("wallet_address", ""),
+            membership_tier="basic",
+            full_name=member.get("name", ""),
+            email=member.get("email", ""),
+            phone=member.get("phone", ""),
+            pma_agreed=member.get("pma_agreed", False),
+            dues_paid=member.get("dues_paid", False),
+            payment_amount=MEMBERSHIP_FEE_USD,
+            total_orders=0,
+            favorite_items=member.get("favorite_items", [])
+        )
+        
+        return member_profile
+        
+    except JWTError:
+        raise credentials_exception
+    except Exception as e:
+        print(f"Auth error: {e}")
+        raise credentials_exception
+
 # BCH Authentication Models
 class ChallengeRequest(BaseModel):
     app_name: str = "Bitcoin Ben's Burger Bus Club"
