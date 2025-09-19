@@ -842,18 +842,20 @@ const MemberDashboard = ({ memberAddress }) => {
         {activeTab === 'orders' && (
           <div className="space-y-4">
             {orders.length === 0 ? (
-              <div className="text-center text-gray-400 py-12">
-                <p>No orders yet. Start by ordering from the menu!</p>
+              <div className="text-center text-gray-400 py-8 sm:py-12">
+                <p className="text-sm sm:text-base">No orders yet. Start by ordering from the menu!</p>
               </div>
             ) : (
               orders.map((order) => (
-                <div key={order.id} className="bg-gray-800 rounded-lg p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-white">Order #{order.id.slice(0, 8)}</h3>
-                      <p className="text-gray-400">Pickup: {order.pickup_time} at {order.pickup_location}</p>
+                <div key={order.id} className="bg-gray-800 rounded-lg p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg sm:text-xl font-bold text-white">Order #{order.id.slice(0, 8)}</h3>
+                      <p className="text-gray-400 text-sm sm:text-base break-words">
+                        Pickup: {order.pickup_time} at {order.pickup_location}
+                      </p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm ${
+                    <span className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
                       order.status === 'pending' ? 'bg-yellow-600 text-yellow-100' :
                       order.status === 'confirmed' ? 'bg-blue-600 text-blue-100' :
                       order.status === 'ready' ? 'bg-green-600 text-green-100' :
