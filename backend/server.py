@@ -1285,6 +1285,38 @@ async def get_member_profile(member: MemberProfile = Depends(get_authenticated_m
     """Get member profile information."""
     return member
 
+@api_router.post("/profile/update-wallet")
+async def update_member_wallet(request: dict, member: MemberProfile = Depends(get_authenticated_member_jwt)):
+    """Update member wallet address for staking"""
+    try:
+        wallet_address = request.get("wallet_address")
+        if not wallet_address:
+            raise HTTPException(status_code=400, detail="Wallet address is required")
+        
+        # Validate Solana wallet address format (basic check)
+        if len(wallet_address) < 32 or len(wallet_address) > 44:
+            raise HTTPException(status_code=400, detail="Invalid Solana wallet address format")
+        
+        # Update member record
+        result = await db.members.update_one(
+            {"id": member.id},
+            {"$set": {"wallet_address": wallet_address, "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Member not found")
+        
+        return {
+            "success": True,
+            "message": "Wallet address updated successfully",
+            "wallet_address": wallet_address
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update wallet address: {str(e)}")
+
 @api_router.put("/profile")
 async def update_member_profile(
     favorite_items: List[str],
