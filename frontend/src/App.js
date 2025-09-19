@@ -872,7 +872,9 @@ const MemberDashboard = ({ memberAddress }) => {
         )}
         
         {activeTab === 'staking' && (
-          <BBCStakingInterface />
+          <SolanaWalletProvider>
+            <BBCStakingInterface />
+          </SolanaWalletProvider>
         )}
       </div>
     </div>
