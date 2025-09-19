@@ -625,10 +625,10 @@ const MemberDashboard = ({ memberAddress }) => {
                 <h3 className="text-red-400 font-bold text-lg">⚠️ Membership Incomplete</h3>
                 <p className="text-red-300">
                   {!memberData.pma_agreed && !memberData.dues_paid 
-                    ? "Please complete your PMA agreement and pay annual dues ($21) to start ordering."
+                    ? "Please complete your FREE PMA agreement to start ordering."
                     : !memberData.pma_agreed 
-                    ? "Please sign the PMA agreement to complete your membership."
-                    : "Please pay your annual dues ($21) to start ordering."
+                    ? "Please complete your FREE PMA agreement to start ordering."
+                    : "Welcome! Your FREE membership is active - start ordering!"
                   }
                 </p>
               </div>
