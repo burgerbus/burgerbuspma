@@ -38,16 +38,16 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
     try {
       // Since membership is free, register member immediately
       const registrationData = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        zip_code: formData.zipCode,
+        name: memberInfo.fullName,
+        email: memberInfo.email,
+        password: memberInfo.password,
+        phone: memberInfo.phone,
+        address: memberInfo.address || '',
+        city: memberInfo.city || '',
+        state: memberInfo.state || '',
+        zip_code: memberInfo.zipCode || '',
         pma_agreed: agreed,
-        referral_code: formData.referralCode
+        referral_code: memberInfo.referralCode || ''
       };
       
       const response = await bchAuthService.post('/api/auth/register', registrationData);
