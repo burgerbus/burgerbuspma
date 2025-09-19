@@ -302,7 +302,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
 };
 
 // Main App Components
-const LandingPage = ({ onGetStarted }) => {
+const LandingPage = ({ onGetStarted, onMemberLogin }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900">
       {/* Pump.fun Token Ticker */}
