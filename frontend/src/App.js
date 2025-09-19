@@ -34,7 +34,39 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
     }
 
     setProcessing(true);
-    setStep('payment');
+    
+    try {
+      // Since membership is free, register member immediately
+      const registrationData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zip_code: formData.zipCode,
+        pma_agreed: agreed,
+        referral_code: formData.referralCode
+      };
+      
+      const response = await bchAuthService.post('/api/auth/register', registrationData);
+      
+      if (response.success) {
+        // Store token and user data
+        localStorage.setItem('accessToken', response.access_token);
+        localStorage.setItem('memberData', JSON.stringify(response.user));
+        
+        alert('🎉 Welcome to Bitcoin Ben\'s Burger Bus Club! Your FREE membership is active!');
+        onComplete(response.user);
+      } else {
+        throw new Error('Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert(`Registration failed: ${error.response?.data?.detail || error.message}. Please try again.`);
+      setProcessing(false);
+    }
   };
 
   const handlePaymentComplete = () => {
