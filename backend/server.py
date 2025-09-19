@@ -1017,6 +1017,20 @@ async def approve_pump_claim(request: ApproveClaimRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to approve claim: {str(e)}")
 
+# Optional authentication dependency for staking endpoints
+async def get_optional_member(credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False))) -> Optional[MemberProfile]:
+    if not credentials:
+        return None
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        wallet_address: str = payload.get("sub")
+        if wallet_address is None:
+            return None
+        member = await get_or_create_member(wallet_address)
+        return member
+    except JWTError:
+        return None
+
 # Solana Staking Endpoints
 @api_router.get("/staking/info")
 async def get_staking_info():
