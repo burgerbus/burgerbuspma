@@ -16,11 +16,12 @@ const WalletConnectionModal = ({ isOpen, onClose, onWalletConnected }) => {
     try {
       // Update member profile with wallet address
       const response = await bchAuthService.post('/api/profile/update-wallet', {
-        wallet_address: publicKey.toString()
+        wallet_address: walletAddress
       });
 
       if (response.success) {
-        onWalletConnected(publicKey.toString());
+        setConnectedWallet(walletAddress);
+        onWalletConnected(walletAddress);
         onClose();
       } else {
         setError('Failed to update profile with wallet address');
