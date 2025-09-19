@@ -173,7 +173,7 @@ const BBCStakingInterface = () => {
   };
 
   return (
-    <div className="staking-interface max-w-6xl mx-auto p-6 space-y-6"
+    <div className="staking-interface max-w-6xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-4xl font-bold text-white mb-2">BBC Token Staking</h1>
