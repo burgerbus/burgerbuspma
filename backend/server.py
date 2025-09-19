@@ -273,6 +273,23 @@ class StakeRewardsRequest(BaseModel):
     wallet_address: str
     stake_account_pubkey: Optional[str] = None
 
+# Authentication Models
+class MemberLoginRequest(BaseModel):
+    email: str
+    password: str
+
+class MemberRegistrationRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    zip_code: Optional[str] = None
+    pma_agreed: bool
+    referral_code: Optional[str] = None
+
 # Database helper functions
 async def get_or_create_member(wallet_address: str) -> MemberProfile:
     member = await db.members.find_one({"wallet_address": wallet_address})
