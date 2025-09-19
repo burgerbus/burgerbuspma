@@ -376,13 +376,23 @@ const BBCStakingInterface = () => {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={isLoading || !stakeAmount || parseFloat(stakeAmount) < MINIMUM_STAKE}
-                  className="w-full py-4 bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? 'Processing...' : 'Stake BBC Tokens'}
-                </button>
+                {!walletConnected ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowWalletModal(true)}
+                    className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-lg transition-all transform hover:scale-105"
+                  >
+                    Connect Wallet to Stake
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isLoading || !stakeAmount || parseFloat(stakeAmount) < MINIMUM_STAKE}
+                    className="w-full py-4 bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Processing...' : 'Stake BBC Tokens'}
+                  </button>
+                )}
               </form>
             </div>
           )}
