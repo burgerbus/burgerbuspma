@@ -677,7 +677,7 @@ const MemberDashboard = ({ memberAddress }) => {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              {tab}
+              {tab === 'staking' ? '🪙 BBC Staking' : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
         </div>
