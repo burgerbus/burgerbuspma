@@ -43,6 +43,14 @@ PUMP_TOKEN_NAME = "Burger Bus Club Token"
 PUMP_TOKEN_SYMBOL = "BBC"
 PUMP_TOKEN_DECIMALS = 9
 
+# Solana Staking Configuration
+SOLANA_RPC_URL = os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com")
+STAKING_PROGRAM_ID = os.getenv("STAKING_PROGRAM_ID", "Stake11111111111111111111111111111111111112")
+VALIDATOR_VOTE_ACCOUNT = os.getenv("VALIDATOR_VOTE_ACCOUNT", "7K8DVxtNJGnMtUY1CQJT5jcs8sFGSZTDiG7kowvFpECh")
+MIN_STAKE_AMOUNT = float(os.getenv("MIN_STAKE_AMOUNT", "1.0"))  # Minimum 1 SOL to stake
+STAKING_REWARDS_RATE = float(os.getenv("STAKING_REWARDS_RATE", "0.07"))  # 7% APY base rate
+MEMBER_BONUS_RATE = float(os.getenv("MEMBER_BONUS_RATE", "0.02"))  # Additional 2% for members
+
 # P2P Payment Methods (Update these with your actual handles)
 PAYMENT_METHODS = {
     "cashapp": {
