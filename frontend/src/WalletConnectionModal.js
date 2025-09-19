@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { bchAuthService } from './BCHAuth';
+import SimpleWalletConnect from './SimpleWalletConnect';
 
 const WalletConnectionModal = ({ isOpen, onClose, onWalletConnected }) => {
   const { publicKey, connected, disconnect } = useWallet();
