@@ -682,10 +682,10 @@ const MemberDashboard = ({ memberAddress }) => {
         {/* PMA Status Warning */}
         {memberData && (!memberData.pma_agreed || !memberData.dues_paid) && (
           <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-red-400 font-bold text-lg">⚠️ Membership Incomplete</h3>
-                <p className="text-red-300">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-red-400 font-bold text-base sm:text-lg">⚠️ Membership Incomplete</h3>
+                <p className="text-red-300 text-sm sm:text-base">
                   {!memberData.pma_agreed && !memberData.dues_paid 
                     ? "Please complete your FREE PMA agreement to start ordering."
                     : !memberData.pma_agreed 
@@ -696,7 +696,7 @@ const MemberDashboard = ({ memberAddress }) => {
               </div>
               <button
                 onClick={() => setShowPMAPage(true)}
-                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                className="px-4 py-2 sm:px-6 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors w-full sm:w-auto text-sm sm:text-base"
               >
                 Complete Membership
               </button>
