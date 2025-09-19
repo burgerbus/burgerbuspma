@@ -25,8 +25,8 @@ BCH_RECEIVING_ADDRESS = os.environ.get("BCH_RECEIVING_ADDRESS", "bitcoincash:qph
 
 # PMA P2P Payment Configuration
 MEMBERSHIP_FEE_USD = 0.00  # Free membership for now
-CASHSTAMP_AMOUNT_USD = 15.00  # All members receive $15 BCH cashstamp
-AFFILIATE_COMMISSION_USD = 3.00  # Affiliates earn $3 per referral
+CASHSTAMP_AMOUNT_USD = 0.00  # All members receive $0 BCH cashstamp
+AFFILIATE_COMMISSION_USD = 0.00  # Affiliates earn $0 per referral
 PMA_NET_AMOUNT_USD = MEMBERSHIP_FEE_USD - AFFILIATE_COMMISSION_USD  # Free membership
 
 # Pump.fun Token Configuration
