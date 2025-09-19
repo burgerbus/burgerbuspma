@@ -1527,19 +1527,7 @@ async def verify_signature(request: SignatureRequest):
 async def get_authenticated_member(member: MemberProfile = Depends(get_current_user)) -> MemberProfile:
     return member
 
-# Optional authentication dependency
-async def get_optional_member(credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False))) -> Optional[MemberProfile]:
-    if not credentials:
-        return None
-    try:
-        payload = jwt.decode(credentials.credentials, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        wallet_address: str = payload.get("sub")
-        if wallet_address is None:
-            return None
-        member = await get_or_create_member(wallet_address)
-        return member
-    except JWTError:
-        return None
+# Removed - moved to before staking endpoints
 
 # Affiliate System Endpoints
 @api_router.get("/affiliate/my-stats")
