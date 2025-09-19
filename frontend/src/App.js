@@ -435,57 +435,33 @@ const LandingPage = ({ onGetStarted, onMemberLogin }) => {
         </div>
       </div>
 
-      {/* Sample Menu Preview */}
+      {/* Graphic Menu Section */}
       <div className="bg-gray-800/50 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-bold text-white text-center mb-8 sm:mb-12">Bitcoin Ben's Exclusive Menu</h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <div className="bg-gray-800 rounded-lg overflow-hidden">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-gray-800 rounded-lg overflow-hidden shadow-2xl border border-orange-600/30">
               <img 
-                src="https://images.unsplash.com/photo-1628838463043-b81a343794d6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85"
-                alt="Artisanal Fruit Bowl"
-                className="w-full h-40 sm:h-48 object-cover"
+                src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxmb29kJTIwbWVudXxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85"
+                alt="Bitcoin Ben's Burger Bus Club Menu"
+                className="w-full h-96 sm:h-[500px] lg:h-[600px] object-cover"
               />
-              <div className="p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">The Satoshi Stacker</h3>
-                <p className="text-gray-400 mb-4 text-sm sm:text-base">Triple-stacked wagyu beef with crypto-gold sauce</p>
-                <div className="text-center">
-                  <div className="text-orange-500 font-bold text-base sm:text-lg">Members Only Pricing</div>
-                  <div className="text-gray-400 text-xs sm:text-sm">Connect wallet to view prices</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-800 rounded-lg overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1623073284788-0d846f75e329?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85"
-                alt="Truffle Mac & Cheese"
-                className="w-full h-40 sm:h-48 object-cover"
-              />
-              <div className="p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">The Hodl Burger</h3>
-                <p className="text-gray-400 mb-4 text-sm sm:text-base">Premium beef that gets better with time</p>
-                <div className="text-center">
-                  <div className="text-orange-500 font-bold text-base sm:text-lg">Members Only Pricing</div>
-                  <div className="text-gray-400 text-xs sm:text-sm">Connect wallet to view prices</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-800 rounded-lg overflow-hidden border-2 border-orange-600 sm:col-span-2 lg:col-span-1">
-              <img 
-                src="https://images.unsplash.com/photo-1616671285410-2a676a9a433d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHw0fHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85"
-                alt="Wagyu Beef Sliders"
-                className="w-full h-40 sm:h-48 object-cover"
-              />
-              <div className="p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-2">The Bitcoin Mining Rig</h3>
-                <p className="text-gray-400 mb-2 text-sm sm:text-base">Ultimate burger stack for serious crypto miners</p>
-                <div className="text-orange-400 text-sm mb-4">🥇 Premium Members Only</div>
-                <div className="text-center">
-                  <div className="text-orange-500 font-bold text-base sm:text-lg">Members Only Pricing</div>
-                  <div className="text-gray-400 text-xs sm:text-sm">Connect wallet to view prices</div>
+              <div className="p-4 sm:p-6 text-center bg-gradient-to-t from-gray-900 to-gray-800">
+                <h3 className="text-xl sm:text-2xl font-bold text-orange-400 mb-2">Premium Bitcoin-Themed Menu</h3>
+                <p className="text-gray-300 mb-4 text-sm sm:text-base">
+                  Featuring exclusive gourmet burgers, crypto-inspired dishes, and member-only pricing
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+                  <div className="text-orange-500 font-bold text-base sm:text-lg">
+                    🔐 Members Only Pricing & Access
+                  </div>
+                  <button
+                    onClick={onGetStarted}
+                    className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base"
+                  >
+                    Join to View Full Menu
+                  </button>
                 </div>
               </div>
             </div>
