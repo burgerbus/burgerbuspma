@@ -443,7 +443,7 @@ const LandingPage = ({ onGetStarted, onMemberLogin }) => {
           <div className="max-w-4xl mx-auto">
             <div className="bg-gray-800 rounded-lg overflow-hidden shadow-2xl border border-orange-600/30">
               <img 
-                src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxmb29kJTIwbWVudXxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85"
+                src="https://images.unsplash.com/photo-1629341948402-42a2d20577a6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwxfHxidXJnZXIlMjBtZW51fGVufDB8fHx8MTc1ODMyMzY5OXww&ixlib=rb-4.1.0&q=85"
                 alt="Bitcoin Ben's Burger Bus Club Menu"
                 className="w-full h-96 sm:h-[500px] lg:h-[600px] object-cover"
               />
