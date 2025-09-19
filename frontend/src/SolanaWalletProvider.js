@@ -25,7 +25,6 @@ const SolanaWalletProvider = ({ children }) => {
             new PhantomWalletAdapter(),
             new SolflareWalletAdapter({ network }),
             new TorusWalletAdapter(),
-            new BackpackWalletAdapter(),
         ],
         [network]
     );
