@@ -38,11 +38,17 @@ const BBCStakingInterface = () => {
         setMemberInfo(profile);
         
         if (profile?.wallet_address) {
+          // Wallet is connected
+          setWalletConnected(true);
+          
           // Calculate rewards for this wallet
           await calculateRewards(profile.wallet_address);
           
           // Simulate token balance (in real app, this would fetch from blockchain)
           setUserTokenBalance(5000000); // 5M BBC tokens
+        } else {
+          // No wallet connected
+          setWalletConnected(false);
         }
       } catch (error) {
         console.error('Failed to get member info:', error);
