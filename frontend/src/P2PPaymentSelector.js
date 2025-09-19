@@ -176,7 +176,11 @@ const PaymentMethodCard = ({ methodKey, method, onSelect }) => {
       <div className={`text-sm font-medium ${
         isComingSoon ? 'text-gray-500' : 'text-orange-400'
       }`}>
-        {isComingSoon ? 'Coming Soon' : (methodKey === 'bch' ? 'Bitcoin Cash Available' : `Send to: ${method.handle}`)}
+        {isComingSoon ? 'Coming Soon' : (
+          methodKey === 'bch' ? 'Bitcoin Cash Available' : 
+          methodKey === 'venmo' ? 'Venmo • Active' :
+          `Send to: ${method.handle}`
+        )}
       </div>
       
       {methodKey === 'bch' && !isComingSoon && (
