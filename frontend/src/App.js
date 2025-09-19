@@ -667,7 +667,7 @@ const MemberDashboard = ({ memberAddress }) => {
 
         {/* Tab Navigation */}
         <div className="flex space-x-1 bg-gray-800 rounded-lg p-1 mb-6">
-          {['menu', 'locations', 'events', 'orders', 'affiliates'].map((tab) => (
+          {['menu', 'locations', 'events', 'orders', 'affiliates', 'staking'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
