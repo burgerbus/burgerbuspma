@@ -3,18 +3,12 @@ import { bchAuthService } from './BCHAuth';
 import SimpleWalletConnect from './SimpleWalletConnect';
 
 const WalletConnectionModal = ({ isOpen, onClose, onWalletConnected }) => {
-  const { publicKey, connected, disconnect } = useWallet();
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [error, setError] = useState('');
+  const [connectedWallet, setConnectedWallet] = useState(null);
 
-  useEffect(() => {
-    if (connected && publicKey) {
-      updateMemberWallet();
-    }
-  }, [connected, publicKey]);
-
-  const updateMemberWallet = async () => {
-    if (!publicKey) return;
+  const updateMemberWallet = async (walletAddress) => {
+    if (!walletAddress) return;
     
     setIsUpdatingProfile(true);
     setError('');
