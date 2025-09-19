@@ -333,6 +333,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     member = await get_or_create_member(wallet_address)
     return member
 
+async def verify_member_auth(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verify member authentication and return member profile"""
+    return await get_current_user(credentials)
+
 # BCH Authentication Models
 class ChallengeRequest(BaseModel):
     app_name: str = "Bitcoin Ben's Burger Bus Club"
