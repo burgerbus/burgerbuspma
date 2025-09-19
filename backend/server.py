@@ -1960,7 +1960,7 @@ async def get_my_stakes(current_member: MemberProfile = Depends(get_authenticate
 @api_router.get("/staking/account/{stake_account_pubkey}")
 async def get_stake_account_info(
     stake_account_pubkey: str,
-    current_member: MemberProfile = Depends(verify_member_auth)
+    current_member: MemberProfile = Depends(get_authenticated_member_jwt)
 ):
     """Get detailed information about a specific stake account"""
     try:
