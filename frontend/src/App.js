@@ -823,7 +823,8 @@ function App() {
     memberAddress: null,
     showAuth: false,
     showAdmin: false,  // Add admin panel state
-    showDebug: false   // Add debug panel state
+    showDebug: false,  // Add debug panel state
+    showStaking: false // Add staking panel state
   });
 
   useEffect(() => {
