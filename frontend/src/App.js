@@ -794,20 +794,22 @@ const MemberDashboard = ({ memberAddress }) => {
         )}
 
         {activeTab === 'locations' && (
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {locations.map((location) => (
-              <div key={location.id} className="bg-gray-800 rounded-lg p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-white">{location.name}</h3>
+              <div key={location.id} className="bg-gray-800 rounded-lg p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-white flex-1">{location.name}</h3>
                   {location.is_member_exclusive && (
-                    <span className="text-xs bg-orange-600 text-white px-2 py-1 rounded">
+                    <span className="text-xs bg-orange-600 text-white px-2 py-1 rounded w-fit">
                       MEMBERS ONLY
                     </span>
                   )}
                 </div>
-                <p className="text-gray-400 mb-2">📍 {location.address}</p>
-                <p className="text-gray-400 mb-2">📅 {location.date}</p>
-                <p className="text-gray-400">⏰ {location.start_time} - {location.end_time}</p>
+                <div className="space-y-2 text-sm sm:text-base">
+                  <p className="text-gray-400">📍 {location.address}</p>
+                  <p className="text-gray-400">📅 {location.date}</p>
+                  <p className="text-gray-400">⏰ {location.start_time} - {location.end_time}</p>
+                </div>
               </div>
             ))}
           </div>
