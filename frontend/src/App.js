@@ -349,7 +349,7 @@ const LandingPage = ({ onGetStarted, onMemberLogin }) => {
               </button>
               
               <button
-                onClick={() => setAuthState(prev => ({ ...prev, showLogin: true }))}
+                onClick={onMemberLogin}
                 className="px-8 py-4 bg-transparent border-2 border-yellow-600 hover:bg-yellow-600 hover:text-black text-yellow-600 text-lg font-bold rounded-lg transition-colors transform hover:scale-105"
               >
                 Member Login
