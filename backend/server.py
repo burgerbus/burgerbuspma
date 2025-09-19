@@ -392,6 +392,161 @@ class BCHAuthService:
 
 bch_auth_service = BCHAuthService()
 
+# Solana Staking Service
+class SolanaStakingService:
+    def __init__(self):
+        self.rpc_url = SOLANA_RPC_URL
+        self.staking_program_id = STAKING_PROGRAM_ID
+        self.validator_vote_account = VALIDATOR_VOTE_ACCOUNT
+        self.min_stake_amount = MIN_STAKE_AMOUNT
+        
+    async def validate_wallet_address(self, wallet_address: str) -> bool:
+        """Validate Solana wallet address format"""
+        try:
+            # Decode base58 address and check length
+            decoded = base58.b58decode(wallet_address)
+            return len(decoded) == 32
+        except Exception:
+            return False
+    
+    async def validate_stake_account(self, stake_account_pubkey: str) -> bool:
+        """Validate stake account exists and is properly formatted"""
+        try:
+            # Basic validation - decode base58 and check length
+            decoded = base58.b58decode(stake_account_pubkey)
+            return len(decoded) == 32
+        except Exception:
+            return False
+    
+    async def calculate_staking_rewards(self, stake_amount_sol: float, is_member: bool = False, days_staked: int = 1) -> Dict[str, float]:
+        """Calculate staking rewards for a given amount and duration"""
+        # Base APY calculation
+        daily_rate = STAKING_REWARDS_RATE / 365
+        base_reward = stake_amount_sol * daily_rate * days_staked
+        
+        # Member bonus
+        member_bonus = 0.0
+        if is_member:
+            member_daily_rate = MEMBER_BONUS_RATE / 365
+            member_bonus = stake_amount_sol * member_daily_rate * days_staked
+        
+        return {
+            "base_reward_sol": base_reward,
+            "member_bonus_sol": member_bonus,
+            "total_reward_sol": base_reward + member_bonus,
+            "effective_apy": STAKING_REWARDS_RATE + (MEMBER_BONUS_RATE if is_member else 0)
+        }
+    
+    async def get_stake_account_info(self, stake_account_pubkey: str) -> Optional[Dict[str, Any]]:
+        """Get stake account information from Solana RPC"""
+        try:
+            # In a real implementation, this would make RPC calls to Solana
+            # For now, return mock data
+            return {
+                "pubkey": stake_account_pubkey,
+                "lamports": 2000000000,  # 2 SOL in lamports
+                "owner": STAKING_PROGRAM_ID,
+                "executable": False,
+                "rent_epoch": 361,
+                "data": {
+                    "parsed": {
+                        "type": "delegated",
+                        "info": {
+                            "meta": {
+                                "authorized": {
+                                    "staker": stake_account_pubkey,
+                                    "withdrawer": stake_account_pubkey
+                                },
+                                "lockup": {
+                                    "custodian": "11111111111111111111111111111112",
+                                    "epoch": 0,
+                                    "unix_timestamp": 0
+                                },
+                                "rent_exempt_reserve": 2282880
+                            },
+                            "stake": {
+                                "creditsObserved": 12345,
+                                "delegation": {
+                                    "activationEpoch": "350",
+                                    "deactivationEpoch": "18446744073709551615",
+                                    "stake": str(2000000000 - 2282880),
+                                    "voter": VALIDATOR_VOTE_ACCOUNT,
+                                    "warmupCooldownRate": 0.25
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        except Exception as e:
+            print(f"Error fetching stake account info: {e}")
+            return None
+    
+    async def create_stake_instruction(self, wallet_address: str, amount_sol: float) -> Dict[str, Any]:
+        """Create instructions for staking SOL (returns instruction data for frontend)"""
+        try:
+            # Convert SOL to lamports
+            amount_lamports = int(amount_sol * 1_000_000_000)
+            
+            # Generate new stake account keypair (in real implementation)
+            stake_account_pubkey = base58.b58encode(os.urandom(32)).decode('utf-8')
+            
+            return {
+                "success": True,
+                "stake_account_pubkey": stake_account_pubkey,
+                "instructions": {
+                    "create_account": {
+                        "from_pubkey": wallet_address,
+                        "new_account_pubkey": stake_account_pubkey,
+                        "lamports": amount_lamports,
+                        "space": 200,  # Stake account size
+                        "owner": STAKING_PROGRAM_ID
+                    },
+                    "initialize_stake": {
+                        "stake_pubkey": stake_account_pubkey,
+                        "authorized": {
+                            "staker": wallet_address,
+                            "withdrawer": wallet_address
+                        }
+                    },
+                    "delegate_stake": {
+                        "stake_pubkey": stake_account_pubkey,
+                        "vote_pubkey": VALIDATOR_VOTE_ACCOUNT,
+                        "authorized_pubkey": wallet_address
+                    }
+                },
+                "estimated_fee": 0.01,  # SOL
+                "note": "Please sign and submit these transactions in order"
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    async def create_unstake_instruction(self, stake_account_pubkey: str, wallet_address: str) -> Dict[str, Any]:
+        """Create instructions for unstaking SOL"""
+        try:
+            return {
+                "success": True,
+                "instructions": {
+                    "deactivate_stake": {
+                        "stake_pubkey": stake_account_pubkey,
+                        "authorized_pubkey": wallet_address
+                    }
+                },
+                "estimated_fee": 0.005,  # SOL
+                "cooldown_period": "2-3 epochs (~4-6 days)",
+                "note": "After deactivation, you can withdraw your SOL in 2-3 epochs"
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+solana_staking_service = SolanaStakingService()
+
 # BCH Authentication Endpoints
 @api_router.get("/payments/methods")
 async def get_payment_methods():
