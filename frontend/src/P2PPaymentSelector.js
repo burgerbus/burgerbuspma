@@ -137,26 +137,35 @@ const PaymentMethodCard = ({ methodKey, method, onSelect }) => {
     }
   };
 
+  const isComingSoon = method.handle === "Coming Soon";
+  
   return (
     <button
-      onClick={onSelect}
-      className="bg-gray-700 hover:bg-gray-600 border border-gray-600 hover:border-orange-500 rounded-lg p-6 text-left transition-all duration-200 group"
+      onClick={isComingSoon ? undefined : onSelect}
+      className={`border rounded-lg p-6 text-left transition-all duration-200 group ${
+        isComingSoon 
+          ? 'bg-gray-800 border-gray-700 cursor-not-allowed opacity-60'
+          : 'bg-gray-700 hover:bg-gray-600 border-gray-600 hover:border-orange-500'
+      }`}
+      disabled={isComingSoon}
     >
       <div className="flex items-center justify-between mb-3">
         <div className="text-3xl">{getIcon(methodKey)}</div>
         <div className="text-right">
           <div className="text-white font-bold text-lg">
-            ${method.amount}
+            {method.amount === 0 ? 'FREE' : `$${method.amount}`}
           </div>
-          {method.cashstamp && (
+          {!isComingSoon && methodKey === 'bch' && method.cashstamp && (
             <div className="text-green-400 text-sm font-medium">
-              +${method.cashstamp} bonus
+              Available for purchases
             </div>
           )}
         </div>
       </div>
       
-      <h3 className="text-white font-bold text-lg mb-1 group-hover:text-orange-400 transition-colors">
+      <h3 className={`font-bold text-lg mb-1 transition-colors ${
+        isComingSoon ? 'text-gray-400' : 'text-white group-hover:text-orange-400'
+      }`}>
         {method.display_name}
       </h3>
       
@@ -164,13 +173,15 @@ const PaymentMethodCard = ({ methodKey, method, onSelect }) => {
         {getDescription(methodKey)}
       </p>
       
-      <div className="text-orange-400 text-sm font-medium">
-        Send to: {method.handle}
+      <div className={`text-sm font-medium ${
+        isComingSoon ? 'text-gray-500' : 'text-orange-400'
+      }`}>
+        {isComingSoon ? 'Coming Soon' : (methodKey === 'bch' ? 'Bitcoin Cash Available' : `Send to: ${method.handle}`)}
       </div>
       
-      {methodKey === 'bch' && (
+      {methodKey === 'bch' && !isComingSoon && (
         <div className="mt-2 text-green-400 text-xs">
-          🎁 Net cost: $6.00 (after $15 cashstamp)
+          ₿ Ready for future menu purchases
         </div>
       )}
     </button>
