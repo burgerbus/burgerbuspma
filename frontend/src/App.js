@@ -170,64 +170,64 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
       {/* Pump.fun Token Ticker */}
       <PumpTokenTicker />
       
-      <div className="py-12 px-4">
+      <div className="py-8 sm:py-12 px-3 sm:px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gray-800 rounded-lg p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-4">
+          <div className="bg-gray-800 rounded-lg p-4 sm:p-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Welcome to <span className="text-orange-500">Bitcoin Ben's</span><br />
               Burger Bus Club
             </h1>
-            <p className="text-gray-400">
+            <p className="text-gray-400 text-sm sm:text-base">
               Complete your FREE membership by signing our Private Membership Agreement
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">{/* Rest of the original PMA form stays the same */}
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">{/* Rest of the original PMA form stays the same */}
             {/* Member Information */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <label className="block text-white font-medium mb-2">Full Name *</label>
+                <label className="block text-white font-medium mb-2 text-sm sm:text-base">Full Name *</label>
                 <input
                   type="text"
                   required
                   value={memberInfo.fullName}
                   onChange={(e) => setMemberInfo({...memberInfo, fullName: e.target.value})}
-                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none"
+                  className="w-full px-3 py-3 sm:px-4 sm:py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none text-base"
                   placeholder="Enter your full name"
                 />
               </div>
               <div>
-                <label className="block text-white font-medium mb-2">Email Address *</label>
+                <label className="block text-white font-medium mb-2 text-sm sm:text-base">Email Address *</label>
                 <input
                   type="email"
                   required
                   value={memberInfo.email}
                   onChange={(e) => setMemberInfo({...memberInfo, email: e.target.value})}
-                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none"
+                  className="w-full px-3 py-3 sm:px-4 sm:py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none text-base"
                   placeholder="Enter your email"
                 />
               </div>
               <div>
-                <label className="block text-white font-medium mb-2">Password *</label>
+                <label className="block text-white font-medium mb-2 text-sm sm:text-base">Password *</label>
                 <input
                   type="password"
                   required
                   value={memberInfo.password}
                   onChange={(e) => setMemberInfo({...memberInfo, password: e.target.value})}
-                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none"
+                  className="w-full px-3 py-3 sm:px-4 sm:py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none text-base"
                   placeholder="Create a password"
                 />
               </div>
               <div>
-                <label className="block text-white font-medium mb-2">
+                <label className="block text-white font-medium mb-2 text-sm sm:text-base">
                   Referral Code <span className="text-yellow-400">(Optional - Earn $3!)</span>
                 </label>
                 <input
                   type="text"
                   value={memberInfo.referralCode}
                   onChange={(e) => setMemberInfo({...memberInfo, referralCode: e.target.value.toUpperCase()})}
-                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-yellow-500 focus:outline-none"
+                  className="w-full px-3 py-3 sm:px-4 sm:py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-yellow-500 focus:outline-none text-base"
                   placeholder="BITCOINBEN-XXXX (optional)"
                 />
                 <p className="text-xs text-gray-400 mt-1">
@@ -237,12 +237,12 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
             </div>
 
             <div>
-              <label className="block text-white font-medium mb-2">Phone Number (Optional)</label>
+              <label className="block text-white font-medium mb-2 text-sm sm:text-base">Phone Number (Optional)</label>
               <input
                 type="tel"
                 value={memberInfo.phone}
                 onChange={(e) => setMemberInfo({...memberInfo, phone: e.target.value})}
-                className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none"
+                className="w-full px-3 py-3 sm:px-4 sm:py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-orange-500 focus:outline-none text-base"
                 placeholder="Enter your phone number"
               />
             </div>
