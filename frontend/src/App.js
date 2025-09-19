@@ -923,6 +923,27 @@ function App() {
     return <AdminPanel />;
   }
 
+  if (authState.showLogin) {
+    return (
+      <BBCStakingProvider>
+        <LoginPage 
+          onLoginSuccess={(user) => {
+            setAuthState(prev => ({ 
+              ...prev, 
+              isAuthenticated: true, 
+              memberAddress: user.wallet_address || user.email,
+              showLogin: false 
+            }));
+          }}
+          onBackToHome={() => {
+            setAuthState(prev => ({ ...prev, showLogin: false }));
+            window.history.pushState({}, '', '/');
+          }}
+        />
+      </BBCStakingProvider>
+    );
+  }
+
   if (authState.showStaking) {
     return (
       <BBCStakingProvider>
