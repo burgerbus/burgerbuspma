@@ -79,10 +79,10 @@ const P2PPaymentSelector = ({ memberEmail, onPaymentSelected }) => {
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-white mb-4">
-          Choose Your P2P Payment Method
+          Complete Your FREE Membership
         </h2>
         <p className="text-gray-400 mb-2">
-          Private Membership Association - Member to Member Payments
+          Private Membership Association - No Payment Required
         </p>
         <div className="bg-blue-900/20 border border-blue-600 rounded-lg p-3 mb-6">
           <p className="text-blue-400 text-sm">
