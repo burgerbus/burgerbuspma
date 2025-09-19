@@ -154,8 +154,26 @@ const BBCStakingInterface = () => {
     );
   }
 
+  const handleWalletConnected = async (walletAddress) => {
+    // Update member info with new wallet address
+    setMemberInfo(prev => ({
+      ...prev,
+      wallet_address: walletAddress
+    }));
+    setWalletConnected(true);
+    
+    // Calculate rewards for the connected wallet
+    try {
+      await calculateRewards(walletAddress);
+      // Simulate token balance
+      setUserTokenBalance(5000000); // 5M BBC tokens
+    } catch (error) {
+      console.error('Error calculating rewards for connected wallet:', error);
+    }
+  };
+
   return (
-    <div className="staking-interface max-w-6xl mx-auto p-6 space-y-6">
+    <div className="staking-interface max-w-6xl mx-auto p-6 space-y-6"
       {/* Header */}
       <div className="text-center">
         <h1 className="text-4xl font-bold text-white mb-2">BBC Token Staking</h1>
