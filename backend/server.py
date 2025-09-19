@@ -56,11 +56,11 @@ PAYMENT_METHODS = {
         "instructions": "CashApp payment option coming soon"
     },
     "venmo": {
-        "handle": "Coming Soon",  # Coming soon
+        "handle": "@burgerbusclub",  # Active Venmo account
         "display_name": "Venmo", 
         "amount": MEMBERSHIP_FEE_USD,
         "cashstamp": CASHSTAMP_AMOUNT_USD,
-        "instructions": "Venmo payment option coming soon"
+        "instructions": "Send payment via Venmo to @burgerbusclub. Include your email address in the payment memo/note so we can verify your membership and activate your account."
     },
     "zelle": {
         "handle": "Coming Soon",  # Coming soon
