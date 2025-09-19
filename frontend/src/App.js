@@ -373,24 +373,24 @@ const LandingPage = ({ onGetStarted, onMemberLogin }) => {
             crypto-friendly dining, member-only locations, and special Bitcoin events.
           </p>
           
-          <div className="flex flex-col items-center gap-6">
-            <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col items-center gap-4 sm:gap-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-md sm:max-w-none">
               <button
                 onClick={onGetStarted}
-                className="px-8 py-4 bg-yellow-600 hover:bg-yellow-700 text-black text-lg font-bold rounded-lg transition-colors transform hover:scale-105"
+                className="px-6 py-4 sm:px-8 bg-yellow-600 hover:bg-yellow-700 text-black text-lg font-bold rounded-lg transition-colors transform hover:scale-105 w-full sm:w-auto"
               >
                 Join the Club
               </button>
               
               <button
                 onClick={onMemberLogin}
-                className="px-8 py-4 bg-transparent border-2 border-yellow-600 hover:bg-yellow-600 hover:text-black text-yellow-600 text-lg font-bold rounded-lg transition-colors transform hover:scale-105"
+                className="px-6 py-4 sm:px-8 bg-transparent border-2 border-yellow-600 hover:bg-yellow-600 hover:text-black text-yellow-600 text-lg font-bold rounded-lg transition-colors transform hover:scale-105 w-full sm:w-auto"
               >
                 Member Login
               </button>
             </div>
             
-            <div className="text-gray-400 text-sm text-center">
+            <div className="text-gray-400 text-sm text-center px-4">
               🔐 Private Membership Association with P2P payment options | 🍔 Premium Bitcoin Burgers<br/>
               <span className="text-yellow-400">Existing members:</span> Use your email and password to access your dashboard
             </div>
