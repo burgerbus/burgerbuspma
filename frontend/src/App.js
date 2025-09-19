@@ -909,6 +909,9 @@ function App() {
     if (urlParams.get('staking') === 'true') {
       setAuthState(prev => ({ ...prev, showStaking: true }));
     }
+    if (urlParams.get('login') === 'true' || window.location.pathname === '/login') {
+      setAuthState(prev => ({ ...prev, showLogin: true }));
+    }
   }, []);
 
   // Use the combined state for render condition
