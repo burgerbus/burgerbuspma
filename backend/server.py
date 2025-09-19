@@ -1687,7 +1687,7 @@ async def calculate_staking_rewards(request: StakeRewardsRequest):
         try:
             member = await db.members.find_one({"wallet_address": request.wallet_address})
             is_member = member and member.get("dues_paid", False) and member.get("pma_agreed", False)
-        except:
+        except Exception:
             is_member = False
         
         # Calculate rewards for different time periods
