@@ -2131,7 +2131,7 @@ async def get_stake_rewards(
 
 # Claim rewards (simulate)
 @api_router.post("/staking/claim-rewards")
-async def claim_stake_rewards(request: StakeRewardsRequest, current_member: MemberProfile = Depends(get_authenticated_member_jwt)):
+async def claim_stake_rewards(request: StakeRewardsRequest, current_member: MemberProfile = Depends(get_current_user)):
     """Claim accumulated staking rewards"""
     try:
         # Find all stake accounts for user
