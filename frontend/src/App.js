@@ -880,13 +880,15 @@ function App() {
 
   useEffect(() => {
     const checkAuth = () => {
-      // TEMPORARILY DISABLED for debugging
-      console.log('Auth check disabled for debugging');
-      return;
-      
       // Skip auth check if registration is in progress to prevent race conditions
       if (authState.registrationInProgress) {
         console.log('Skipping auth check - registration in progress');
+        return;
+      }
+      
+      // Skip auth check if user just became authenticated (prevent immediate override)
+      if (authState.isAuthenticated && authState.memberAddress) {
+        console.log('Skipping auth check - user is already authenticated');
         return;
       }
       
@@ -901,18 +903,14 @@ function App() {
             // Handle both wallet auth (payload.sub) and email auth (payload.email)
             const memberAddress = payload.sub || payload.email || payload.member_id;
             
-            // Only update state if we're not already authenticated with this address
-            // This prevents overriding state during registration flow
-            if (!authState.isAuthenticated || authState.memberAddress !== memberAddress) {
-              console.log('Setting authenticated state for:', memberAddress);
-              setAuthState(prev => ({
-                ...prev,
-                isAuthenticated: true,
-                memberAddress: memberAddress,
-                showAuth: false,  // Ensure we hide auth forms when authenticated
-                registrationInProgress: false  // Clear registration flag when authenticated
-              }));
-            }
+            console.log('Auth check: Setting authenticated state for:', memberAddress);
+            setAuthState(prev => ({
+              ...prev,
+              isAuthenticated: true,
+              memberAddress: memberAddress,
+              showAuth: false,  // Ensure we hide auth forms when authenticated
+              registrationInProgress: false  // Clear registration flag when authenticated
+            }));
           } catch (e) {
             console.error('Token decode error:', e);
             // Clear potentially corrupted tokens
@@ -927,26 +925,24 @@ function App() {
             }));
           }
         }
-      } else {
-        // Only clear auth state if we were previously authenticated
-        // This prevents interfering with registration flow
-        if (authState.isAuthenticated && !authState.registrationInProgress) {
-          console.log('Clearing authentication state');
-          setAuthState(prev => ({
-            ...prev,
-            isAuthenticated: false,
-            memberAddress: null
-          }));
-        }
       }
+      // Removed the else clause that was clearing auth state - this was causing the issue!
     };
 
-    checkAuth();
+    // Only run auth check on initial load, not on every state change
+    if (!authState.isAuthenticated && !authState.registrationInProgress) {
+      checkAuth();
+    }
     
-    // Check authentication less frequently and respect registration state
-    const interval = setInterval(checkAuth, 30000);
+    // Check authentication less frequently
+    const interval = setInterval(() => {
+      if (!authState.isAuthenticated && !authState.registrationInProgress) {
+        checkAuth();
+      }
+    }, 60000); // Reduced to once per minute
+    
     return () => clearInterval(interval);
-  }, [authState.isAuthenticated, authState.memberAddress, authState.registrationInProgress]);
+  }, []); // Empty dependency array - only run on mount
 
   // Add debugging function for users
   const debugAuthState = () => {
