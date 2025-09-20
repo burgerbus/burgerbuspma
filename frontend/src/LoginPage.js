@@ -10,6 +10,17 @@ const LoginPage = ({ onLoginSuccess, onBackToHome }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const clearCache = () => {
+    // Clear all authentication-related cache
+    localStorage.removeItem('bch_auth_token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('memberData');
+    sessionStorage.clear();
+    
+    // Force reload to clear any cached state
+    window.location.reload();
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
