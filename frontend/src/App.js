@@ -1034,14 +1034,21 @@ function App() {
       <BBCStakingProvider>
         <PMAgreementPage memberAddress="" onComplete={(userData) => {
           if (userData) {
+            console.log('PMA registration completed successfully:', userData);
             // User successfully registered and is now authenticated
             setAuthState(prev => ({ 
               ...prev, 
               showAuth: false,
               isAuthenticated: true,
-              memberAddress: userData.email
+              memberAddress: userData.email || userData.id
             }));
+            
+            // Force a page reload to ensure clean state
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           } else {
+            console.log('PMA registration cancelled or failed');
             // Just hide the auth screen and go back to landing
             setAuthState(prev => ({ ...prev, showAuth: false }));
           }
