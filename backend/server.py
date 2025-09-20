@@ -162,7 +162,8 @@ api_router = APIRouter(prefix="/api")
 # Models
 class MemberProfile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    wallet_address: str = ""
+    wallet_address: str = ""  # BCH wallet address for authentication
+    solana_wallet_address: str = ""  # Solana wallet address for staking
     membership_tier: str = "basic"
     full_name: str = ""
     email: str = ""
