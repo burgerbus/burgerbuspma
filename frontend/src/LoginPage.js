@@ -150,6 +150,20 @@ const LoginPage = ({ onLoginSuccess, onBackToHome }) => {
 
           {/* Additional Options */}
           <div className="mt-6 space-y-4">
+            {/* Clear Cache Button */}
+            <div className="text-center">
+              <button
+                onClick={clearCache}
+                className="text-red-400 hover:text-red-300 transition-colors text-sm underline"
+                title="Clear cache if you're having login issues"
+              >
+                🔄 Clear Cache & Refresh
+              </button>
+              <p className="text-gray-500 text-xs mt-1">
+                Having login issues? Try clearing your cache
+              </p>
+            </div>
+            
             <div className="text-center">
               <button
                 onClick={onBackToHome}
