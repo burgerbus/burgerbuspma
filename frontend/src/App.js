@@ -1083,7 +1083,8 @@ function App() {
     );
   }
 
-  if (authState.showStaking) {
+  // Render StakingInterface (second priority)
+  if (authState.showStaking && !authState.showLogin) {
     console.log('RENDERING: StakingInterface');
     return (
       <BBCStakingProvider>
