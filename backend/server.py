@@ -695,9 +695,9 @@ async def get_payment_status(payment_id: str):
     return {
         "payment_id": payment_id,
         "status": payment["status"],
-        "amount_usd": payment["amount_usd"],
-        "amount_bch": payment["amount_bch"],
-        "receiving_address": payment["receiving_address"],
+        "amount_usd": payment.get("amount", 0.0),  # Use "amount" field from P2P payment
+        "amount_bch": payment.get("amount_bch", 0.0),  # May not exist for non-BCH payments
+        "receiving_address": payment.get("handle", ""),  # Use "handle" field from P2P payment
         "expires_at": payment["expires_at"],
         "created_at": payment["created_at"],
         "verified_at": payment.get("verified_at"),
