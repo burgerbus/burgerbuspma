@@ -2093,7 +2093,7 @@ async def unstake_tokens(request: UnstakeRequest, current_member: MemberProfile 
 @api_router.get("/staking/rewards/{stake_account_pubkey}")
 async def get_stake_rewards(
     stake_account_pubkey: str,
-    current_member: MemberProfile = Depends(get_authenticated_member_jwt)
+    current_member: MemberProfile = Depends(get_current_user)
 ):
     """Get reward history for a specific stake account"""
     try:
