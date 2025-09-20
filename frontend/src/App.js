@@ -895,6 +895,10 @@ function App() {
             }));
           } catch (e) {
             console.error('Token decode error:', e);
+            // Clear potentially corrupted tokens
+            localStorage.removeItem('bch_auth_token');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('memberData');
             setAuthState(prev => ({
               ...prev,
               isAuthenticated: false,
@@ -913,8 +917,8 @@ function App() {
 
     checkAuth();
     
-    // Check authentication state less frequently to minimize interference
-    const interval = setInterval(checkAuth, 5000);
+    // Reduced frequency from 5 seconds to 30 seconds to minimize race conditions
+    const interval = setInterval(checkAuth, 30000);
     return () => clearInterval(interval);
   }, []);
 
