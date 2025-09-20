@@ -888,11 +888,17 @@ function App() {
             const payload = JSON.parse(atob(token.split('.')[1]));
             // Handle both wallet auth (payload.sub) and email auth (payload.email)
             const memberAddress = payload.sub || payload.email || payload.member_id;
-            setAuthState(prev => ({
-              ...prev,
-              isAuthenticated: true,
-              memberAddress: memberAddress
-            }));
+            
+            // Only update state if we're not already authenticated with this address
+            // This prevents overriding state during registration flow
+            if (!authState.isAuthenticated || authState.memberAddress !== memberAddress) {
+              setAuthState(prev => ({
+                ...prev,
+                isAuthenticated: true,
+                memberAddress: memberAddress,
+                showAuth: false  // Ensure we hide auth forms when authenticated
+              }));
+            }
           } catch (e) {
             console.error('Token decode error:', e);
             // Clear potentially corrupted tokens
@@ -907,11 +913,15 @@ function App() {
           }
         }
       } else {
-        setAuthState(prev => ({
-          ...prev,
-          isAuthenticated: false,
-          memberAddress: null
-        }));
+        // Only clear auth state if we were previously authenticated
+        // This prevents interfering with registration flow
+        if (authState.isAuthenticated) {
+          setAuthState(prev => ({
+            ...prev,
+            isAuthenticated: false,
+            memberAddress: null
+          }));
+        }
       }
     };
 
@@ -920,7 +930,7 @@ function App() {
     // Reduced frequency from 5 seconds to 30 seconds to minimize race conditions
     const interval = setInterval(checkAuth, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [authState.isAuthenticated, authState.memberAddress]);
 
   // Add debugging function for users
   const debugAuthState = () => {
