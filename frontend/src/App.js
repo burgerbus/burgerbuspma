@@ -964,28 +964,12 @@ function App() {
     console.log('================================');
   };
 
-  // Debug: Log the current auth state
+  // Debug: Log the current auth state for troubleshooting
   useEffect(() => {
-    console.log('=== AUTH STATE DEBUG ===');
-    console.log('isAuthenticated:', authState.isAuthenticated);
-    console.log('memberAddress:', authState.memberAddress);
-    console.log('showAuth:', authState.showAuth);
-    console.log('showLogin:', authState.showLogin);
-    console.log('registrationInProgress:', authState.registrationInProgress);
-    console.log('=========================');
-  }, [authState]);
-
-  // Debug: Add button to force check auth state
-  useEffect(() => {
-    window.debugAuthState = () => {
-      console.log('=== CURRENT AUTH STATE ===');
-      console.log(authState);
-      console.log('bchAuthService.isAuthenticated():', bchAuthService.isAuthenticated());
-      console.log('localStorage bch_auth_token:', localStorage.getItem('bch_auth_token'));
-      console.log('===========================');
-    };
-    console.log('Debug: Type window.debugAuthState() to check auth state');
-  }, [authState]);
+    if (authState.isAuthenticated) {
+      console.log('User authenticated:', authState.memberAddress);
+    }
+  }, [authState.isAuthenticated, authState.memberAddress]);
 
   const handleAuthSuccess = useCallback((address) => {
     console.log('Authentication successful for address:', address);
