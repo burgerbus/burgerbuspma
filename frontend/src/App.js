@@ -879,6 +879,12 @@ function App() {
 
   useEffect(() => {
     const checkAuth = () => {
+      // Skip auth check if registration is in progress to prevent race conditions
+      if (authState.registrationInProgress) {
+        console.log('Skipping auth check - registration in progress');
+        return;
+      }
+      
       const authenticated = bchAuthService.isAuthenticated();
       
       if (authenticated) {
@@ -893,11 +899,13 @@ function App() {
             // Only update state if we're not already authenticated with this address
             // This prevents overriding state during registration flow
             if (!authState.isAuthenticated || authState.memberAddress !== memberAddress) {
+              console.log('Setting authenticated state for:', memberAddress);
               setAuthState(prev => ({
                 ...prev,
                 isAuthenticated: true,
                 memberAddress: memberAddress,
-                showAuth: false  // Ensure we hide auth forms when authenticated
+                showAuth: false,  // Ensure we hide auth forms when authenticated
+                registrationInProgress: false  // Clear registration flag when authenticated
               }));
             }
           } catch (e) {
@@ -909,14 +917,16 @@ function App() {
             setAuthState(prev => ({
               ...prev,
               isAuthenticated: false,
-              memberAddress: null
+              memberAddress: null,
+              registrationInProgress: false
             }));
           }
         }
       } else {
         // Only clear auth state if we were previously authenticated
         // This prevents interfering with registration flow
-        if (authState.isAuthenticated) {
+        if (authState.isAuthenticated && !authState.registrationInProgress) {
+          console.log('Clearing authentication state');
           setAuthState(prev => ({
             ...prev,
             isAuthenticated: false,
@@ -928,10 +938,10 @@ function App() {
 
     checkAuth();
     
-    // Reduced frequency from 5 seconds to 30 seconds to minimize race conditions
+    // Check authentication less frequently and respect registration state
     const interval = setInterval(checkAuth, 30000);
     return () => clearInterval(interval);
-  }, [authState.isAuthenticated, authState.memberAddress]);
+  }, [authState.isAuthenticated, authState.memberAddress, authState.registrationInProgress]);
 
   // Add debugging function for users
   const debugAuthState = () => {
