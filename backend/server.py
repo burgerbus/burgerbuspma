@@ -754,9 +754,9 @@ async def get_pending_payments():
             
             pending_payments.append({
                 "payment_id": payment_id,
-                "user_address": payment["user_address"],
-                "amount_usd": payment["amount_usd"],
-                "amount_bch": payment["amount_bch"],
+                "user_address": payment.get("user_address", ""),
+                "amount_usd": payment.get("amount", 0.0),  # Use "amount" field from P2P payment
+                "amount_bch": payment.get("amount_bch", 0.0),  # May not exist for non-BCH payments
                 "created_at": payment["created_at"],
                 "expires_at": payment["expires_at"]
             })
