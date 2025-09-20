@@ -964,10 +964,27 @@ function App() {
     console.log('================================');
   };
 
-  // Make debug function available globally for user debugging
+  // Debug: Log the current auth state
   useEffect(() => {
-    window.bbcDebugAuth = debugAuthState;
-    console.log('BBC Debug: Type "bbcDebugAuth()" in console to debug authentication issues');
+    console.log('=== AUTH STATE DEBUG ===');
+    console.log('isAuthenticated:', authState.isAuthenticated);
+    console.log('memberAddress:', authState.memberAddress);
+    console.log('showAuth:', authState.showAuth);
+    console.log('showLogin:', authState.showLogin);
+    console.log('registrationInProgress:', authState.registrationInProgress);
+    console.log('=========================');
+  }, [authState]);
+
+  // Debug: Add button to force check auth state
+  useEffect(() => {
+    window.debugAuthState = () => {
+      console.log('=== CURRENT AUTH STATE ===');
+      console.log(authState);
+      console.log('bchAuthService.isAuthenticated():', bchAuthService.isAuthenticated());
+      console.log('localStorage bch_auth_token:', localStorage.getItem('bch_auth_token'));
+      console.log('===========================');
+    };
+    console.log('Debug: Type window.debugAuthState() to check auth state');
   }, [authState]);
 
   const handleAuthSuccess = useCallback((address) => {
