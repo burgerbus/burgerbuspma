@@ -6,20 +6,40 @@ const SimpleWalletConnect = ({ onWalletConnected, onClose }) => {
   const [phantomWallet, setPhantomWallet] = useState(null);
 
   useEffect(() => {
-    // Check if Phantom is installed
+    // Better wallet detection to avoid conflicts with Brave wallet
     const getProvider = () => {
+      if ('phantom' in window) {
+        // Check for Phantom specifically first
+        const phantom = window.phantom?.solana;
+        if (phantom?.isPhantom) {
+          return phantom;
+        }
+      }
+      
       if ('solana' in window) {
         const provider = window.solana;
+        // Make sure it's actually Phantom and not Brave wallet
         if (provider.isPhantom) {
           return provider;
         }
       }
+      
       return null;
     };
 
     const provider = getProvider();
     setPhantomWallet(provider);
-  }, []);
+    
+    // Add a small delay to let wallet extensions initialize
+    const timer = setTimeout(() => {
+      const retryProvider = getProvider();
+      if (!phantomWallet && retryProvider) {
+        setPhantomWallet(retryProvider);
+      }
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [phantomWallet]);
 
   const connectPhantom = async () => {
     if (!phantomWallet) {
