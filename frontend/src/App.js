@@ -1027,7 +1027,29 @@ function App() {
     return <AdminPanel />;
   }
 
+  // Debug: Show which component should render
+  const getComponentToRender = () => {
+    if (authState.showLogin) return "LoginPage";
+    if (authState.showStaking) return "StakingInterface";
+    if (authState.isAuthenticated && authState.memberAddress) return "MemberDashboard";
+    if (authState.showAuth) return "PMAgreementPage";
+    return "LandingPage";
+  };
+
+  // Debug: Log what should render
+  useEffect(() => {
+    const componentToRender = getComponentToRender();
+    console.log(`=== RENDER LOGIC: Should render ${componentToRender} ===`);
+    console.log('Conditions:');
+    console.log('- showLogin:', authState.showLogin);
+    console.log('- showStaking:', authState.showStaking);
+    console.log('- isAuthenticated && memberAddress:', authState.isAuthenticated && authState.memberAddress);
+    console.log('- showAuth:', authState.showAuth);
+    console.log('==================================================');
+  }, [authState]);
+
   if (authState.showLogin) {
+    console.log('RENDERING: LoginPage');
     return (
       <BBCStakingProvider>
         <LoginPage 
