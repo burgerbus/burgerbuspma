@@ -1106,7 +1106,8 @@ function App() {
     );
   }
 
-  if (authState.showAuth) {
+  // Render PMAgreementPage (fourth priority - registration in progress)
+  if (authState.showAuth && !authState.showLogin && !authState.showStaking && !authState.isAuthenticated) {
     console.log('RENDERING: PMAgreementPage');
     return (
       <BBCStakingProvider>
