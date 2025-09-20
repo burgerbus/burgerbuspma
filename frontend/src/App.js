@@ -1042,11 +1042,6 @@ function App() {
               isAuthenticated: true,
               memberAddress: userData.email || userData.id
             }));
-            
-            // Force a page reload to ensure clean state
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
           } else {
             console.log('PMA registration cancelled or failed');
             // Just hide the auth screen and go back to landing
