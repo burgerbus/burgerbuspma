@@ -1049,6 +1049,16 @@ function App() {
     console.log('==================================================');
   }, [authState]);
 
+  // Debug: Show current state values before rendering
+  console.log('=== RENDER DECISION ===');
+  console.log('showLogin:', authState.showLogin);
+  console.log('showStaking:', authState.showStaking);
+  console.log('isAuthenticated:', authState.isAuthenticated);
+  console.log('memberAddress:', authState.memberAddress);
+  console.log('showAuth:', authState.showAuth);
+  console.log('registrationInProgress:', authState.registrationInProgress);
+
+  // Render LoginPage (highest priority)
   if (authState.showLogin) {
     console.log('RENDERING: LoginPage');
     return (
