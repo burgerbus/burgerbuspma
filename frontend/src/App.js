@@ -1094,6 +1094,7 @@ function App() {
   }
 
   if (authState.showAuth) {
+    console.log('RENDERING: PMAgreementPage');
     return (
       <BBCStakingProvider>
         <PMAgreementPage memberAddress="" onComplete={(userData) => {
