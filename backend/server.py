@@ -1906,7 +1906,7 @@ async def calculate_staking_rewards(request: StakeRewardsRequest):
 
 # Create stake (authenticated)
 @api_router.post("/staking/create-stake")
-async def create_stake(request: StakeRequest, current_member: MemberProfile = Depends(get_authenticated_member_jwt)):
+async def create_stake(request: StakeRequest, current_member: MemberProfile = Depends(get_current_user)):
     """Create a new stake account for the authenticated member"""
     try:
         # Validate inputs
