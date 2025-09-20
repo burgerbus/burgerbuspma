@@ -880,6 +880,10 @@ function App() {
 
   useEffect(() => {
     const checkAuth = () => {
+      // TEMPORARILY DISABLED for debugging
+      console.log('Auth check disabled for debugging');
+      return;
+      
       // Skip auth check if registration is in progress to prevent race conditions
       if (authState.registrationInProgress) {
         console.log('Skipping auth check - registration in progress');
