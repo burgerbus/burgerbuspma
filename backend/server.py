@@ -2037,7 +2037,7 @@ async def get_stake_account_info(
 
 # Unstake tokens
 @api_router.post("/staking/unstake")
-async def unstake_tokens(request: UnstakeRequest, current_member: MemberProfile = Depends(get_authenticated_member_jwt)):
+async def unstake_tokens(request: UnstakeRequest, current_member: MemberProfile = Depends(get_current_user)):
     """Create unstaking instructions for a stake account"""
     try:
         # Validate inputs
