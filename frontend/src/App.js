@@ -1056,17 +1056,30 @@ function App() {
         <PMAgreementPage memberAddress="" onComplete={(userData) => {
           if (userData) {
             console.log('PMA registration completed successfully:', userData);
-            // User successfully registered and is now authenticated
+            // Set registration in progress to prevent auth useEffect interference
             setAuthState(prev => ({ 
               ...prev, 
-              showAuth: false,
-              isAuthenticated: true,
-              memberAddress: userData.email || userData.id
+              registrationInProgress: true
             }));
+            
+            // Use a small delay to ensure token is properly stored
+            setTimeout(() => {
+              setAuthState(prev => ({ 
+                ...prev, 
+                showAuth: false,
+                isAuthenticated: true,
+                memberAddress: userData.email || userData.id,
+                registrationInProgress: false
+              }));
+            }, 500);
           } else {
             console.log('PMA registration cancelled or failed');
             // Just hide the auth screen and go back to landing
-            setAuthState(prev => ({ ...prev, showAuth: false }));
+            setAuthState(prev => ({ 
+              ...prev, 
+              showAuth: false,
+              registrationInProgress: false 
+            }));
           }
         }} />
       </BBCStakingProvider>
