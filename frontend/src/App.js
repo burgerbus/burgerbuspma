@@ -1073,6 +1073,7 @@ function App() {
   }
 
   if (authState.showStaking) {
+    console.log('RENDERING: StakingInterface');
     return (
       <BBCStakingProvider>
         <div className="min-h-screen bg-gray-900">
