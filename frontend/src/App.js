@@ -625,11 +625,16 @@ const MemberDashboard = ({ memberAddress }) => {
 
   return (
     <div className="min-h-screen bg-gray-900">
+      {/* DEBUG: Very visible indicator that dashboard is rendering */}
+      <div className="fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-2 z-50 font-bold">
+        🚨 DASHBOARD IS RENDERING - DEBUG MODE 🚨
+      </div>
+      
       {/* Pump.fun Token Ticker */}
       <PumpTokenTicker />
       
       {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700">
+      <div className="bg-gray-800 border-b border-gray-700" style={{marginTop: '40px'}}>
         <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div className="flex-1 min-w-0">
