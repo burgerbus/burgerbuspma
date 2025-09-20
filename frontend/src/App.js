@@ -1073,27 +1073,27 @@ function App() {
     return (
       <BBCStakingProvider>
         <PMAgreementPage memberAddress="" onComplete={(userData) => {
+          console.log('=== PMA onComplete called ===');
+          console.log('userData:', userData);
+          
           if (userData) {
             console.log('PMA registration completed successfully:', userData);
-            // Set registration in progress to prevent auth useEffect interference
-            setAuthState(prev => ({ 
-              ...prev, 
-              registrationInProgress: true
-            }));
             
-            // Use a small delay to ensure token is properly stored
-            setTimeout(() => {
-              setAuthState(prev => ({ 
+            // Directly set the authentication state without setTimeout
+            console.log('Setting authentication state...');
+            setAuthState(prev => {
+              const newState = { 
                 ...prev, 
                 showAuth: false,
                 isAuthenticated: true,
                 memberAddress: userData.email || userData.id,
                 registrationInProgress: false
-              }));
-            }, 500);
+              };
+              console.log('New auth state will be:', newState);
+              return newState;
+            });
           } else {
             console.log('PMA registration cancelled or failed');
-            // Just hide the auth screen and go back to landing
             setAuthState(prev => ({ 
               ...prev, 
               showAuth: false,
