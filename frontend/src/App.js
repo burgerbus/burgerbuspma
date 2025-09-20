@@ -873,7 +873,8 @@ function App() {
     showAdmin: false,  // Add admin panel state
     showDebug: false,  // Add debug panel state
     showStaking: false, // Add staking panel state
-    showLogin: false   // Add login page state
+    showLogin: false,   // Add login page state
+    registrationInProgress: false  // Add flag to prevent race conditions during registration
   });
 
   useEffect(() => {
