@@ -43,7 +43,7 @@ const SimpleWalletConnect = ({ onWalletConnected, onClose }) => {
 
   const connectPhantom = async () => {
     if (!phantomWallet) {
-      setError('Phantom wallet not detected. Please install Phantom from phantom.app');
+      setError('Phantom wallet not detected. Please install Phantom from phantom.app and refresh the page.');
       return;
     }
 
@@ -51,8 +51,19 @@ const SimpleWalletConnect = ({ onWalletConnected, onClose }) => {
     setError('');
 
     try {
-      const response = await phantomWallet.connect();
+      // Disconnect any existing connections first
+      if (phantomWallet.isConnected) {
+        await phantomWallet.disconnect();
+      }
+      
+      // Connect to Phantom specifically
+      const response = await phantomWallet.connect({ onlyIfTrusted: false });
       console.log('Phantom connected:', response.publicKey.toString());
+      
+      // Verify the connection
+      if (!response.publicKey) {
+        throw new Error('No public key received from wallet');
+      }
       
       // Update member profile with wallet address
       if (onWalletConnected) {
@@ -64,7 +75,13 @@ const SimpleWalletConnect = ({ onWalletConnected, onClose }) => {
       }
     } catch (err) {
       console.error('Phantom connection error:', err);
-      setError(`Connection failed: ${err.message}`);
+      if (err.code === 4001) {
+        setError('Connection cancelled by user');
+      } else if (err.message.includes('User rejected')) {
+        setError('Connection rejected by user');
+      } else {
+        setError(`Connection failed: ${err.message}`);
+      }
     } finally {
       setIsConnecting(false);
     }
