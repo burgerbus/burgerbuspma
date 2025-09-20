@@ -1297,9 +1297,9 @@ async def update_member_wallet(request: dict, member: MemberProfile = Depends(ge
         if len(wallet_address) < 32 or len(wallet_address) > 44:
             raise HTTPException(status_code=400, detail="Invalid Solana wallet address format")
         
-        # Update member record
+        # Update member record using wallet_address as key
         result = await db.members.update_one(
-            {"id": member.id},
+            {"wallet_address": member.wallet_address},
             {"$set": {"wallet_address": wallet_address, "updated_at": datetime.now(timezone.utc).isoformat()}}
         )
         
