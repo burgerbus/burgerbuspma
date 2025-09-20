@@ -1286,7 +1286,7 @@ async def get_member_profile(member: MemberProfile = Depends(get_current_user)):
     return member
 
 @api_router.post("/profile/update-wallet")
-async def update_member_wallet(request: dict, member: MemberProfile = Depends(get_authenticated_member_jwt)):
+async def update_member_wallet(request: dict, member: MemberProfile = Depends(get_current_user)):
     """Update member wallet address for staking"""
     try:
         wallet_address = request.get("wallet_address")
