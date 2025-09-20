@@ -1015,11 +1015,13 @@ function App() {
       <BBCStakingProvider>
         <LoginPage 
           onLoginSuccess={(user) => {
+            console.log('Login successful:', user);
             setAuthState(prev => ({ 
               ...prev, 
               isAuthenticated: true, 
-              memberAddress: user.wallet_address || user.email,
-              showLogin: false 
+              memberAddress: user.wallet_address || user.email || user.id,
+              showLogin: false,
+              registrationInProgress: false  // Clear any registration flag
             }));
           }}
           onBackToHome={() => {
