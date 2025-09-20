@@ -1288,20 +1288,20 @@ async def get_member_profile(member: MemberProfile = Depends(get_current_user)):
 
 @api_router.post("/profile/update-wallet")
 async def update_member_wallet(request: dict, member: MemberProfile = Depends(get_current_user)):
-    """Update member wallet address for staking"""
+    """Update member Solana wallet address for staking"""
     try:
-        wallet_address = request.get("wallet_address")
-        if not wallet_address:
-            raise HTTPException(status_code=400, detail="Wallet address is required")
+        solana_wallet_address = request.get("wallet_address")
+        if not solana_wallet_address:
+            raise HTTPException(status_code=400, detail="Solana wallet address is required")
         
         # Validate Solana wallet address format (basic check)
-        if len(wallet_address) < 32 or len(wallet_address) > 44:
+        if len(solana_wallet_address) < 32 or len(solana_wallet_address) > 44:
             raise HTTPException(status_code=400, detail="Invalid Solana wallet address format")
         
-        # Update member record using wallet_address as key
+        # Update member record using BCH wallet_address as key, but update solana_wallet_address
         result = await db.members.update_one(
             {"wallet_address": member.wallet_address},
-            {"$set": {"wallet_address": wallet_address, "updated_at": datetime.now(timezone.utc).isoformat()}}
+            {"$set": {"solana_wallet_address": solana_wallet_address, "updated_at": datetime.now(timezone.utc).isoformat()}}
         )
         
         if result.modified_count == 0:
@@ -1309,14 +1309,14 @@ async def update_member_wallet(request: dict, member: MemberProfile = Depends(ge
         
         return {
             "success": True,
-            "message": "Wallet address updated successfully",
-            "wallet_address": wallet_address
+            "message": "Solana wallet address updated successfully",
+            "solana_wallet_address": solana_wallet_address
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to update wallet address: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to update Solana wallet address: {str(e)}")
 
 @api_router.put("/profile")
 async def update_member_profile(
