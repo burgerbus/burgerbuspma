@@ -1910,6 +1910,13 @@ async def calculate_staking_rewards(request: StakeRewardsRequest):
 async def create_stake(request: StakeRequest, current_member: MemberProfile = Depends(get_current_user)):
     """Create a new stake account for the authenticated member"""
     try:
+        # Get updated member profile with Solana wallet address
+        updated_member = await get_or_create_member(current_member.wallet_address)
+        
+        # Check if member has set up Solana wallet
+        if not updated_member.solana_wallet_address:
+            raise HTTPException(status_code=400, detail="Please set up your Solana wallet address first using /api/profile/update-wallet")
+        
         # Validate inputs
         if not await solana_staking_service.validate_wallet_address(request.wallet_address):
             raise HTTPException(status_code=400, detail="Invalid wallet address")
@@ -1918,8 +1925,8 @@ async def create_stake(request: StakeRequest, current_member: MemberProfile = De
             raise HTTPException(status_code=400, detail=f"Minimum stake amount is {MIN_STAKE_AMOUNT} SOL")
         
         # Ensure wallet belongs to authenticated member
-        if current_member.wallet_address != request.wallet_address:
-            raise HTTPException(status_code=403, detail="Can only stake from your own wallet")
+        if updated_member.solana_wallet_address != request.wallet_address:
+            raise HTTPException(status_code=403, detail="Can only stake from your registered Solana wallet")
         
         # Use specified validator or default
         validator = request.validator_vote_account or VALIDATOR_VOTE_ACCOUNT
