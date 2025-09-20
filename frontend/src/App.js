@@ -922,6 +922,33 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Add debugging function for users
+  const debugAuthState = () => {
+    console.log('=== BBC Authentication Debug ===');
+    console.log('Auth State:', authState);
+    console.log('Stored bch_auth_token:', localStorage.getItem('bch_auth_token'));
+    console.log('Stored accessToken:', localStorage.getItem('accessToken'));
+    console.log('Stored memberData:', localStorage.getItem('memberData'));
+    console.log('bchAuthService.isAuthenticated():', bchAuthService.isAuthenticated());
+    
+    if (bchAuthService.getStoredToken()) {
+      try {
+        const token = bchAuthService.getStoredToken();
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Token payload:', payload);
+      } catch (e) {
+        console.log('Token decode error:', e);
+      }
+    }
+    console.log('================================');
+  };
+
+  // Make debug function available globally for user debugging
+  useEffect(() => {
+    window.bbcDebugAuth = debugAuthState;
+    console.log('BBC Debug: Type "bbcDebugAuth()" in console to debug authentication issues');
+  }, [authState]);
+
   const handleAuthSuccess = useCallback((address) => {
     console.log('Authentication successful for address:', address);
     // Atomic state update to prevent race conditions
