@@ -1096,7 +1096,8 @@ function App() {
     );
   }
 
-  if (authState.isAuthenticated && authState.memberAddress) {
+  // Render MemberDashboard (third priority - authenticated users)
+  if (authState.isAuthenticated && authState.memberAddress && !authState.showLogin && !authState.showStaking && !authState.showAuth && !authState.registrationInProgress) {
     console.log('RENDERING: MemberDashboard for', authState.memberAddress);
     return (
       <BBCStakingProvider>
