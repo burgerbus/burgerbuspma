@@ -512,7 +512,14 @@ const MemberDashboard = ({ memberAddress }) => {
         setLoading(true);
         
         // Seed sample data first
-        await bchAuthService.post('/api/admin/seed-data');
+        const token = localStorage.getItem('accessToken');
+        await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/seed-data`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
         
         // Try to load member profile first (using real authenticated endpoint)
         let profile;
