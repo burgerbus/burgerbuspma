@@ -27,10 +27,11 @@ load_dotenv(ROOT_DIR / '.env')
 BCH_RECEIVING_ADDRESS = os.environ.get("BCH_RECEIVING_ADDRESS", "bitcoincash:qph0duvh0zn0r2um7znh8gx20p50dr3ycc5lcp0sc4")
 
 # PMA P2P Payment Configuration
-MEMBERSHIP_FEE_USD = 0.00  # Free membership for now
-CASHSTAMP_AMOUNT_USD = 0.00  # All members receive $0 BCH cashstamp
-AFFILIATE_COMMISSION_USD = 0.00  # Affiliates earn $0 per referral
-PMA_NET_AMOUNT_USD = MEMBERSHIP_FEE_USD - AFFILIATE_COMMISSION_USD  # Free membership
+MEMBERSHIP_FEE_USD = 21.00  # $21 yearly membership
+CASHSTAMP_AMOUNT_USD = 18.00  # $18 goes to BCH cashstamp purchase
+AFFILIATE_COMMISSION_USD = 3.00  # $3 goes to affiliate or treasury
+PMA_NET_AMOUNT_USD = MEMBERSHIP_FEE_USD - AFFILIATE_COMMISSION_USD  # $18 net after affiliate
+BBC_STAKING_REQUIREMENT = 1000000.0  # 1,000,000 BBC tokens required for free membership
 
 # Pump.fun Token Configuration
 PUMP_TOKEN_MINT = os.getenv("PUMP_FUN_TOKEN_ADDRESS", "mWusXdRfsYAoFtYdaDcf8tmG7hnRNvnVc2TuvNEpump")
