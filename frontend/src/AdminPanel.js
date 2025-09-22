@@ -18,9 +18,14 @@ const AdminPanel = () => {
 
   const loadData = async () => {
     try {
+      const token = localStorage.getItem('accessToken');
       const [paymentsResponse, affiliatesResponse] = await Promise.all([
-        bchAuthService.get('/api/admin/pending-payments'),
-        bchAuthService.get('/api/admin/affiliate-payouts')
+        fetch(`${BACKEND_URL}/api/admin/pending-payments`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        }).then(r => r.json()),
+        fetch(`${BACKEND_URL}/api/admin/affiliate-payouts`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        }).then(r => r.json())
       ]);
       
       setPendingPayments(paymentsResponse.pending_payments || []);
