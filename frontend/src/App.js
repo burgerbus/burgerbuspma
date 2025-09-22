@@ -76,7 +76,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
         localStorage.setItem('accessToken', data.access_token);
         localStorage.setItem('memberData', JSON.stringify(data.user));
         
-        alert('🎉 Welcome to Bitcoin Ben\'s Burger Bus Club! Your FREE membership is active!');
+        alert('🎉 Welcome to Bitcoin Ben\'s Burger Bus Club! Please proceed to payment to complete your membership.');
         onComplete(data.user);
       } else {
         throw new Error(data.detail || 'Registration failed');
