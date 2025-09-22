@@ -616,7 +616,14 @@ const MemberDashboard = ({ memberAddress }) => {
       alert('Order placed successfully!');
       
       // Refresh orders
-      const ordersData = await bchAuthService.get('/api/orders');
+      const token = localStorage.getItem('accessToken');
+      const ordersResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/orders`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const ordersData = await ordersResponse.json();
       setOrders(ordersData);
     } catch (error) {
       console.error('Order failed:', error);
