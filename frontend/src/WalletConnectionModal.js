@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { bchAuthService } from './BCHAuth';
 import SimpleWalletConnect from './SimpleWalletConnect';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const WalletConnectionModal = ({ isOpen, onClose, onWalletConnected }) => {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
