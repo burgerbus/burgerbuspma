@@ -1081,7 +1081,10 @@ function App() {
   }
 
   if (authState.showAdmin) {
-    return <AdminPanel />;
+    if (!authState.adminAuthenticated) {
+      return <AdminLogin onAdminLogin={handleAdminLogin} />;
+    }
+    return <AdminPanel onLogout={handleAdminLogout} adminUser={authState.adminUser} />;
   }
 
   // Debug: Show which component should render
