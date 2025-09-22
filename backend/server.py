@@ -196,8 +196,12 @@ class MenuItem(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: str
-    price: float
-    member_price: float  # Special pricing for members
+    price: float  # USD price
+    member_price: float  # Special USD pricing for members
+    price_bch: Optional[float] = None  # BCH price
+    member_price_bch: Optional[float] = None  # Member BCH price
+    price_bbc: Optional[float] = None  # BBC token price
+    member_price_bbc: Optional[float] = None  # Member BBC token price
     category: str  # appetizer, main, dessert, beverage
     image_url: str
     is_available: bool = True
