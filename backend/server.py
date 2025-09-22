@@ -407,6 +407,34 @@ async def get_authenticated_member_jwt(credentials: HTTPAuthorizationCredentials
         print(f"Auth error: {e}")
         raise credentials_exception
 
+async def get_admin_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Get authenticated admin from JWT token"""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Admin access required",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET_KEY, algorithms=["HS256"])
+        email: str = payload.get("email")
+        is_admin: bool = payload.get("admin", False)
+        role: str = payload.get("role", "")
+        
+        if email is None or not is_admin or role != "admin":
+            raise credentials_exception
+        
+        return {
+            "email": email,
+            "role": "admin",
+            "is_admin": True
+        }
+        
+    except JWTError:
+        raise credentials_exception
+    except Exception as e:
+        print(f"Admin auth error: {e}")
+        raise credentials_exception
+
 # BCH Authentication Models
 class ChallengeRequest(BaseModel):
     app_name: str = "Bitcoin Ben's Burger Bus Club"
