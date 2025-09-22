@@ -44,21 +44,28 @@ const LoginPage = ({ onLoginSuccess, onBackToHome }) => {
       }
 
       // Attempt login
-      const response = await bchAuthService.post('/api/auth/login', {
-        email: formData.email,
-        password: formData.password
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
       });
 
-      if (response.success) {
-        // Store token using the same key as bchAuthService expects
-        localStorage.setItem('bch_auth_token', response.access_token);
-        localStorage.setItem('accessToken', response.access_token); // Keep for compatibility
-        localStorage.setItem('memberData', JSON.stringify(response.user));
+      const data = await response.json();
+
+      if (data.success) {
+        // Store token
+        localStorage.setItem('accessToken', data.access_token);
+        localStorage.setItem('memberData', JSON.stringify(data.user));
         
         // Call success callback
-        onLoginSuccess(response.user);
+        onLoginSuccess(data.user);
       } else {
-        setError('Login failed. Please check your credentials.');
+        setError(data.detail || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
       console.error('Login error:', error);
