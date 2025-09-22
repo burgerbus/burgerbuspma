@@ -83,7 +83,7 @@ const AdminPanel = () => {
       const data = await response.json();
 
       if (data.success) {
-        const instructions = response.instructions;
+        const instructions = data.instructions;
         const message = `
 Send Cashstamp Instructions:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
