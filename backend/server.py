@@ -1975,6 +1975,9 @@ async def process_bbc_staking_payment(request: BBCStakingPaymentRequest):
         return {
             "success": True,
             "message": "BBC token staking verified! Your membership is now active.",
+            "staking_verified": True,
+            "membership_activated": True,
+            "tokens_staked": request.bbc_tokens_staked,
             "payment_id": staking_payment_id,
             "staking_details": {
                 "tokens_staked": request.bbc_tokens_staked,
