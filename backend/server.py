@@ -149,10 +149,18 @@ JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "bch-bitcoin-bens-burger-bus-s
 JWT_ALGORITHM = "HS256"
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# MongoDB connection with production handling
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+db_name = os.environ.get('DB_NAME', 'bitcoin_bens_burger_club')
+
+try:
+    client = AsyncIOMotorClient(mongo_url)
+    db = client[db_name]
+    print(f"✅ MongoDB connected to database: {db_name}")
+    print(f"✅ Using MongoDB URL: {mongo_url[:20]}..." if mongo_url.startswith('mongodb+srv') else f"✅ Using MongoDB URL: {mongo_url}")
+except Exception as e:
+    print(f"❌ MongoDB connection failed: {e}")
+    raise e
 
 # Create the main app
 app = FastAPI(title="Bitcoin Ben's Burger Bus Club API")
