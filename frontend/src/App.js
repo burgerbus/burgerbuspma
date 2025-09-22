@@ -618,12 +618,18 @@ const MemberDashboard = ({ memberAddress }) => {
       // Reload member data after PMA completion
       const loadMemberData = async () => {
         try {
+          const token = localStorage.getItem('accessToken');
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          };
+
           const [profile, menuData, locationsData, eventsData, ordersData] = await Promise.all([
-            bchAuthService.get('/api/profile'),
-            bchAuthService.get('/api/debug/menu'),
-            bchAuthService.get('/api/debug/locations'),
-            bchAuthService.get('/api/debug/events'),
-            bchAuthService.get('/api/debug/orders')
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/profile`, { headers }).then(r => r.json()),
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/menu`, { headers }).then(r => r.json()),
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/locations`, { headers }).then(r => r.json()),
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/events`, { headers }).then(r => r.json()),
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/orders`, { headers }).then(r => r.json())
           ]);
 
           setMemberData(profile);
@@ -632,7 +638,7 @@ const MemberDashboard = ({ memberAddress }) => {
           setEvents(eventsData);
           setOrders(ordersData);
         } catch (error) {
-          console.error('Error reloading member data:', error);
+          console.error('Error loading member data:', error);
         }
       };
       loadMemberData();
