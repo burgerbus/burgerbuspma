@@ -336,7 +336,10 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
               <h3 className="text-xl font-bold text-orange-400 mb-2">Membership Investment</h3>
               <div className="flex justify-between items-center text-white">
                 <span>Annual Membership Dues:</span>
-                <span className="text-2xl font-bold text-green-400">FREE</span>
+                <span className="text-2xl font-bold text-green-400">$21/year</span>
+                <div className="text-sm text-gray-400 mt-1">
+                  or stake 1M $BBC tokens for FREE
+                </div>
               </div>
               <p className="text-gray-400 text-sm mt-2">
                 Payment processing via P2P payment methods. Your membership activates immediately upon agreement.
