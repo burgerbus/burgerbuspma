@@ -27,7 +27,7 @@ load_dotenv(ROOT_DIR / '.env')
 BCH_RECEIVING_ADDRESS = os.environ.get("BCH_RECEIVING_ADDRESS", "bitcoincash:qph0duvh0zn0r2um7znh8gx20p50dr3ycc5lcp0sc4")
 
 # PMA P2P Payment Configuration
-MEMBERSHIP_FEE_USD = 21.00  # $21 yearly membership
+MEMBERSHIP_FEE_USD = 0.00  # FREE yearly membership
 CASHSTAMP_AMOUNT_USD = 18.00  # $18 goes to BCH cashstamp purchase
 AFFILIATE_COMMISSION_USD = 3.00  # $3 goes to affiliate or treasury
 PMA_NET_AMOUNT_USD = MEMBERSHIP_FEE_USD - AFFILIATE_COMMISSION_USD  # $18 net after affiliate
