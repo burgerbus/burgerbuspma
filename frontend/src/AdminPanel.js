@@ -71,14 +71,18 @@ const AdminPanel = () => {
 
   const sendCashstamp = async (paymentId, recipientAddress) => {
     try {
-      const response = await bchAuthService.post('/api/admin/send-cashstamp', null, {
-        params: {
-          payment_id: paymentId,
-          recipient_address: recipientAddress
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${BACKEND_URL}/api/admin/send-cashstamp?payment_id=${paymentId}&recipient_address=${recipientAddress}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
+      
+      const data = await response.json();
 
-      if (response.success) {
+      if (data.success) {
         const instructions = response.instructions;
         const message = `
 Send Cashstamp Instructions:
