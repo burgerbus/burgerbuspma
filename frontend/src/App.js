@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import { bchAuthService } from './BCHAuth';
 import AdminPanel from './AdminPanel';
 import WalletDebug from './WalletDebug';
 import P2PPaymentSelector from './P2PPaymentSelector';
