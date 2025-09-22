@@ -967,19 +967,20 @@ function App() {
   const debugAuthState = () => {
     console.log('=== BBC Authentication Debug ===');
     console.log('Auth State:', authState);
-    console.log('Stored bch_auth_token:', localStorage.getItem('bch_auth_token'));
     console.log('Stored accessToken:', localStorage.getItem('accessToken'));
     console.log('Stored memberData:', localStorage.getItem('memberData'));
-    console.log('bchAuthService.isAuthenticated():', bchAuthService.isAuthenticated());
     
-    if (bchAuthService.getStoredToken()) {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
       try {
-        const token = bchAuthService.getStoredToken();
         const payload = JSON.parse(atob(token.split('.')[1]));
         console.log('Token payload:', payload);
+        console.log('Token expired:', payload.exp * 1000 < Date.now());
       } catch (e) {
         console.log('Token decode error:', e);
       }
+    } else {
+      console.log('No access token found');
     }
     console.log('================================');
   };
