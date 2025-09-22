@@ -16,11 +16,21 @@ const WalletConnectionModal = ({ isOpen, onClose, onWalletConnected }) => {
 
     try {
       // Update member profile with wallet address
-      const response = await bchAuthService.post('/api/profile/update-wallet', {
-        wallet_address: walletAddress
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${BACKEND_URL}/api/profile/update-wallet`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          wallet_address: walletAddress
+        })
       });
+      
+      const data = await response.json();
 
-      if (response.success) {
+      if (data.success) {
         setConnectedWallet(walletAddress);
         onWalletConnected(walletAddress);
         onClose();
