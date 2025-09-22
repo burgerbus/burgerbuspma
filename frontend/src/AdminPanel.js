@@ -90,7 +90,7 @@ Send Cashstamp Instructions:
 
 From: ${instructions.from_address}
 To: ${instructions.to_address}
-Amount: ${instructions.amount_bch} BCH ($${response.cashstamp_amount_usd})
+Amount: ${instructions.amount_bch} BCH ($${data.cashstamp_amount_usd})
 Memo: ${instructions.memo}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
