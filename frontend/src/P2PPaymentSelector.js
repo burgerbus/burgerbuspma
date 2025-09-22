@@ -29,14 +29,17 @@ const P2PPaymentSelector = ({ memberEmail, onPaymentSelected }) => {
     setLoading(true);
 
     try {
-      const response = await bchAuthService.post('/api/payments/create-p2p-payment', null, {
-        params: {
-          payment_method: methodKey,
-          user_email: memberEmail
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${BACKEND_URL}/api/payments/create-p2p-payment?payment_method=${methodKey}&user_email=${memberEmail}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
-
-      setPaymentInstructions(response);
+      
+      const data = await response.json();
+      setPaymentInstructions(data);
       onPaymentSelected && onPaymentSelected(response);
     } catch (error) {
       console.error('Failed to create payment instructions:', error);
