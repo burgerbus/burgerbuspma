@@ -294,7 +294,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
                 </p>
                 <p>
                   <strong>3. MEMBERSHIP DUES</strong><br />
-                  Membership is currently FREE! Simply complete the PMA agreement to join. 
+                  Annual membership is $21 or stake 1,000,000 $BBC tokens for free membership! 
                   Dues are non-refundable and provide access to all club benefits for one year.
                 </p>
                 <p>
