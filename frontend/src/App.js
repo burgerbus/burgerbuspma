@@ -1121,6 +1121,9 @@ function App() {
   }
 
   if (authState.isAuthenticated && authState.memberAddress) {
+    console.log('=== RENDERING DASHBOARD ===');
+    console.log('isAuthenticated:', authState.isAuthenticated);
+    console.log('memberAddress:', authState.memberAddress);
     return (
       <BBCStakingProvider>
         <MemberDashboard memberAddress={authState.memberAddress} />
