@@ -203,7 +203,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
               Burger Bus Club
             </h1>
             <p className="text-gray-400 text-sm sm:text-base">
-              Complete your FREE membership by signing our Private Membership Agreement
+              Complete your membership by signing our Private Membership Agreement
             </p>
           </div>
 
