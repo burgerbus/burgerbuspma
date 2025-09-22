@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import PumpTokenTicker from './PumpTokenTicker';
-import { bchAuthService } from './BCHAuth';
 
 const LoginPage = ({ onLoginSuccess, onBackToHome }) => {
   const [formData, setFormData] = useState({
