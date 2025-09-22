@@ -590,7 +590,7 @@ const MemberDashboard = ({ memberAddress }) => {
   const handlePreOrder = async (item, quantity = 1) => {
     // Check if member has completed PMA requirements
     if (!memberData || !memberData.pma_agreed || !memberData.dues_paid) {
-      alert('You must complete your FREE PMA membership agreement before placing orders. Please complete your registration first.');
+      alert('You must complete your PMA membership agreement and payment before placing orders. Please complete your registration first.');
       setShowPMAPage(true);
       return;
     }
