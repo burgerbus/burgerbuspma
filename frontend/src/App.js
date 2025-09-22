@@ -932,6 +932,8 @@ function App() {
     memberAddress: null,
     showAuth: false,
     showAdmin: false,  // Add admin panel state
+    adminAuthenticated: false,  // Admin authentication state
+    adminUser: null,  // Admin user data
     showDebug: false,  // Add debug panel state
     showStaking: false, // Add staking panel state
     showLogin: false,   // Add login page state
