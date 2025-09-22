@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-const AdminPanel = () => {
+const AdminPanel = ({ onLogout, adminUser }) => {
   const [pendingPayments, setPendingPayments] = useState([]);
   const [affiliatePayouts, setAffiliatePayouts] = useState([]);
   const [loading, setLoading] = useState(true);
