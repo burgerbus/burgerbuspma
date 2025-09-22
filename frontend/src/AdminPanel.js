@@ -177,8 +177,9 @@ Please send this amount manually from your admin wallet.
               <li>1. Check your BCH wallet for incoming $21 payments</li>
               <li>2. Copy the transaction ID from your wallet</li>
               <li>3. Paste it into the verification form and click "Verify Payment"</li>
-              <li>4. Send the $15 BCH cashstamp to the member's address</li>
-              <li>5. Member will be automatically activated after verification</li>
+              <li>4. Send the $18 BCH cashstamp to the member's address</li>
+              <li>5. $3 goes to affiliate (or treasury if no referral)</li>
+              <li>6. Member will be automatically activated after verification</li>
             </ul>
           </div>
         </div>
