@@ -14,8 +14,9 @@ const P2PPaymentSelector = ({ memberEmail, onPaymentSelected }) => {
 
   const loadPaymentMethods = async () => {
     try {
-      const response = await bchAuthService.get('/api/payments/methods');
-      setPaymentMethods(response.payment_methods);
+      const response = await fetch(`${BACKEND_URL}/api/payments/methods`);
+      const data = await response.json();
+      setPaymentMethods(data.payment_methods);
     } catch (error) {
       console.error('Failed to load payment methods:', error);
     } finally {
