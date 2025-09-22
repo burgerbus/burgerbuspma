@@ -615,8 +615,7 @@ const MemberDashboard = ({ memberAddress }) => {
 
       alert('Order placed successfully!');
       
-      // Refresh orders
-      const token = localStorage.getItem('accessToken');
+      // Refresh orders (reuse existing token variable)
       const ordersResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/orders`, {
         headers: {
           'Authorization': `Bearer ${token}`,
