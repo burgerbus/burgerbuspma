@@ -292,6 +292,14 @@ class MemberRegistrationRequest(BaseModel):
     pma_agreed: bool
     referral_code: Optional[str] = None
 
+class AdminLoginRequest(BaseModel):
+    email: str
+    password: str
+
+class BBCStakingPaymentRequest(BaseModel):
+    wallet_address: str
+    bbc_tokens_staked: float
+
 # Database helper functions
 async def get_or_create_member(wallet_address: str) -> MemberProfile:
     member = await db.members.find_one({"wallet_address": wallet_address})
