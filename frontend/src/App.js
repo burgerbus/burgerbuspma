@@ -1075,18 +1075,6 @@ function App() {
     window.location.href = '/';
   };
 
-  // Use the combined state for render condition
-  if (authState.showDebug) {
-    return <WalletDebug />;
-  }
-
-  if (authState.showAdmin) {
-    if (!authState.adminAuthenticated) {
-      return <AdminLogin onAdminLogin={handleAdminLogin} />;
-    }
-    return <AdminPanel onLogout={handleAdminLogout} adminUser={authState.adminUser} />;
-  }
-
   // Debug: Show which component should render
   const getComponentToRender = () => {
     if (authState.showLogin) return "LoginPage";
@@ -1107,6 +1095,19 @@ function App() {
     console.log('- showAuth:', authState.showAuth);
     console.log('==================================================');
   }, [authState]);
+
+  // ALL CONDITIONAL RETURNS AFTER ALL HOOKS
+  // Use the combined state for render condition
+  if (authState.showDebug) {
+    return <WalletDebug />;
+  }
+
+  if (authState.showAdmin) {
+    if (!authState.adminAuthenticated) {
+      return <AdminLogin onAdminLogin={handleAdminLogin} />;
+    }
+    return <AdminPanel onLogout={handleAdminLogout} adminUser={authState.adminUser} />;
+  }
 
   // Simplified rendering logic with clear priorities
   if (authState.showLogin) {
