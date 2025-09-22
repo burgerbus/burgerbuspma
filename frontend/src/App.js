@@ -599,10 +599,18 @@ const MemberDashboard = ({ memberAddress }) => {
         special_instructions: ""
       }];
 
-      await bchAuthService.post('/api/orders', {
-        items: orderItems,
-        pickup_location: "Downtown Business District",
-        pickup_time: "12:00"
+      const token = localStorage.getItem('accessToken');
+      await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: orderItems,
+          pickup_location: "Downtown Business District",
+          pickup_time: "12:00"
+        })
       });
 
       alert('Order placed successfully!');
