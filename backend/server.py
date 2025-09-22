@@ -1605,14 +1605,18 @@ async def join_member_event(
 async def seed_sample_data():
     """Seed the database with sample data (for demo purposes)."""
     
-    # Sample menu items - Bitcoin Ben's themed
+    # Sample menu items - Bitcoin Ben's themed with multi-currency pricing
     sample_menu = [
         {
             "id": str(uuid.uuid4()),
             "name": "The Satoshi Stacker",
             "description": "Triple-stacked wagyu beef with crypto-gold sauce and blockchain pickles",
-            "price": 28.00,
-            "member_price": 21.00,
+            "price": 28.00,  # USD
+            "member_price": 21.00,  # USD member price
+            "price_bch": 0.085,  # BCH price (~$28 at ~$330/BCH)
+            "member_price_bch": 0.064,  # BCH member price (~$21)
+            "price_bbc": 1140.0,  # BBC token price (assuming $0.0245/BBC)
+            "member_price_bbc": 857.0,  # BBC member price
             "category": "main",
             "image_url": "https://images.unsplash.com/photo-1616671285410-2a676a9a433d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHw0fHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85",
             "is_available": True,
@@ -1622,8 +1626,12 @@ async def seed_sample_data():
             "id": str(uuid.uuid4()),
             "name": "The Hodl Burger",
             "description": "Premium beef that gets better with time, served with diamond hands fries",
-            "price": 22.00,
-            "member_price": 18.00,
+            "price": 22.00,  # USD
+            "member_price": 18.00,  # USD member price
+            "price_bch": 0.067,  # BCH price (~$22)
+            "member_price_bch": 0.055,  # BCH member price (~$18)
+            "price_bbc": 898.0,  # BBC token price
+            "member_price_bbc": 735.0,  # BBC member price
             "category": "main",
             "image_url": "https://images.unsplash.com/photo-1623073284788-0d846f75e329?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85",
             "is_available": True,
@@ -1633,8 +1641,12 @@ async def seed_sample_data():
             "id": str(uuid.uuid4()),
             "name": "The Bitcoin Mining Rig",
             "description": "Ultimate burger stack for serious crypto miners - requires premium membership",
-            "price": 35.00,
-            "member_price": 28.00,
+            "price": 35.00,  # USD
+            "member_price": 28.00,  # USD member price
+            "price_bch": 0.106,  # BCH price (~$35)
+            "member_price_bch": 0.085,  # BCH member price (~$28)
+            "price_bbc": 1429.0,  # BBC token price
+            "member_price_bbc": 1143.0,  # BBC member price
             "category": "main",
             "image_url": "https://images.unsplash.com/photo-1628838463043-b81a343794d6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyfHxnb3VybWV0JTIwZm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85",
             "is_available": True,
@@ -1644,8 +1656,12 @@ async def seed_sample_data():
             "id": str(uuid.uuid4()),
             "name": "Lightning Network Loaded Fries",
             "description": "Crispy fries loaded with cheese, bacon, and instant satisfaction",
-            "price": 14.00,
-            "member_price": 11.00,
+            "price": 14.00,  # USD
+            "member_price": 11.00,  # USD member price
+            "price_bch": 0.042,  # BCH price (~$14)
+            "member_price_bch": 0.033,  # BCH member price (~$11)
+            "price_bbc": 571.0,  # BBC token price
+            "member_price_bbc": 449.0,  # BBC member price
             "category": "sides",
             "image_url": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwyMHx8Zm9vZHxlbnwwfHx8fDE3NTc0MzcyMDJ8MA&ixlib=rb-4.1.0&q=85",
             "is_available": True,
