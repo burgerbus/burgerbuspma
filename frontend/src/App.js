@@ -1030,11 +1030,17 @@ function App() {
     console.error('Auth error:', error);
   };
 
-  // Check for admin access via URL parameter
+  // Check for admin access via URL parameter and existing admin token
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
+    const adminToken = localStorage.getItem('adminToken');
+    
     if (urlParams.get('admin') === 'true') {
-      setAuthState(prev => ({ ...prev, showAdmin: true }));
+      setAuthState(prev => ({ 
+        ...prev, 
+        showAdmin: true,
+        adminAuthenticated: !!adminToken 
+      }));
     }
     if (urlParams.get('debug') === 'true') {
       setAuthState(prev => ({ ...prev, showDebug: true }));
@@ -1046,6 +1052,28 @@ function App() {
       setAuthState(prev => ({ ...prev, showLogin: true }));
     }
   }, []);
+
+  // Handle admin login
+  const handleAdminLogin = (adminUser) => {
+    setAuthState(prev => ({
+      ...prev,
+      adminAuthenticated: true,
+      adminUser: adminUser
+    }));
+  };
+
+  // Handle admin logout
+  const handleAdminLogout = () => {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('accessToken');
+    setAuthState(prev => ({
+      ...prev,
+      showAdmin: false,
+      adminAuthenticated: false,
+      adminUser: null
+    }));
+    window.location.href = '/';
+  };
 
   // Use the combined state for render condition
   if (authState.showDebug) {
