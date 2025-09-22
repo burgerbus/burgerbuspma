@@ -40,7 +40,13 @@ const BBCStakingInterface = () => {
           setTimeout(() => reject(new Error('Request timeout')), 10000)
         );
         
-        const profilePromise = bchAuthService.get('/api/profile');
+        const token = localStorage.getItem('accessToken');
+        const profilePromise = fetch(`${BACKEND_URL}/api/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json());
         
         const profile = await Promise.race([profilePromise, timeoutPromise]);
         setMemberInfo(profile);
