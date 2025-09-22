@@ -18,7 +18,7 @@ import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
 # Treasury Configuration
-TREASURY_WALLET_ADDRESS = os.getenv("TREASURY_WALLET_ADDRESS", "TreasuryWallet1111111111111111111111111111")
+TREASURY_WALLET_ADDRESS = os.getenv("TREASURY_WALLET_ADDRESS", "Er3xC3Ue31QB3KghoUEVTTLBHvGYgnfB3hFUy2g3fdpr")
 REWARDS_TOKEN_MINT = os.getenv("PUMP_FUN_TOKEN_ADDRESS", "mWusXdRfsYAoFtYdaDcf8tmG7hnRNvnVc2TuvNEpump")
 
 # Reward Distribution Settings
