@@ -877,71 +877,34 @@ function App() {
     registrationInProgress: false  // Add flag to prevent race conditions during registration
   });
 
+  // Simple authentication check using localStorage token
   useEffect(() => {
-    const checkAuth = () => {
-      // Skip auth check if registration is in progress to prevent race conditions
-      if (authState.registrationInProgress) {
-        console.log('Skipping auth check - registration in progress');
-        return;
-      }
-      
-      // Skip auth check if user just became authenticated (prevent immediate override)
-      if (authState.isAuthenticated && authState.memberAddress) {
-        console.log('Skipping auth check - user is already authenticated');
-        return;
-      }
-      
-      const authenticated = bchAuthService.isAuthenticated();
-      
-      if (authenticated) {
-        // Decode JWT to get address
-        const token = bchAuthService.getStoredToken();
-        if (token) {
-          try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            // Handle both wallet auth (payload.sub) and email auth (payload.email)
-            const memberAddress = payload.sub || payload.email || payload.member_id;
-            
-            console.log('Auth check: Setting authenticated state for:', memberAddress);
-            setAuthState(prev => ({
-              ...prev,
-              isAuthenticated: true,
-              memberAddress: memberAddress,
-              showAuth: false,  // Ensure we hide auth forms when authenticated
-              registrationInProgress: false  // Clear registration flag when authenticated
-            }));
-          } catch (e) {
-            console.error('Token decode error:', e);
-            // Clear potentially corrupted tokens
-            localStorage.removeItem('bch_auth_token');
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('memberData');
-            setAuthState(prev => ({
-              ...prev,
-              isAuthenticated: false,
-              memberAddress: null,
-              registrationInProgress: false
-            }));
-          }
+    const token = localStorage.getItem('accessToken');
+    if (token && !authState.isAuthenticated) {
+      try {
+        // Decode JWT to get user info
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const memberAddress = payload.email || payload.member_id;
+        
+        // Check if token is not expired
+        if (payload.exp * 1000 > Date.now()) {
+          setAuthState(prev => ({
+            ...prev,
+            isAuthenticated: true,
+            memberAddress: memberAddress
+          }));
+        } else {
+          // Token expired, clear it
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('memberData');
         }
+      } catch (e) {
+        console.log('Invalid token, clearing...');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('memberData');
       }
-      // Removed the else clause that was clearing auth state - this was causing the issue!
-    };
-
-    // Only run auth check on initial load, not on every state change
-    if (!authState.isAuthenticated && !authState.registrationInProgress) {
-      checkAuth();
     }
-    
-    // Check authentication less frequently
-    const interval = setInterval(() => {
-      if (!authState.isAuthenticated && !authState.registrationInProgress) {
-        checkAuth();
-      }
-    }, 60000); // Reduced to once per minute
-    
-    return () => clearInterval(interval);
-  }, []); // Empty dependency array - only run on mount
+  }, [authState.isAuthenticated]);
 
   // Add debugging function for users
   const debugAuthState = () => {
