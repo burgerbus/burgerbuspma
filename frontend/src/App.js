@@ -540,11 +540,17 @@ const MemberDashboard = ({ memberAddress }) => {
         }
 
         // Load member data (using debug endpoints temporarily)
+        const token = localStorage.getItem('accessToken');
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
         const [menuData, locationsData, eventsData, ordersData] = await Promise.all([
-          bchAuthService.get('/api/debug/menu'),
-          bchAuthService.get('/api/debug/locations'),
-          bchAuthService.get('/api/debug/events'),
-          bchAuthService.get('/api/debug/orders')
+          fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/menu`, { headers }).then(r => r.json()),
+          fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/locations`, { headers }).then(r => r.json()),
+          fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/events`, { headers }).then(r => r.json()),
+          fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/orders`, { headers }).then(r => r.json())
         ]);
 
         setMemberData(profile);
