@@ -1651,6 +1651,131 @@ class FoodTruckBackendTester:
         except Exception as e:
             self.log_test("Auth Protection Tests", False, f"Connection error: {str(e)}")
 
+    def test_dashboard_data_endpoints(self):
+        """Test dashboard data endpoints that were previously using bchAuthService"""
+        print("\n=== Testing Dashboard Data Endpoints ===")
+        
+        if not hasattr(self, 'access_token'):
+            self.log_test("Dashboard Data Endpoints", False, "No access token available for testing")
+            return
+        
+        # Set up authorization header
+        auth_headers = {
+            "Authorization": f"Bearer {self.access_token}"
+        }
+        
+        # Test dashboard data endpoints
+        dashboard_endpoints = [
+            ("/api/profile", "User Profile Data", "GET"),
+            ("/api/debug/menu", "Menu Items", "GET"),
+            ("/api/debug/locations", "Locations", "GET"),
+            ("/api/debug/events", "Events", "GET"),
+            ("/api/debug/orders", "Orders", "GET"),
+            ("/api/pump/token-info", "Pump.fun Token Info", "GET"),
+            ("/api/pump/token-price", "Pump.fun Token Price", "GET"),
+            ("/api/affiliate/my-stats", "Affiliate Stats", "GET")
+        ]
+        
+        for endpoint, name, method in dashboard_endpoints:
+            try:
+                if method == "GET":
+                    if endpoint.startswith("/api/pump/") or endpoint == "/api/debug/menu":
+                        # These endpoints might not require auth
+                        response = self.session.get(f"{self.base_url}{endpoint}")
+                        if response.status_code == 401 or response.status_code == 403:
+                            # Try with auth
+                            response = self.session.get(f"{self.base_url}{endpoint}", headers=auth_headers)
+                    else:
+                        # These definitely require auth
+                        response = self.session.get(f"{self.base_url}{endpoint}", headers=auth_headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.log_test(f"Dashboard Data ({name})", True, f"Successfully retrieved data: {response.status_code}")
+                    
+                    # Validate data structure based on endpoint
+                    if endpoint == "/api/profile":
+                        required_fields = ["id", "wallet_address", "membership_tier"]
+                        if all(field in data for field in required_fields):
+                            self.log_test(f"Profile Data Structure", True, f"All required profile fields present")
+                        else:
+                            missing = [f for f in required_fields if f not in data]
+                            self.log_test(f"Profile Data Structure", False, f"Missing fields: {missing}")
+                    
+                    elif endpoint == "/api/debug/menu":
+                        if isinstance(data, list) and len(data) > 0:
+                            self.log_test(f"Menu Data Structure", True, f"Menu contains {len(data)} items")
+                            # Check for Bitcoin Ben's themed items
+                            bitcoin_items = [item for item in data if "Bitcoin" in item.get("name", "") or "Satoshi" in item.get("name", "") or "Hodl" in item.get("name", "")]
+                            if len(bitcoin_items) > 0:
+                                self.log_test(f"Bitcoin Themed Menu Items", True, f"Found {len(bitcoin_items)} Bitcoin-themed items")
+                            else:
+                                self.log_test(f"Bitcoin Themed Menu Items", False, "No Bitcoin-themed items found")
+                        else:
+                            self.log_test(f"Menu Data Structure", False, "Menu data is empty or invalid")
+                    
+                    elif endpoint == "/api/debug/locations":
+                        if isinstance(data, list):
+                            self.log_test(f"Locations Data Structure", True, f"Locations contains {len(data)} items")
+                        else:
+                            self.log_test(f"Locations Data Structure", False, "Locations data is not a list")
+                    
+                    elif endpoint == "/api/debug/events":
+                        if isinstance(data, list):
+                            self.log_test(f"Events Data Structure", True, f"Events contains {len(data)} items")
+                        else:
+                            self.log_test(f"Events Data Structure", False, "Events data is not a list")
+                    
+                    elif endpoint == "/api/debug/orders":
+                        if isinstance(data, list):
+                            self.log_test(f"Orders Data Structure", True, f"Orders contains {len(data)} items")
+                        else:
+                            self.log_test(f"Orders Data Structure", False, "Orders data is not a list")
+                    
+                    elif endpoint == "/api/pump/token-info":
+                        if "token" in data and "mint" in data["token"]:
+                            self.log_test(f"Token Info Data Structure", True, f"Token info contains required fields")
+                        else:
+                            self.log_test(f"Token Info Data Structure", False, "Token info missing required fields")
+                    
+                    elif endpoint == "/api/pump/token-price":
+                        required_price_fields = ["price_usd", "market_cap", "volume_24h", "holders"]
+                        if all(field in data for field in required_price_fields):
+                            self.log_test(f"Token Price Data Structure", True, f"Token price contains all required fields")
+                        else:
+                            missing = [f for f in required_price_fields if f not in data]
+                            self.log_test(f"Token Price Data Structure", False, f"Missing price fields: {missing}")
+                    
+                    elif endpoint == "/api/affiliate/my-stats":
+                        required_affiliate_fields = ["referral_code", "total_referrals", "total_commissions_earned"]
+                        if all(field in data for field in required_affiliate_fields):
+                            self.log_test(f"Affiliate Stats Data Structure", True, f"Affiliate stats contain all required fields")
+                        else:
+                            missing = [f for f in required_affiliate_fields if f not in data]
+                            self.log_test(f"Affiliate Stats Data Structure", False, f"Missing affiliate fields: {missing}")
+                
+                elif response.status_code in [401, 403]:
+                    self.log_test(f"Dashboard Data ({name})", False, f"Authentication failed: {response.status_code}")
+                else:
+                    self.log_test(f"Dashboard Data ({name})", False, f"Unexpected status: {response.status_code}, Response: {response.text[:200]}")
+            
+            except Exception as e:
+                self.log_test(f"Dashboard Data ({name})", False, f"Connection error: {str(e)}")
+
+    def run_dashboard_fix_tests(self):
+        """Run tests specifically for the dashboard data population fix"""
+        print(f"🚀 Starting Dashboard Data Population Fix Testing for: {self.base_url}")
+        print("=" * 80)
+        
+        # Test user registration and login flow (BCH authentication)
+        self.test_authentication_and_dashboard_flow()
+        
+        # Test dashboard data endpoints
+        self.test_dashboard_data_endpoints()
+        
+        # Generate summary
+        self.generate_summary()
+
     def run_all_tests(self):
         """Run all backend tests"""
         print(f"🚀 Starting comprehensive backend testing for Bitcoin Ben's Burger Bus Club")
