@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { bchAuthService } from './BCHAuth';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const AffiliateDashboard = () => {
   const [affiliateStats, setAffiliateStats] = useState(null);
@@ -12,7 +13,14 @@ const AffiliateDashboard = () => {
 
   const loadAffiliateStats = async () => {
     try {
-      const stats = await bchAuthService.get('/api/affiliate/my-stats');
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${BACKEND_URL}/api/affiliate/my-stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const stats = await response.json();
       setAffiliateStats(stats);
     } catch (error) {
       console.error('Failed to load affiliate stats:', error);
