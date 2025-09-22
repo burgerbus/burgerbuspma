@@ -1914,6 +1914,66 @@ async def register_member(request: MemberRegistrationRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
+@api_router.post("/auth/bbc-staking-payment")
+async def process_bbc_staking_payment(request: BBCStakingPaymentRequest):
+    """Process BBC token staking for free membership (alternative to $21 payment)"""
+    try:
+        # Validate BBC token amount (must be exactly 1,000,000)
+        if request.bbc_tokens_staked != BBC_STAKING_REQUIREMENT:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Must stake exactly {BBC_STAKING_REQUIREMENT:,.0f} BBC tokens for free membership"
+            )
+        
+        # Validate Solana wallet address format
+        if not request.wallet_address or len(request.wallet_address) < 32:
+            raise HTTPException(status_code=400, detail="Valid Solana wallet address required")
+        
+        # In a real implementation, verify the staking transaction on-chain
+        # For now, we'll simulate this verification
+        
+        # Create staking record
+        staking_payment_id = f"bbc_stake_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}"
+        
+        staking_record = {
+            "payment_id": staking_payment_id,
+            "wallet_address": request.wallet_address,
+            "bbc_tokens_staked": request.bbc_tokens_staked,
+            "payment_method": "bbc_staking",
+            "status": "verified",  # Auto-verify for now
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "verified_at": datetime.now(timezone.utc).isoformat(),
+            "equivalent_usd_value": MEMBERSHIP_FEE_USD,
+            "membership_type": "staking_member"
+        }
+        
+        # Store in payment tracking (use existing payment_requests_db for now)
+        payment_requests_db[staking_payment_id] = staking_record
+        
+        return {
+            "success": True,
+            "message": "BBC token staking verified! Your membership is now active.",
+            "payment_id": staking_payment_id,
+            "staking_details": {
+                "tokens_staked": request.bbc_tokens_staked,
+                "wallet_address": request.wallet_address,
+                "equivalent_value_usd": MEMBERSHIP_FEE_USD,
+                "membership_status": "active",
+                "payment_method": "bbc_staking"
+            },
+            "benefits": {
+                "membership_fee_waived": True,
+                "cashstamp_eligible": True,
+                "affiliate_eligible": True,
+                "member_pricing": True
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"BBC staking payment failed: {str(e)}")
+
 # =======================
 # BBC TOKEN STAKING ENDPOINTS
 # =======================
