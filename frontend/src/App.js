@@ -521,7 +521,7 @@ const MemberDashboard = ({ memberAddress }) => {
           }
         });
         
-        // Try to load member profile first (using real authenticated endpoint)
+        // Try to load member profile and dashboard data
         let profile;
         try {
           const token = localStorage.getItem('accessToken');
@@ -529,7 +529,22 @@ const MemberDashboard = ({ memberAddress }) => {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           };
+          
           profile = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/profile`, { headers }).then(r => r.json());
+          
+          // Load member data (using debug endpoints temporarily)
+          const [menuData, locationsData, eventsData, ordersData] = await Promise.all([
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/menu`, { headers }).then(r => r.json()),
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/locations`, { headers }).then(r => r.json()),
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/events`, { headers }).then(r => r.json()),
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/orders`, { headers }).then(r => r.json())
+          ]);
+
+          setMemberData(profile);
+          setMenu(menuData);
+          setLocations(locationsData);
+          setEvents(eventsData);
+          setOrders(ordersData);
         } catch (profileError) {
           console.error('Profile fetch error:', profileError);
           // If profile doesn't exist, show PMA page
@@ -538,26 +553,6 @@ const MemberDashboard = ({ memberAddress }) => {
           setLoading(false);
           return;
         }
-
-        // Load member data (using debug endpoints temporarily)
-        const token = localStorage.getItem('accessToken');
-        const headers = {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        };
-
-        const [menuData, locationsData, eventsData, ordersData] = await Promise.all([
-          fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/menu`, { headers }).then(r => r.json()),
-          fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/locations`, { headers }).then(r => r.json()),
-          fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/events`, { headers }).then(r => r.json()),
-          fetch(`${process.env.REACT_APP_BACKEND_URL}/api/debug/orders`, { headers }).then(r => r.json())
-        ]);
-
-        setMemberData(profile);
-        setMenu(menuData);
-        setLocations(locationsData);
-        setEvents(eventsData);
-        setOrders(ordersData);
         
         // Check if member has completed PMA requirements
         if (!profile.pma_agreed || !profile.dues_paid) {
