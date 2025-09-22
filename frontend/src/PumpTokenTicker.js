@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { bchAuthService } from './BCHAuth';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const PumpTokenTicker = () => {
   const [tokenData, setTokenData] = useState(null);
@@ -10,10 +11,13 @@ const PumpTokenTicker = () => {
     const fetchTokenData = async () => {
       try {
         setLoading(true);
-        const [tokenInfo, tokenPrice] = await Promise.all([
-          bchAuthService.get('/api/pump/token-info'),
-          bchAuthService.get('/api/pump/token-price')
+        const [tokenInfoResponse, tokenPriceResponse] = await Promise.all([
+          fetch(`${BACKEND_URL}/api/pump/token-info`),
+          fetch(`${BACKEND_URL}/api/pump/token-price`)
         ]);
+        
+        const tokenInfo = await tokenInfoResponse.json();
+        const tokenPrice = await tokenPriceResponse.json();
         
         setTokenData({
           ...tokenInfo.token,
