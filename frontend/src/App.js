@@ -1050,18 +1050,19 @@ function App() {
     console.log('==================================================');
   }, [authState]);
 
+  // Simplified rendering logic with clear priorities
   if (authState.showLogin) {
     return (
       <BBCStakingProvider>
         <LoginPage 
           onLoginSuccess={(user) => {
-            console.log('Login successful:', user);
             setAuthState(prev => ({ 
               ...prev, 
               isAuthenticated: true, 
               memberAddress: user.wallet_address || user.email || user.id,
               showLogin: false,
-              registrationInProgress: false  // Clear any registration flag
+              showAuth: false,
+              registrationInProgress: false
             }));
           }}
           onBackToHome={() => {
@@ -1073,26 +1074,7 @@ function App() {
     );
   }
 
-  if (authState.showStaking && !authState.showLogin) {
-    return (
-      <BBCStakingProvider>
-        <div className="min-h-screen bg-gray-900">
-          <PumpTokenTicker />
-          <BBCStakingInterface />
-        </div>
-      </BBCStakingProvider>
-    );
-  }
-
-  if (authState.isAuthenticated && authState.memberAddress && !authState.showLogin && !authState.showStaking && !authState.showAuth && !authState.registrationInProgress) {
-    return (
-      <BBCStakingProvider>
-        <MemberDashboard memberAddress={authState.memberAddress} />
-      </BBCStakingProvider>
-    );
-  }
-
-  if (authState.showAuth && !authState.showLogin && !authState.showStaking) {
+  if (authState.showAuth) {
     return (
       <BBCStakingProvider>
         <PMAgreementPage memberAddress="" onComplete={(userData) => {
@@ -1114,6 +1096,25 @@ function App() {
             }));
           }
         }} />
+      </BBCStakingProvider>
+    );
+  }
+
+  if (authState.showStaking) {
+    return (
+      <BBCStakingProvider>
+        <div className="min-h-screen bg-gray-900">
+          <PumpTokenTicker />
+          <BBCStakingInterface />
+        </div>
+      </BBCStakingProvider>
+    );
+  }
+
+  if (authState.isAuthenticated && authState.memberAddress) {
+    return (
+      <BBCStakingProvider>
+        <MemberDashboard memberAddress={authState.memberAddress} />
       </BBCStakingProvider>
     );
   }
