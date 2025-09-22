@@ -93,7 +93,14 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
     // Poll for payment status every 30 seconds
     const pollInterval = setInterval(async () => {
       try {
-        const status = await bchAuthService.get(`/api/payments/status/${paymentData.payment_id}`);
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payments/status/${paymentData.payment_id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        const status = await response.json();
         if (status.status === 'verified') {
           clearInterval(pollInterval);
           alert('Payment verified! Welcome to Bitcoin Ben\'s Burger Bus Club!');
