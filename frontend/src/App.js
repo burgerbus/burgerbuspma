@@ -964,12 +964,30 @@ function App() {
     console.log('================================');
   };
 
-  // Debug: Log the current auth state for troubleshooting
+  // Debug: Track every state change
   useEffect(() => {
-    if (authState.isAuthenticated) {
-      console.log('User authenticated:', authState.memberAddress);
+    console.log('=== AUTH STATE CHANGED ===');
+    console.log('showAuth:', authState.showAuth);
+    console.log('showLogin:', authState.showLogin);
+    console.log('showStaking:', authState.showStaking);
+    console.log('isAuthenticated:', authState.isAuthenticated);
+    console.log('memberAddress:', authState.memberAddress);
+    console.log('registrationInProgress:', authState.registrationInProgress);
+    
+    // Determine what should render
+    if (authState.showLogin) {
+      console.log('Should render: LoginPage');
+    } else if (authState.showStaking && !authState.showLogin) {
+      console.log('Should render: StakingInterface');
+    } else if (authState.isAuthenticated && authState.memberAddress && !authState.showLogin && !authState.showStaking && !authState.showAuth && !authState.registrationInProgress) {
+      console.log('Should render: MemberDashboard');
+    } else if (authState.showAuth && !authState.showLogin && !authState.showStaking) {
+      console.log('Should render: PMAgreementPage');
+    } else {
+      console.log('Should render: LandingPage (default)');
     }
-  }, [authState.isAuthenticated, authState.memberAddress]);
+    console.log('===========================');
+  }, [authState]);
 
   const handleAuthSuccess = useCallback((address) => {
     console.log('Authentication successful for address:', address);
