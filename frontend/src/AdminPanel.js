@@ -297,7 +297,7 @@ const PaymentCard = ({ payment, onVerify, onSendCashstamp, isVerifying }) => {
           onClick={() => onSendCashstamp(payment.payment_id, payment.user_address)}
           className="w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded font-medium transition-colors"
         >
-          💰 Generate $15 Cashstamp Instructions
+          💰 Generate $18 Cashstamp Instructions
         </button>
       </div>
     </div>
