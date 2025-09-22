@@ -51,18 +51,36 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
         referral_code: memberInfo.referralCode || ''
       };
       
-      const response = await bchAuthService.post('/api/auth/register', registrationData);
+      const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: memberInfo.fullName,
+          email: memberInfo.email,
+          password: memberInfo.password,
+          phone: memberInfo.phone,
+          address: memberInfo.address,
+          city: memberInfo.city,
+          state: memberInfo.state,
+          zip_code: memberInfo.zipCode,
+          pma_agreed: agreed,
+          referral_code: memberInfo.referralCode || ''
+        }),
+      });
+
+      const data = await response.json();
       
-      if (response.success) {
-        // Store token using the same key as bchAuthService expects
-        localStorage.setItem('bch_auth_token', response.access_token);
-        localStorage.setItem('accessToken', response.access_token); // Keep for compatibility
-        localStorage.setItem('memberData', JSON.stringify(response.user));
+      if (data.success) {
+        // Store token 
+        localStorage.setItem('accessToken', data.access_token);
+        localStorage.setItem('memberData', JSON.stringify(data.user));
         
         alert('🎉 Welcome to Bitcoin Ben\'s Burger Bus Club! Your FREE membership is active!');
-        onComplete(response.user);
+        onComplete(data.user);
       } else {
-        throw new Error('Registration failed');
+        throw new Error(data.detail || 'Registration failed');
       }
     } catch (error) {
       console.error('Registration error:', error);
