@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 class BCHAuthVerificationTester:
     def __init__(self):
-        self.base_url = "https://bbc-rewards-hub.preview.emergentagent.com"
+        self.base_url = "https://bbcmembership.preview.emergentagent.com"
         self.session = requests.Session()
         self.test_results = []
         

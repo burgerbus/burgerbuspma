@@ -7,7 +7,7 @@ import requests
 import json
 
 def test_staking_auth_fix():
-    base_url = "https://bbc-rewards-hub.preview.emergentagent.com"
+    base_url = "https://bbcmembership.preview.emergentagent.com"
     session = requests.Session()
     
     print("🔧 Testing Fixed Staking Authentication")

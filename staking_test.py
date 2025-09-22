@@ -9,7 +9,7 @@ import json
 import time
 
 def test_staking_system():
-    base_url = "https://bbc-rewards-hub.preview.emergentagent.com"
+    base_url = "https://bbcmembership.preview.emergentagent.com"
     session = requests.Session()
     
     print("🚀 Testing BBC Token Staking System")
