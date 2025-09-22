@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useBBCStaking } from './BBCStakingProvider';
-import { bchAuthService } from './BCHAuth';
 import WalletConnectionModal from './WalletConnectionModal';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const BBCStakingInterface = () => {
   const {
