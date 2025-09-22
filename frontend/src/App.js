@@ -1103,7 +1103,16 @@ function App() {
   return (
     <BBCStakingProvider>
       <LandingPage 
-        onGetStarted={() => setAuthState(prev => ({ ...prev, showAuth: true }))}
+        onGetStarted={() => {
+          console.log('=== JOIN CLUB BUTTON CLICKED ===');
+          console.log('Current authState before click:', authState);
+          setAuthState(prev => {
+            const newState = { ...prev, showAuth: true };
+            console.log('Setting new authState:', newState);
+            return newState;
+          });
+          console.log('setAuthState called - waiting for re-render...');
+        }}
         onMemberLogin={() => setAuthState(prev => ({ ...prev, showLogin: true }))}
       />
     </BBCStakingProvider>
