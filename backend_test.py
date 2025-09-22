@@ -1776,6 +1776,383 @@ class FoodTruckBackendTester:
         # Generate summary
         self.generate_summary()
 
+    def test_admin_authentication_system(self):
+        """Test new admin authentication system"""
+        print("\n=== Testing Admin Authentication System ===")
+        
+        # Test 1: Admin Login with Correct Credentials
+        try:
+            admin_login_data = {
+                "email": "admin@bitcoinben.com",
+                "password": "admin123"
+            }
+            response = self.session.post(f"{self.base_url}/api/auth/admin-login", json=admin_login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["access_token", "token_type", "expires_in", "admin", "role"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("Admin Login - Correct Credentials", True, f"Admin login successful. Role: {data.get('role')}")
+                    
+                    # Store admin token for further tests
+                    self.admin_token = data["access_token"]
+                    
+                    # Validate admin-specific fields
+                    if data.get("admin") == True and data.get("role") == "admin":
+                        self.log_test("Admin Login - Role Validation", True, "Admin role and permissions correctly set")
+                    else:
+                        self.log_test("Admin Login - Role Validation", False, f"Expected admin=True, role=admin, got admin={data.get('admin')}, role={data.get('role')}")
+                    
+                    # Validate JWT token format
+                    token_parts = data["access_token"].split('.')
+                    if len(token_parts) == 3:
+                        self.log_test("Admin JWT Token Format", True, "JWT token properly formatted")
+                    else:
+                        self.log_test("Admin JWT Token Format", False, f"Invalid JWT format: {len(token_parts)} parts")
+                        
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("Admin Login - Correct Credentials", False, f"Missing fields: {missing_fields}")
+            elif response.status_code == 404:
+                self.log_test("Admin Login - Correct Credentials", False, "Admin login endpoint not implemented")
+            else:
+                self.log_test("Admin Login - Correct Credentials", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Admin Login - Correct Credentials", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Admin Login with Incorrect Credentials (Security Test)
+        try:
+            incorrect_credentials = [
+                {"email": "admin@bitcoinben.com", "password": "wrongpassword"},
+                {"email": "wrong@email.com", "password": "admin123"},
+                {"email": "admin@bitcoinben.com", "password": ""},
+                {"email": "", "password": "admin123"}
+            ]
+            
+            security_passed = 0
+            for i, creds in enumerate(incorrect_credentials):
+                response = self.session.post(f"{self.base_url}/api/auth/admin-login", json=creds)
+                
+                if response.status_code in [401, 403]:
+                    security_passed += 1
+                    self.log_test(f"Admin Security Test {i+1}", True, f"Correctly rejected invalid credentials: {response.status_code}")
+                elif response.status_code == 404:
+                    self.log_test(f"Admin Security Test {i+1}", False, "Admin login endpoint not implemented")
+                    break
+                else:
+                    self.log_test(f"Admin Security Test {i+1}", False, f"Security issue: {response.status_code} for invalid credentials")
+            
+            if security_passed == len(incorrect_credentials):
+                self.log_test("Admin Security - Overall", True, "All invalid credential attempts properly rejected")
+            elif security_passed > 0:
+                self.log_test("Admin Security - Overall", True, f"Most security tests passed ({security_passed}/{len(incorrect_credentials)})")
+            else:
+                self.log_test("Admin Security - Overall", False, "Admin authentication security issues detected")
+                
+        except Exception as e:
+            self.log_test("Admin Security Tests", False, f"Connection error: {str(e)}")
+    
+    def test_bbc_staking_payment_system(self):
+        """Test BBC staking payment system"""
+        print("\n=== Testing BBC Staking Payment System ===")
+        
+        # Test 1: BBC Staking Payment with Valid Data
+        try:
+            staking_data = {
+                "wallet_address": "7K8DVxtNJGnMtUY1CQJT5jcs8sFGSZTDiG7kowvFpECh",  # Valid Solana wallet format
+                "bbc_tokens_staked": 1000000.0  # 1,000,000 BBC tokens as required
+            }
+            response = self.session.post(f"{self.base_url}/api/auth/bbc-staking-payment", json=staking_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "staking_verified", "membership_activated", "tokens_staked"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("BBC Staking Payment - Valid Data", True, f"Staking payment successful: {data.get('message')}")
+                    
+                    # Validate staking amount
+                    if data.get("tokens_staked") == 1000000.0:
+                        self.log_test("BBC Staking Amount Validation", True, f"Correct staking amount: {data['tokens_staked']} BBC tokens")
+                    else:
+                        self.log_test("BBC Staking Amount Validation", False, f"Expected 1,000,000, got {data.get('tokens_staked')}")
+                    
+                    # Validate membership activation
+                    if data.get("membership_activated") == True:
+                        self.log_test("BBC Staking Membership Activation", True, "Membership correctly activated for staking")
+                    else:
+                        self.log_test("BBC Staking Membership Activation", False, "Membership not activated despite valid staking")
+                        
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_test("BBC Staking Payment - Valid Data", False, f"Missing fields: {missing_fields}")
+            elif response.status_code == 404:
+                self.log_test("BBC Staking Payment - Valid Data", False, "BBC staking payment endpoint not implemented")
+            else:
+                self.log_test("BBC Staking Payment - Valid Data", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("BBC Staking Payment - Valid Data", False, f"Connection error: {str(e)}")
+        
+        # Test 2: BBC Staking Payment with Insufficient Tokens
+        try:
+            insufficient_staking_data = {
+                "wallet_address": "7K8DVxtNJGnMtUY1CQJT5jcs8sFGSZTDiG7kowvFpECh",
+                "bbc_tokens_staked": 500000.0  # Only 500,000 BBC tokens (insufficient)
+            }
+            response = self.session.post(f"{self.base_url}/api/auth/bbc-staking-payment", json=insufficient_staking_data)
+            
+            if response.status_code == 400:
+                data = response.json()
+                if "insufficient" in data.get("detail", "").lower() or "minimum" in data.get("detail", "").lower():
+                    self.log_test("BBC Staking - Insufficient Tokens", True, "Correctly rejects insufficient staking amount")
+                else:
+                    self.log_test("BBC Staking - Insufficient Tokens", False, f"Unexpected error message: {data.get('detail')}")
+            elif response.status_code == 404:
+                self.log_test("BBC Staking - Insufficient Tokens", False, "BBC staking payment endpoint not implemented")
+            else:
+                self.log_test("BBC Staking - Insufficient Tokens", False, f"Expected 400, got {response.status_code}")
+        except Exception as e:
+            self.log_test("BBC Staking - Insufficient Tokens", False, f"Connection error: {str(e)}")
+        
+        # Test 3: BBC Staking Payment with Invalid Wallet Address
+        try:
+            invalid_wallet_data = {
+                "wallet_address": "invalid_wallet_address_123",
+                "bbc_tokens_staked": 1000000.0
+            }
+            response = self.session.post(f"{self.base_url}/api/auth/bbc-staking-payment", json=invalid_wallet_data)
+            
+            if response.status_code == 400:
+                data = response.json()
+                if "invalid" in data.get("detail", "").lower() or "wallet" in data.get("detail", "").lower():
+                    self.log_test("BBC Staking - Invalid Wallet", True, "Correctly rejects invalid wallet address")
+                else:
+                    self.log_test("BBC Staking - Invalid Wallet", False, f"Unexpected error message: {data.get('detail')}")
+            elif response.status_code == 404:
+                self.log_test("BBC Staking - Invalid Wallet", False, "BBC staking payment endpoint not implemented")
+            else:
+                self.log_test("BBC Staking - Invalid Wallet", False, f"Expected 400, got {response.status_code}")
+        except Exception as e:
+            self.log_test("BBC Staking - Invalid Wallet", False, f"Connection error: {str(e)}")
+    
+    def test_membership_pricing_configuration(self):
+        """Test updated membership pricing configuration ($21 instead of free)"""
+        print("\n=== Testing Membership Pricing Configuration ===")
+        
+        # Test 1: Payment Methods Configuration
+        try:
+            response = self.session.get(f"{self.base_url}/api/payments/methods")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "payment_methods" in data:
+                    payment_methods = data["payment_methods"]
+                    
+                    # Check BCH payment method pricing
+                    if "bch" in payment_methods:
+                        bch_method = payment_methods["bch"]
+                        if bch_method.get("amount") == 21.0:
+                            self.log_test("BCH Payment Method Pricing", True, f"BCH payment correctly set to ${bch_method['amount']}")
+                        else:
+                            self.log_test("BCH Payment Method Pricing", False, f"Expected $21, got ${bch_method.get('amount')}")
+                    
+                    # Check Venmo payment method pricing
+                    if "venmo" in payment_methods:
+                        venmo_method = payment_methods["venmo"]
+                        if venmo_method.get("amount") == 21.0:
+                            self.log_test("Venmo Payment Method Pricing", True, f"Venmo payment correctly set to ${venmo_method['amount']}")
+                        else:
+                            self.log_test("Venmo Payment Method Pricing", False, f"Expected $21, got ${venmo_method.get('amount')}")
+                    
+                    # Check membership type
+                    if data.get("membership_type") == "Private Membership Association":
+                        self.log_test("Membership Type Configuration", True, "Membership type correctly set to PMA")
+                    else:
+                        self.log_test("Membership Type Configuration", False, f"Expected PMA, got {data.get('membership_type')}")
+                        
+                else:
+                    self.log_test("Payment Methods Configuration", False, "Payment methods not found in response")
+            else:
+                self.log_test("Payment Methods Configuration", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Payment Methods Configuration", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Payment Creation with $21 Amount
+        try:
+            response = self.session.post(f"{self.base_url}/api/payments/create-membership-payment", 
+                                       json={"user_address": "bitcoincash:qtest_pricing"})
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("amount_usd") == 21.0:
+                    self.log_test("Payment Creation - $21 Amount", True, f"Payment correctly created for ${data['amount_usd']}")
+                else:
+                    self.log_test("Payment Creation - $21 Amount", False, f"Expected $21, got ${data.get('amount_usd')}")
+            else:
+                self.log_test("Payment Creation - $21 Amount", False, f"Payment creation failed: {response.status_code}")
+        except Exception as e:
+            self.log_test("Payment Creation - $21 Amount", False, f"Connection error: {str(e)}")
+    
+    def test_multi_currency_menu_pricing(self):
+        """Test menu items include multi-currency pricing (USD, BCH, BBC)"""
+        print("\n=== Testing Multi-Currency Menu Pricing ===")
+        
+        # First seed data to ensure menu items exist
+        try:
+            self.session.post(f"{self.base_url}/api/admin/seed-data")
+            time.sleep(2)  # Allow time for seeding
+        except:
+            pass
+        
+        # Test member menu with authentication (if we have a token)
+        if hasattr(self, 'access_token'):
+            try:
+                auth_headers = {"Authorization": f"Bearer {self.access_token}"}
+                response = self.session.get(f"{self.base_url}/api/menu/member", headers=auth_headers)
+                
+                if response.status_code == 200:
+                    menu_items = response.json()
+                    if len(menu_items) > 0:
+                        self.log_test("Member Menu Access", True, f"Retrieved {len(menu_items)} menu items")
+                        
+                        # Check first item for multi-currency pricing
+                        item = menu_items[0]
+                        currency_fields = ["price", "member_price", "price_bch", "member_price_bch", "price_bbc", "member_price_bbc"]
+                        present_currencies = [field for field in currency_fields if field in item and item[field] is not None]
+                        
+                        if len(present_currencies) >= 4:  # Should have USD and member USD at minimum, ideally all 6
+                            self.log_test("Multi-Currency Pricing", True, f"Found {len(present_currencies)} currency fields: {present_currencies}")
+                            
+                            # Validate specific currencies
+                            if "price" in item and "member_price" in item:
+                                self.log_test("USD Pricing", True, f"USD: ${item['price']}, Member: ${item['member_price']}")
+                            
+                            if "price_bch" in item and item["price_bch"] is not None:
+                                self.log_test("BCH Pricing", True, f"BCH: {item['price_bch']} BCH")
+                            else:
+                                self.log_test("BCH Pricing", False, "BCH pricing not found or null")
+                            
+                            if "price_bbc" in item and item["price_bbc"] is not None:
+                                self.log_test("BBC Token Pricing", True, f"BBC: {item['price_bbc']} BBC tokens")
+                            else:
+                                self.log_test("BBC Token Pricing", False, "BBC token pricing not found or null")
+                                
+                        else:
+                            self.log_test("Multi-Currency Pricing", False, f"Only found {len(present_currencies)} currency fields: {present_currencies}")
+                    else:
+                        self.log_test("Member Menu Access", False, "No menu items found")
+                else:
+                    self.log_test("Member Menu Access", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test("Member Menu Multi-Currency", False, f"Connection error: {str(e)}")
+        
+        # Test debug menu endpoint (no auth required)
+        try:
+            response = self.session.get(f"{self.base_url}/api/debug/menu")
+            
+            if response.status_code == 200:
+                menu_items = response.json()
+                if len(menu_items) > 0:
+                    self.log_test("Debug Menu Access", True, f"Retrieved {len(menu_items)} menu items via debug endpoint")
+                    
+                    # Check for multi-currency pricing in debug menu
+                    item = menu_items[0]
+                    currency_fields = ["price", "member_price", "price_bch", "member_price_bch", "price_bbc", "member_price_bbc"]
+                    present_currencies = [field for field in currency_fields if hasattr(item, field) or (isinstance(item, dict) and field in item)]
+                    
+                    if len(present_currencies) >= 2:
+                        self.log_test("Debug Menu Multi-Currency", True, f"Multi-currency fields present: {present_currencies}")
+                    else:
+                        self.log_test("Debug Menu Multi-Currency", False, f"Limited currency fields: {present_currencies}")
+                else:
+                    self.log_test("Debug Menu Access", False, "No menu items in debug endpoint")
+            else:
+                self.log_test("Debug Menu Access", False, f"Debug menu status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Debug Menu Multi-Currency", False, f"Connection error: {str(e)}")
+    
+    def test_existing_endpoints_with_new_pricing(self):
+        """Test that all existing endpoints still work with the new pricing structure"""
+        print("\n=== Testing Existing Endpoints with New Pricing Structure ===")
+        
+        # Test 1: Public endpoints still work
+        public_endpoints = [
+            ("/api/", "Root API"),
+            ("/api/menu/public", "Public Menu"),
+            ("/api/locations/public", "Public Locations"),
+            ("/api/payments/methods", "Payment Methods")
+        ]
+        
+        for endpoint, name in public_endpoints:
+            try:
+                response = self.session.get(f"{self.base_url}{endpoint}")
+                if response.status_code == 200:
+                    self.log_test(f"Public Endpoint - {name}", True, f"Endpoint working: {response.status_code}")
+                else:
+                    self.log_test(f"Public Endpoint - {name}", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test(f"Public Endpoint - {name}", False, f"Connection error: {str(e)}")
+        
+        # Test 2: Payment system endpoints
+        payment_endpoints_tests = [
+            ("create-membership-payment", "POST", {"user_address": "bitcoincash:qtest"}),
+            ("methods", "GET", None)
+        ]
+        
+        for endpoint_suffix, method, data in payment_endpoints_tests:
+            try:
+                endpoint = f"{self.base_url}/api/payments/{endpoint_suffix}"
+                if method == "POST":
+                    response = self.session.post(endpoint, json=data)
+                else:
+                    response = self.session.get(endpoint)
+                
+                if response.status_code == 200:
+                    self.log_test(f"Payment Endpoint - {endpoint_suffix}", True, f"Endpoint working with new pricing: {response.status_code}")
+                else:
+                    self.log_test(f"Payment Endpoint - {endpoint_suffix}", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test(f"Payment Endpoint - {endpoint_suffix}", False, f"Connection error: {str(e)}")
+        
+        # Test 3: Admin endpoints (if we have admin token)
+        if hasattr(self, 'admin_token'):
+            admin_headers = {"Authorization": f"Bearer {self.admin_token}"}
+            admin_endpoints = [
+                ("/api/admin/pending-payments", "GET", None),
+                ("/api/admin/seed-data", "POST", None)
+            ]
+            
+            for endpoint, method, data in admin_endpoints:
+                try:
+                    if method == "POST":
+                        response = self.session.post(f"{self.base_url}{endpoint}", json=data, headers=admin_headers)
+                    else:
+                        response = self.session.get(f"{self.base_url}{endpoint}", headers=admin_headers)
+                    
+                    if response.status_code in [200, 201]:
+                        self.log_test(f"Admin Endpoint - {endpoint}", True, f"Admin endpoint working: {response.status_code}")
+                    else:
+                        self.log_test(f"Admin Endpoint - {endpoint}", False, f"Status: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Admin Endpoint - {endpoint}", False, f"Connection error: {str(e)}")
+        
+        # Test 4: Token integration endpoints
+        token_endpoints = [
+            ("/api/pump/token-info", "Token Info"),
+            ("/api/pump/token-price", "Token Price")
+        ]
+        
+        for endpoint, name in token_endpoints:
+            try:
+                response = self.session.get(f"{self.base_url}{endpoint}")
+                if response.status_code == 200:
+                    self.log_test(f"Token Endpoint - {name}", True, f"Token endpoint working: {response.status_code}")
+                else:
+                    self.log_test(f"Token Endpoint - {name}", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test(f"Token Endpoint - {name}", False, f"Connection error: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print(f"🚀 Starting comprehensive backend testing for Bitcoin Ben's Burger Bus Club")
