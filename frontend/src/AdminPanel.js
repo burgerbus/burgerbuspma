@@ -46,14 +46,18 @@ const AdminPanel = () => {
     setVerifying(prev => ({ ...prev, [paymentId]: true }));
 
     try {
-      const response = await bchAuthService.post('/api/admin/verify-payment', null, {
-        params: {
-          payment_id: paymentId,
-          transaction_id: transactionId.trim()
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${BACKEND_URL}/api/admin/verify-payment?payment_id=${paymentId}&transaction_id=${transactionId.trim()}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
+      
+      const data = await response.json();
 
-      if (response.success) {
+      if (data.success) {
         alert('Payment verified successfully! Member activated.');
         loadData(); // Refresh the data
       }
