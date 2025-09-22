@@ -36,7 +36,7 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
     setProcessing(true);
     
     try {
-      // Since membership is free, register member immediately
+      // Register member and proceed to payment options
       const registrationData = {
         name: memberInfo.fullName,
         email: memberInfo.email,
