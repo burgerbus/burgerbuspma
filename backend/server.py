@@ -1763,6 +1763,43 @@ async def login_member(request: MemberLoginRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
 
+@api_router.post("/auth/admin-login")
+async def admin_login(request: AdminLoginRequest):
+    """Admin authentication with email and password"""
+    try:
+        # Check for admin credentials (you should set these in environment variables)
+        ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@bitcoinben.com")
+        ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+        
+        if request.email != ADMIN_EMAIL or request.password != ADMIN_PASSWORD:
+            raise HTTPException(status_code=401, detail="Invalid admin credentials")
+        
+        # Create JWT token for admin
+        token_data = {
+            "email": request.email,
+            "admin": True,
+            "role": "admin",
+            "exp": datetime.now(timezone.utc) + timedelta(days=1)  # 1 day token for admin
+        }
+        
+        access_token = jwt.encode(token_data, JWT_SECRET_KEY, algorithm="HS256")
+        
+        return {
+            "success": True,
+            "access_token": access_token,
+            "token_type": "bearer",
+            "role": "admin",
+            "user": {
+                "email": request.email,
+                "role": "admin"
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Admin login failed: {str(e)}")
+
 @api_router.post("/auth/register")
 async def register_member(request: MemberRegistrationRequest):
     """Register a new member with PMA agreement"""
