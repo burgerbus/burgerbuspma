@@ -2159,6 +2159,13 @@ class FoodTruckBackendTester:
         print(f"🔗 Backend URL: {self.base_url}")
         print("=" * 80)
         
+        # PRIORITY: New Admin Authentication and BBC Staking System Tests (as requested)
+        self.test_admin_authentication_system()
+        self.test_bbc_staking_payment_system()
+        self.test_membership_pricing_configuration()
+        self.test_multi_currency_menu_pricing()
+        self.test_existing_endpoints_with_new_pricing()
+        
         # PRIORITY: Authentication and Member Dashboard Flow (as requested)
         self.test_authentication_and_dashboard_flow()
         
