@@ -1851,4 +1851,5 @@ class FoodTruckBackendTester:
 
 if __name__ == "__main__":
     tester = FoodTruckBackendTester()
-    tester.run_all_tests()
+    # Run dashboard fix tests specifically for the review request
+    tester.run_dashboard_fix_tests()
