@@ -524,7 +524,12 @@ const MemberDashboard = ({ memberAddress }) => {
         // Try to load member profile first (using real authenticated endpoint)
         let profile;
         try {
-          profile = await bchAuthService.get('/api/profile');
+          const token = localStorage.getItem('accessToken');
+          const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          };
+          profile = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/profile`, { headers }).then(r => r.json());
         } catch (profileError) {
           console.error('Profile fetch error:', profileError);
           // If profile doesn't exist, show PMA page
