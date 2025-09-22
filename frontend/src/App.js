@@ -1078,16 +1078,25 @@ function App() {
     return (
       <BBCStakingProvider>
         <PMAgreementPage memberAddress="" onComplete={(userData) => {
+          console.log('=== PMA onComplete called ===');
+          console.log('userData:', userData);
+          
           if (userData) {
+            console.log('Registration successful, setting auth state...');
             // User successfully registered - set authentication state
-            setAuthState(prev => ({ 
-              ...prev, 
-              showAuth: false,
-              isAuthenticated: true,
-              memberAddress: userData.email || userData.id,
-              registrationInProgress: false
-            }));
+            setAuthState(prev => {
+              const newState = { 
+                ...prev, 
+                showAuth: false,
+                isAuthenticated: true,
+                memberAddress: userData.email || userData.id,
+                registrationInProgress: false
+              };
+              console.log('Setting new auth state:', newState);
+              return newState;
+            });
           } else {
+            console.log('Registration cancelled or failed');
             // Registration cancelled - go back to landing page
             setAuthState(prev => ({ 
               ...prev, 
