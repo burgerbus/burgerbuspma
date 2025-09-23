@@ -29,12 +29,22 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('=== FORM SUBMISSION STARTED ===');
+    console.log('Form data:', memberInfo);
+    console.log('Agreed:', agreed);
+    
     if (!agreed) {
       alert('Please read and accept the PMA agreement to continue.');
       return;
     }
 
+    if (!memberInfo.fullName || !memberInfo.email || !memberInfo.password) {
+      alert('Please fill in all required fields (Name, Email, Password).');
+      return;
+    }
+
     setProcessing(true);
+    console.log('Processing set to true, making API call...');
     
     try {
       // Register member and proceed to payment options
