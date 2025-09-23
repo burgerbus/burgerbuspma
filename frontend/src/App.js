@@ -93,11 +93,16 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
       console.log('Response data:', data);
       
       if (data.success) {
+        console.log('Registration successful!', data);
+        
         // Store token 
         localStorage.setItem('accessToken', data.access_token);
         localStorage.setItem('memberData', JSON.stringify(data.user));
         
-        alert('🎉 Welcome to Bitcoin Ben\'s Burger Bus Club! Please proceed to payment to complete your membership.');
+        alert('🎉 Welcome to Bitcoin Ben\'s Burger Bus Club! Registration successful - loading your dashboard...');
+        
+        // Since dues_paid is true by default, complete registration immediately
+        console.log('Calling onComplete with user data:', data.user);
         onComplete(data.user);
       } else {
         throw new Error(data.detail || 'Registration failed');
