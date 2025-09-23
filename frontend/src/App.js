@@ -1164,21 +1164,25 @@ function App() {
         <PMAgreementPage memberAddress="" onComplete={(userData) => {
           console.log('=== PMA onComplete called ===');
           console.log('userData:', userData);
+          console.log('Current authState before update:', authState);
           
           if (userData) {
             console.log('Registration successful, setting auth state...');
             // User successfully registered - set authentication state
-            setAuthState(prev => {
-              const newState = { 
-                ...prev, 
-                showAuth: false,
-                isAuthenticated: true,
-                memberAddress: userData.email || userData.id,
-                registrationInProgress: false
-              };
-              console.log('Setting new auth state:', newState);
-              return newState;
-            });
+            const newState = { 
+              ...authState, 
+              showAuth: false,
+              isAuthenticated: true,
+              memberAddress: userData.email || userData.id,
+              registrationInProgress: false
+            };
+            console.log('Setting new auth state:', newState);
+            setAuthState(newState);
+            
+            // Force a small delay to ensure state update
+            setTimeout(() => {
+              console.log('Auth state should be updated now');
+            }, 100);
           } else {
             console.log('Registration cancelled or failed');
             // Registration cancelled - go back to landing page
