@@ -99,11 +99,13 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
         localStorage.setItem('accessToken', data.access_token);
         localStorage.setItem('memberData', JSON.stringify(data.user));
         
-        alert('🎉 Welcome to Bitcoin Ben\'s Burger Bus Club! Registration successful - loading your dashboard...');
-        
         // Since dues_paid is true by default, complete registration immediately
         console.log('Calling onComplete with user data:', data.user);
+        
+        // Don't show alert that could cause issues, just complete
         onComplete(data.user);
+        
+        // Don't set processing to false as we're transitioning away
       } else {
         throw new Error(data.detail || 'Registration failed');
       }
