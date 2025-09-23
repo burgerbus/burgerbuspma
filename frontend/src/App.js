@@ -61,26 +61,36 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
         referral_code: memberInfo.referralCode || ''
       };
       
+      console.log('Making API call to:', `${BACKEND_URL}/api/auth/register`);
+      
+      const requestBody = {
+        name: memberInfo.fullName,
+        email: memberInfo.email,
+        password: memberInfo.password,
+        phone: memberInfo.phone || '',
+        address: '',  // Optional field not in current form
+        city: '',     // Optional field not in current form  
+        state: '',    // Optional field not in current form
+        zip_code: '', // Optional field not in current form
+        pma_agreed: agreed,
+        referral_code: memberInfo.referralCode || ''
+      };
+      
+      console.log('Request body:', requestBody);
+      
       const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: memberInfo.fullName,
-          email: memberInfo.email,
-          password: memberInfo.password,
-          phone: memberInfo.phone || '',
-          address: '',  // Optional field not in current form
-          city: '',     // Optional field not in current form  
-          state: '',    // Optional field not in current form
-          zip_code: '', // Optional field not in current form
-          pma_agreed: agreed,
-          referral_code: memberInfo.referralCode || ''
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (data.success) {
         // Store token 
