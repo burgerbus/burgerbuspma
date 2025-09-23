@@ -1331,7 +1331,7 @@ async def get_public_locations():
 
 # Protected member routes
 @api_router.get("/profile", response_model=MemberProfile)
-async def get_member_profile(member: MemberProfile = Depends(get_current_user)):
+async def get_member_profile(member: MemberProfile = Depends(get_authenticated_member_jwt)):
     """Get member profile information."""
     return member
 
