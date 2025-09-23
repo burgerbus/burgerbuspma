@@ -978,10 +978,13 @@ function App() {
         
         // Check if token is not expired
         if (payload.exp * 1000 > Date.now()) {
+          console.log('Found valid token, setting authenticated state');
           setAuthState(prev => ({
             ...prev,
             isAuthenticated: true,
-            memberAddress: memberAddress
+            memberAddress: memberAddress,
+            showAuth: false,  // Ensure we don't show auth form
+            showLogin: false  // Ensure we don't show login form
           }));
         } else {
           // Token expired, clear it
