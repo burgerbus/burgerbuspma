@@ -28,9 +28,9 @@ BCH_RECEIVING_ADDRESS = os.environ.get("BCH_RECEIVING_ADDRESS", "bitcoincash:qph
 
 # PMA P2P Payment Configuration
 MEMBERSHIP_FEE_USD = 21.00  # $21 yearly membership
-CASHSTAMP_AMOUNT_USD = 18.00  # $18 goes to BCH cashstamp purchase
+CASHSTAMP_AMOUNT_USD = 15.00  # $15 goes to BCH cashstamp purchase
 AFFILIATE_COMMISSION_USD = 3.00  # $3 goes to affiliate or treasury
-PMA_NET_AMOUNT_USD = MEMBERSHIP_FEE_USD - AFFILIATE_COMMISSION_USD  # $18 net after affiliate
+PMA_NET_AMOUNT_USD = MEMBERSHIP_FEE_USD - AFFILIATE_COMMISSION_USD  # $3 net after affiliate
 BBC_STAKING_REQUIREMENT = 1000000.0  # 1,000,000 BBC tokens required for free membership
 
 # Pump.fun Token Configuration
