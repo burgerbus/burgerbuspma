@@ -813,9 +813,8 @@ API_DESCRIPTION="Backend API for Bitcoin Ben's membership and ordering system"
 API_VERSION="1.0.0"
 EOF
 
-    chmod 600 "$INSTALL_DIR/.env"
+    chmod 600 "\$INSTALL_DIR/.env"
     print_status "Environment configured"
-}
 
 # Setup systemd service
 setup_service() {
