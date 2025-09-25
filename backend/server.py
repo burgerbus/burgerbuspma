@@ -1883,7 +1883,9 @@ async def register_member(request: MemberRegistrationRequest):
             "state": request.state or "",
             "zip_code": request.zip_code or "",
             "pma_agreed": request.pma_agreed,
-            "dues_paid": True,  # Since membership is free now
+            "dues_paid": False,  # Require $21 payment before activation
+            "payment_pending": True,  # Account pending payment
+            "account_status": "pending_payment",  # Status for admin tracking
             "referral_code": referral_code,
             "referred_by": request.referral_code or "",
             "wallet_address": "",
