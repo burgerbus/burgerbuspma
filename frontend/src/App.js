@@ -95,17 +95,14 @@ const PMAgreementPage = ({ memberAddress, onComplete }) => {
       if (data.success) {
         console.log('Registration successful!', data);
         
-        // Store token 
-        localStorage.setItem('accessToken', data.access_token);
-        localStorage.setItem('memberData', JSON.stringify(data.user));
+        // Store registration data but don't store access token yet (account pending)
+        localStorage.setItem('pendingRegistration', JSON.stringify(data.user));
         
-        // Since dues_paid is true by default, complete registration immediately
-        console.log('Calling onComplete with user data:', data.user);
+        // Show payment instructions instead of completing registration
+        alert('Registration successful! Please complete your $21 payment to activate your account.');
         
-        // Don't show alert that could cause issues, just complete
-        onComplete(data.user);
-        
-        // Don't set processing to false as we're transitioning away
+        // Redirect to payment page instead of dashboard
+        onComplete({ ...data.user, payment_pending: true });
       } else {
         throw new Error(data.detail || 'Registration failed');
       }
