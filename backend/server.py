@@ -1925,20 +1925,27 @@ async def register_member(request: MemberRegistrationRequest):
         
         return {
             "success": True,
-            "access_token": access_token,
-            "token_type": "bearer",
-            "member_id": member_id,
-            "referral_code": referral_code,
             "user": {
                 "id": member_id,
                 "email": member_data["email"],
                 "name": member_data["name"],
                 "pma_agreed": True,
-                "dues_paid": True,
+                "dues_paid": False,
                 "wallet_address": "",
                 "referral_code": referral_code,
-                "is_member": True
-            }
+                "is_member": False
+            },
+            "message": "Registration successful! Please complete your $21 payment to activate your account.",
+            "payment_required": True,
+            "payment_amount": MEMBERSHIP_FEE_USD,
+            "payment_instructions": {
+                "venmo": "@burgerbusclub",
+                "cashapp": "$burgerbusclub", 
+                "zelle": "payments@bitcoinben.com",
+                "bch_address": BCH_RECEIVING_ADDRESS,
+                "instructions": f"Send ${MEMBERSHIP_FEE_USD} via any method above. Include your email ({request.email}) in payment memo."
+            },
+            "next_steps": "After payment, contact admin with transaction ID for activation."
         }
         
     except HTTPException:
