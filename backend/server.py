@@ -2017,6 +2017,147 @@ async def process_bbc_staking_payment(request: BBCStakingPaymentRequest):
         raise HTTPException(status_code=500, detail=f"BBC staking payment failed: {str(e)}")
 
 # =======================
+# ADMIN PAYMENT MANAGEMENT ENDPOINTS  
+# =======================
+
+@api_router.get("/admin/pending-members")
+async def get_pending_members(admin: dict = Depends(get_admin_user)):
+    """Get all members with pending payments"""
+    try:
+        # Find members with pending payments
+        pending_members = await db.members.find({
+            "payment_pending": True,
+            "account_status": "pending_payment"
+        }).to_list(length=None)
+        
+        # Format for admin display
+        pending_list = []
+        for member in pending_members:
+            pending_list.append({
+                "id": member["id"],
+                "name": member["name"], 
+                "email": member["email"],
+                "phone": member.get("phone", ""),
+                "registration_date": member.get("created_at", ""),
+                "referral_code": member.get("referral_code", ""),
+                "referred_by": member.get("referred_by", ""),
+                "payment_amount": MEMBERSHIP_FEE_USD
+            })
+        
+        return {
+            "success": True,
+            "pending_members": pending_list,
+            "total_pending": len(pending_list),
+            "membership_fee": MEMBERSHIP_FEE_USD
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get pending members: {str(e)}")
+
+@api_router.post("/admin/activate-member")
+async def activate_member_payment(
+    member_id: str,
+    transaction_id: str, 
+    payment_method: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Activate a member's account after payment verification"""
+    try:
+        # Find the pending member
+        member = await db.members.find_one({"id": member_id, "payment_pending": True})
+        if not member:
+            raise HTTPException(status_code=404, detail="Pending member not found")
+        
+        # Update member to active status
+        update_result = await db.members.update_one(
+            {"id": member_id},
+            {
+                "$set": {
+                    "dues_paid": True,
+                    "payment_pending": False,
+                    "account_status": "active",
+                    "is_member": True,
+                    "payment_verified_at": datetime.now(timezone.utc).isoformat(),
+                    "payment_verified_by": admin["email"],
+                    "transaction_id": transaction_id,
+                    "payment_method": payment_method,
+                    "payment_amount": MEMBERSHIP_FEE_USD
+                }
+            }
+        )
+        
+        if update_result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="Failed to activate member")
+        
+        # Create access token for the newly activated member
+        token_data = {
+            "email": member["email"],
+            "member_id": member["id"],
+            "exp": datetime.now(timezone.utc) + timedelta(days=30)
+        }
+        access_token = jwt.encode(token_data, JWT_SECRET_KEY, algorithm="HS256")
+        
+        # Handle affiliate commission if referred
+        referral_info = None
+        if member.get("referred_by"):
+            referral_info = await process_affiliate_commission(member["id"], member["referred_by"])
+        
+        return {
+            "success": True,
+            "message": f"Member {member['name']} activated successfully",
+            "member": {
+                "id": member["id"],
+                "name": member["name"],
+                "email": member["email"],
+                "status": "active"
+            },
+            "payment": {
+                "amount": MEMBERSHIP_FEE_USD,
+                "transaction_id": transaction_id,
+                "method": payment_method,
+                "verified_at": datetime.now(timezone.utc).isoformat()
+            },
+            "referral": referral_info,
+            "access_token": access_token
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to activate member: {str(e)}")
+
+async def process_affiliate_commission(member_id: str, referral_code: str):
+    """Process affiliate commission for referral"""
+    try:
+        # Find referring member
+        referring_member = await db.members.find_one({"referral_code": referral_code})
+        if not referring_member:
+            return {"error": "Referring member not found"}
+        
+        # Record affiliate commission
+        commission = {
+            "id": str(uuid.uuid4()),
+            "affiliate_id": referring_member["id"],
+            "affiliate_email": referring_member["email"],
+            "referred_member_id": member_id,
+            "commission_amount": AFFILIATE_COMMISSION_USD,
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.affiliate_commissions.insert_one(commission)
+        
+        return {
+            "commission_id": commission["id"],
+            "affiliate_email": referring_member["email"],
+            "commission_amount": AFFILIATE_COMMISSION_USD,
+            "status": "pending"
+        }
+        
+    except Exception as e:
+        return {"error": f"Commission processing failed: {str(e)}"}
+
+# =======================
 # BBC TOKEN STAKING ENDPOINTS
 # =======================
 
